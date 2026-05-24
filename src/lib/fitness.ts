@@ -216,6 +216,29 @@ export function proposePlanAdjustment(plan: FitnessPlan, feedback: string): Plan
     };
   }
 
+  if (containsAny(text, ["没有哑铃", "没哑铃", "只有弹力带", "器械不够", "no dumbbell", "no equipment"])) {
+    return {
+      type: "exercise_swap",
+      message: "器械临时受限时，先把今天依赖负重或器械的动作换成弹力带或徒手版本，优先保证发力路径和稳定性。",
+      replacements: [
+        toWorkoutItem(findExerciseById("band-row"), 1),
+        toWorkoutItem(findExerciseById("glute-bridge"), 1),
+        toWorkoutItem(findExerciseById("plank"), 1),
+      ],
+      nutritionSuggestions: [],
+    };
+  }
+
+  if (containsAny(text, ["时间不够", "赶时间", "只有 20", "只有20", "只有 25", "只有25", "20 分钟", "25 分钟", "30 分钟", "short on time"])) {
+    const minutes = readMinuteHint(feedback) ?? 20;
+    return {
+      type: "time_adjustment",
+      message: `今天先切到 ${minutes} 分钟版本：保留热身、两个主动作和最后的拉伸，剩下的内容下次再补，不用为了凑完整套把动作做乱。`,
+      replacements: [],
+      nutritionSuggestions: ["训练后 30-60 分钟内补一份蛋白和主食，避免因为赶时间漏掉恢复。"],
+    };
+  }
+
   if (containsAny(text, ["鸡胸", "鸡肉", "吃不了", "不想吃", "没有食材", "can't eat chicken"])) {
     return {
       type: "nutrition_swap",
@@ -255,10 +278,11 @@ function buildWorkoutTemplates(input: {
     : pick(input.exercises, "strength", "bodyweight-squat");
   const bridge = pick(input.exercises, "strength", "glute-bridge");
   const push = pick(input.exercises, "strength", "incline-push-up");
+  const preferredHomePull = input.exercises.some((exercise) => exercise.id === "band-row") ? "band-row" : "dumbbell-row";
   const row = input.trainingEnvironment === "gym"
     ? pick(input.exercises, "strength", "lat-pulldown")
-    : pick(input.exercises, "strength", "dumbbell-row");
-  const secondaryPull = pick(input.exercises, "strength", "dumbbell-row");
+    : pick(input.exercises, "strength", preferredHomePull);
+  const secondaryPull = pick(input.exercises, "strength", preferredHomePull);
   const core = pick(input.exercises, "strength", "plank");
   const cardio = input.trainingEnvironment === "gym"
     ? pick(input.exercises, "cardio", "treadmill-walk")
@@ -512,6 +536,16 @@ function normalizeTrainingDays(days: number, experience: AssessmentInput["experi
 
 function containsAny(text: string, terms: string[]) {
   return terms.some((term) => text.includes(term));
+}
+
+function readMinuteHint(text: string) {
+  const matched = text.match(/(\d{1,2})\s*分钟/);
+  if (!matched) {
+    return null;
+  }
+
+  const minutes = Number.parseInt(matched[1] ?? "", 10);
+  return Number.isFinite(minutes) ? minutes : null;
 }
 
 function createId(prefix: string) {

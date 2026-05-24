@@ -116,7 +116,15 @@ export interface FitnessPlan {
 }
 
 export interface PlanAdjustment {
-  type: "exercise_swap" | "nutrition_swap" | "load_adjustment" | "safety_referral" | "general_guidance";
+  type: "exercise_swap" | "nutrition_swap" | "load_adjustment" | "time_adjustment" | "safety_referral" | "general_guidance";
+  message: string;
+  replacements: WorkoutItem[];
+  nutritionSuggestions: string[];
+}
+
+export interface RevisionPreview {
+  dayIndex: number;
+  adjustmentType: PlanAdjustment["type"];
   message: string;
   replacements: WorkoutItem[];
   nutritionSuggestions: string[];
@@ -157,6 +165,7 @@ export interface SelectedWorkbenchDay extends PlanDay {
   completed: boolean;
   latestCheckInSummary: string | null;
   latestRevisionMessage: string | null;
+  latestRevision: RevisionPreview | null;
 }
 
 export interface WorkoutWorkbench {

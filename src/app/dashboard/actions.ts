@@ -61,6 +61,7 @@ export async function adjustmentAction(formData: FormData) {
   getFitnessService().recordAdjustmentRequest({
     userId: user.id,
     planId,
+    dayIndex: selection.day,
     message,
   });
 

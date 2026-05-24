@@ -240,6 +240,39 @@ describe("fitness service", () => {
     expect(dashboard.revisions.length).toBeGreaterThan(0);
     expect(dashboard.plan?.days[0]?.workoutItems.some((item) => item.name.includes("臀桥"))).toBe(true);
   });
+
+  it("applies an adjustment to the selected day instead of always rewriting day one", () => {
+    const repository = createRepository();
+    const service = createFitnessService({ repository, now: createClock() });
+    const registration = service.registerUser({
+      name: "Day Target User",
+      email: "daytarget@example.com",
+      password: "StrongPass123!",
+    });
+    const assessment = createAssessment(registration.user.id);
+    const plan = service.generatePlanFromAssessment({
+      ...assessment,
+      trainingEnvironment: "home",
+      equipment: ["mat", "band"],
+    });
+    const beforeDayOne = plan.days[0]?.workoutItems.map((item) => item.name) ?? [];
+    const beforeDayNine = plan.days[8]?.workoutItems.map((item) => item.name) ?? [];
+
+    service.recordAdjustmentRequest({
+      userId: registration.user.id,
+      planId: plan.id,
+      dayIndex: 9,
+      message: "今天没有哑铃，只有弹力带，帮我换一下。",
+    });
+
+    const dashboard = service.fetchLatestDashboardData(registration.user.id);
+    const latestPlan = dashboard.plan;
+
+    expect(latestPlan?.days[0]?.workoutItems.map((item) => item.name)).toEqual(beforeDayOne);
+    expect(latestPlan?.days[8]?.workoutItems.map((item) => item.name)).not.toEqual(beforeDayNine);
+    expect(latestPlan?.days[8]?.workoutItems.some((item) => item.name.includes("弹力带"))).toBe(true);
+    expect(dashboard.revisions[0]?.dayIndex).toBe(9);
+  });
 });
 
 function createRepository() {

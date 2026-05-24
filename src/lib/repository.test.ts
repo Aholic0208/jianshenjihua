@@ -174,6 +174,7 @@ describe("app repository", () => {
       id: "revision-1",
       userId: assessment.userId,
       planId: plan.id,
+      dayIndex: 2,
       reason: "Need a lower-impact option",
       adjustmentType: "exercise_swap",
       message: "Swap to a bridge variation.",
@@ -191,6 +192,7 @@ describe("app repository", () => {
     expect(messages.map((item) => item.id)).toEqual(["message-2", "message-1"]);
     expect(messages[0]?.adjustmentType).toBe("exercise_swap");
     expect(revisions[0]?.sourceMessageId).toBe("message-1");
+    expect(revisions[0]?.dayIndex).toBe(2);
     expect(revisions[0]?.replacements.length).toBe(1);
   });
 
@@ -225,6 +227,7 @@ describe("app repository", () => {
       id: "revision-rich-1",
       userId: assessment.userId,
       planId: plan.id,
+      dayIndex: 1,
       reason: "膝盖不舒服",
       adjustmentType: "exercise_swap",
       message: "把深蹲替换为臀桥。",

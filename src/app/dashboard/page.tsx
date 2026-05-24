@@ -18,6 +18,7 @@ const adjustmentSuggestions = [
   "今天膝盖不舒服，帮我换掉下肢动作。",
   "我只有 25 分钟，帮我压缩今天的训练。",
   "今天太累了，帮我把训练量降一点。",
+  "今天没有哑铃，只有弹力带，帮我换一下。",
   "没有鸡胸肉了，帮我换一套更容易买到的饮食方案。",
 ];
 
@@ -462,6 +463,44 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                           <p>如果做不到、不舒服、时间不够或者饮食执行不了，直接说出来。</p>
                         </div>
 
+                        {selectedDay.latestRevision ? (
+                          <div className="stack-md">
+                            <div className="section-heading compact-heading">
+                              <h3>本日最新调整</h3>
+                            </div>
+                            <div className="planner-detail-card">
+                              <span className="planner-day-label">{selectedDay.latestRevision.adjustmentType}</span>
+                              <strong>{selectedDay.latestRevision.message}</strong>
+                            </div>
+                            {selectedDay.latestRevision.replacements.length > 0 ? (
+                              <>
+                                <div className="section-heading compact-heading">
+                                  <h3>已替换动作</h3>
+                                </div>
+                                <div className="pill-row">
+                                  {selectedDay.latestRevision.replacements.map((item) => (
+                                    <span className="info-pill" key={item.id}>
+                                      {item.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </>
+                            ) : null}
+                            {selectedDay.latestRevision.nutritionSuggestions.length > 0 ? (
+                              <>
+                                <div className="section-heading compact-heading">
+                                  <h3>额外饮食建议</h3>
+                                </div>
+                                <ul className="bullet-list">
+                                  {selectedDay.latestRevision.nutritionSuggestions.map((item) => (
+                                    <li key={item}>{item}</li>
+                                  ))}
+                                </ul>
+                              </>
+                            ) : null}
+                          </div>
+                        ) : null}
+
                         <div className="pill-row">
                           {adjustmentSuggestions.map((suggestion) => (
                             <span className="info-pill" key={suggestion}>
@@ -474,6 +513,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                           <input name="planId" type="hidden" value={plan.id} />
                           <input name="week" type="hidden" value={String(workbench.selectedWeek.week)} />
                           <input name="day" type="hidden" value={String(selectedDay.dayIndex)} />
+                          <input name="dayIndex" type="hidden" value={String(selectedDay.dayIndex)} />
                           <div className="field">
                             <label htmlFor="message">你遇到了什么问题？</label>
                             <textarea

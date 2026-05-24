@@ -33,6 +33,7 @@ export function buildWorkoutWorkbench(input: {
   const selectedDay = input.plan.days.find((day) => day.dayIndex === selectedDayIndex) ?? null;
   const latestCheckIn = input.checkIns.find((item) => item.dayIndex === selectedDayIndex) ?? input.checkIns[0] ?? null;
   const latestRevision = input.revisions[0] ?? null;
+  const selectedDayRevision = input.revisions.find((item) => item.dayIndex === selectedDayIndex) ?? null;
   const selectedDayDetail: SelectedWorkbenchDay | null = selectedDay
     ? {
         ...selectedDay,
@@ -42,7 +43,16 @@ export function buildWorkoutWorkbench(input: {
         latestCheckInSummary: latestCheckIn
           ? `完成 ${latestCheckIn.completed ? "是" : "否"} · 疲劳 ${latestCheckIn.fatigue}/5 · 疼痛 ${latestCheckIn.pain}/5`
           : null,
-        latestRevisionMessage: latestRevision?.message ?? null,
+        latestRevisionMessage: selectedDayRevision?.message ?? null,
+        latestRevision: selectedDayRevision
+          ? {
+              dayIndex: selectedDayRevision.dayIndex,
+              adjustmentType: selectedDayRevision.adjustmentType,
+              message: selectedDayRevision.message,
+              replacements: selectedDayRevision.replacements,
+              nutritionSuggestions: selectedDayRevision.nutritionSuggestions,
+            }
+          : null,
       }
     : null;
 

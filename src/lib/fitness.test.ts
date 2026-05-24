@@ -120,4 +120,21 @@ describe("plan adjustments", () => {
     expect(adjustment.message).toContain("替换");
     expect(adjustment.nutritionSuggestions.join(" ")).toContain("鱼");
   });
+
+  it("compresses the session when the user only has a short window", () => {
+    const plan = generateFitnessPlan(baseAssessment);
+    const adjustment = proposePlanAdjustment(plan, "我今天只有 20 分钟，帮我压缩训练。");
+
+    expect(adjustment.type).toBe("time_adjustment");
+    expect(adjustment.message).toContain("20");
+  });
+
+  it("swaps equipment-dependent work when the user loses access to dumbbells", () => {
+    const plan = generateFitnessPlan(baseAssessment);
+    const adjustment = proposePlanAdjustment(plan, "今天没有哑铃，只有弹力带，帮我换一下。");
+
+    expect(adjustment.type).toBe("exercise_swap");
+    expect(adjustment.message).toContain("器械");
+    expect(adjustment.replacements.some((item) => item.name.includes("弹力带"))).toBe(true);
+  });
 });

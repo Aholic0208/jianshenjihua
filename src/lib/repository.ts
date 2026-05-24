@@ -76,6 +76,7 @@ export interface PlanRevisionRecord {
   id: string;
   userId: string;
   planId: string;
+  dayIndex: number;
   reason: string;
   adjustmentType: PlanAdjustment["type"];
   message: string;
@@ -323,14 +324,15 @@ export function createAppRepository(databasePath: string) {
       database
         .prepare(`
           INSERT INTO plan_revisions (
-            id, user_id, plan_id, reason, adjustment_type, message, replacements_json, nutrition_suggestions_json, source_message_id, created_at
+            id, user_id, plan_id, day_index, reason, adjustment_type, message, replacements_json, nutrition_suggestions_json, source_message_id, created_at
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .run(
           revision.id,
           revision.userId,
           revision.planId,
+          revision.dayIndex,
           revision.reason,
           revision.adjustmentType,
           revision.message,
@@ -344,7 +346,7 @@ export function createAppRepository(databasePath: string) {
       const rows = readMany<PlanRevisionRow>(
         database
           .prepare(`
-            SELECT id, user_id, plan_id, reason, adjustment_type, message, replacements_json, nutrition_suggestions_json, source_message_id, created_at
+            SELECT id, user_id, plan_id, day_index, reason, adjustment_type, message, replacements_json, nutrition_suggestions_json, source_message_id, created_at
             FROM plan_revisions
             WHERE plan_id = ?
             ORDER BY datetime(created_at) DESC
@@ -476,6 +478,7 @@ function initializeSchema(database: DatabaseSyncInstance) {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
       plan_id TEXT NOT NULL,
+      day_index INTEGER NOT NULL DEFAULT 1,
       reason TEXT NOT NULL,
       adjustment_type TEXT NOT NULL,
       message TEXT NOT NULL,
@@ -487,6 +490,8 @@ function initializeSchema(database: DatabaseSyncInstance) {
       FOREIGN KEY (plan_id) REFERENCES plans(id)
     );
   `);
+
+  ensurePlanRevisionDayIndexColumn(database);
 }
 
 function seedExerciseMedia(database: DatabaseSyncInstance) {
@@ -617,6 +622,7 @@ function mapPlanRevision(row: PlanRevisionRow): PlanRevisionRecord {
     id: row.id,
     userId: row.user_id,
     planId: row.plan_id,
+    dayIndex: row.day_index,
     reason: row.reason,
     adjustmentType: row.adjustment_type,
     message: row.message,
@@ -706,6 +712,7 @@ interface PlanRevisionRow {
   id: string;
   user_id: string;
   plan_id: string;
+  day_index: number;
   reason: string;
   adjustment_type: PlanAdjustment["type"];
   message: string;
@@ -713,4 +720,14 @@ interface PlanRevisionRow {
   nutrition_suggestions_json: string;
   source_message_id: string;
   created_at: string;
+}
+
+function ensurePlanRevisionDayIndexColumn(database: DatabaseSyncInstance) {
+  const columns = readMany<{ name: string }>(
+    database.prepare("PRAGMA table_info(plan_revisions)").all(),
+  );
+
+  if (!columns.some((column) => column.name === "day_index")) {
+    database.exec("ALTER TABLE plan_revisions ADD COLUMN day_index INTEGER NOT NULL DEFAULT 1");
+  }
 }

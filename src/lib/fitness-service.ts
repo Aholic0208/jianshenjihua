@@ -121,15 +121,16 @@ export function createFitnessService({ repository, now = () => new Date() }: Fit
         today: nextDay,
       };
     },
-    recordAdjustmentRequest(input: { userId: string; planId: string; message: string }) {
+    recordAdjustmentRequest(input: { userId: string; planId: string; dayIndex?: number; message: string }) {
       const plan = repository.getPlanById(input.planId);
       if (!plan) {
         throw new Error("Plan not found");
       }
 
       const userMessageId = randomUUID();
+      const dayIndex = resolveTargetDayIndex(plan, input.dayIndex);
       const adjustment = proposePlanAdjustment(planToFitnessPlan(plan), input.message);
-      const revisedPlan = applyAdjustmentToPlan(plan, adjustment, now().toISOString());
+      const revisedPlan = applyAdjustmentToPlan(plan, adjustment, dayIndex, now().toISOString());
       const responseMessageId = randomUUID();
       const timestamp = now().toISOString();
 
@@ -158,6 +159,7 @@ export function createFitnessService({ repository, now = () => new Date() }: Fit
         id: randomUUID(),
         userId: input.userId,
         planId: input.planId,
+        dayIndex,
         reason: input.message,
         adjustmentType: adjustment.type,
         message: adjustment.message,
@@ -242,13 +244,14 @@ function planToFitnessPlan(plan: SavedPlanRecord): FitnessPlan {
 function applyAdjustmentToPlan(
   plan: SavedPlanRecord,
   adjustment: PlanAdjustment,
+  dayIndex: number,
   timestamp: string,
 ): SavedPlanRecord {
   const revisedSummary = adjustment.message ? `${plan.summary} 已根据最新反馈更新今日安排。` : plan.summary;
 
   if (adjustment.type === "nutrition_swap" && adjustment.nutritionSuggestions.length > 0) {
     const days = plan.days.map((day, index) =>
-      index === 0
+      day.dayIndex === dayIndex
         ? {
             ...day,
             nutrition: {
@@ -268,8 +271,8 @@ function applyAdjustmentToPlan(
   }
 
   if (adjustment.type === "load_adjustment") {
-    const days = plan.days.map((day, index) =>
-      index === 0
+    const days = plan.days.map((day) =>
+      day.dayIndex === dayIndex
         ? {
             ...day,
             workoutItems: day.workoutItems.map((item) => ({
@@ -290,9 +293,28 @@ function applyAdjustmentToPlan(
     };
   }
 
+  if (adjustment.type === "time_adjustment") {
+    const days = plan.days.map((day) =>
+      day.dayIndex === dayIndex
+        ? {
+            ...day,
+            workoutItems: compressWorkoutItems(day.workoutItems),
+            checkInPrompt: "这是压缩版训练日，重点记录动作是否稳定、时间是否够用，以及是否还需要继续精简。",
+          }
+        : day,
+    );
+
+    return {
+      ...plan,
+      summary: revisedSummary,
+      createdAt: timestamp,
+      days,
+    };
+  }
+
   if (adjustment.type === "exercise_swap" && adjustment.replacements.length > 0) {
-    const days = plan.days.map((day, index) => {
-      if (index !== 0) {
+    const days = plan.days.map((day) => {
+      if (day.dayIndex !== dayIndex) {
         return day;
       }
 
@@ -316,4 +338,28 @@ function applyAdjustmentToPlan(
     summary: revisedSummary,
     createdAt: timestamp,
   };
+}
+
+function resolveTargetDayIndex(plan: SavedPlanRecord, requestedDayIndex?: number) {
+  if (requestedDayIndex && plan.days.some((day) => day.dayIndex === requestedDayIndex)) {
+    return requestedDayIndex;
+  }
+
+  return plan.days[0]?.dayIndex ?? 1;
+}
+
+function compressWorkoutItems(items: SavedPlanRecord["days"][number]["workoutItems"]) {
+  const warmup = items.find((item) => item.category === "warmup");
+  const mainWork = items.filter((item) => item.category === "strength").slice(0, 2);
+  const stretch = [...items].reverse().find((item) => item.category === "mobility");
+  const kept = [warmup, ...mainWork, stretch].filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  return kept.map((item, index) => ({
+    ...item,
+    sets: item.sets ? Math.min(item.sets, 2) : item.sets,
+    durationMinutes: item.durationMinutes
+      ? Math.min(item.durationMinutes, index === 0 ? 5 : 6)
+      : item.durationMinutes,
+    notes: `${item.notes} 今天已切换为时间压缩版本。`,
+  }));
 }
