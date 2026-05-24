@@ -1,7 +1,11 @@
-import { DatabaseSync } from "node:sqlite";
+import { createRequire } from "node:module";
 
 import { exerciseLibrary } from "./exercise-library";
 import type { ExerciseMedia, FitnessPlan } from "./types";
+
+const require = createRequire(import.meta.url);
+const { DatabaseSync } = require("node:sqlite") as typeof import("node:sqlite");
+type DatabaseSyncInstance = InstanceType<typeof DatabaseSync>;
 
 interface AppUserRecord {
   id: string;
@@ -156,7 +160,7 @@ export function createAppRepository(databasePath: string) {
   };
 }
 
-function seedExerciseMedia(database: DatabaseSync) {
+function seedExerciseMedia(database: DatabaseSyncInstance) {
   const statement = database.prepare(`
     INSERT INTO exercise_media (id, name, category, difficulty, environment, image_url, video_url)
     VALUES (?, ?, ?, ?, ?, ?, ?)
