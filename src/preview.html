@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>健身计划 UI 预览</title>
+    <style>
+      :root {
+        --bg: #f4fbf8;
+        --bg-accent: #eef8ff;
+        --surface: rgba(255, 255, 255, 0.88);
+        --surface-strong: #ffffff;
+        --ink: #112019;
+        --muted: #556760;
+        --line: rgba(17, 32, 25, 0.1);
+        --coral: #ff6f48;
+        --teal: #0f9b8e;
+        --gold: #f1b94d;
+        --shadow: 0 18px 50px rgba(24, 43, 33, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(255, 111, 72, 0.16), transparent 28%),
+          radial-gradient(circle at top right, rgba(15, 155, 142, 0.14), transparent 30%),
+          linear-gradient(180deg, var(--bg) 0%, #ffffff 40%, var(--bg-accent) 100%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      img {
+        display: block;
+        width: 100%;
+      }
+
+      .shell {
+        width: min(1180px, calc(100vw - 28px));
+        margin: 0 auto;
+        padding: 24px 0 40px;
+      }
+
+      .hero,
+      .panel,
+      .poster,
+      .card {
+        border-radius: 24px;
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .hero-copy,
+      .hero-summary,
+      .panel {
+        padding: 30px;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--teal);
+        font-size: 0.84rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 16px;
+        font-size: clamp(2.6rem, 5vw, 4.8rem);
+        line-height: 0.96;
+        max-width: 10ch;
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        line-height: 1.05;
+      }
+
+      h3,
+      h4,
+      p {
+        margin-top: 0;
+      }
+
+      .muted {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 26px;
+      }
+
+      .primary,
+      .secondary,
+      .pill,
+      .mini-pill {
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+
+      .primary {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .secondary {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid var(--line);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .metric,
+      .week-card,
+      .workout,
+      .chat,
+      .action {
+        border-radius: 18px;
+        background: var(--surface-strong);
+        border: 1px solid var(--line);
+      }
+
+      .metric {
+        min-height: 108px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .metric-wide {
+        grid-column: span 2;
+      }
+
+      .safe-box {
+        margin-top: 16px;
+        padding: 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 111, 72, 0.12), rgba(241, 185, 77, 0.12));
+      }
+
+      .section {
+        margin-top: 24px;
+        display: grid;
+        gap: 24px;
+      }
+
+      .two-col {
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+
+      .field-list,
+      .workouts,
+      .chats,
+      .actions-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .field-row {
+        min-height: 64px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .body-grid,
+      .week-grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .body-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 18px;
+      }
+
+      .body-card {
+        overflow: hidden;
+      }
+
+      .body-card figcaption {
+        padding: 12px 14px;
+        font-weight: 700;
+      }
+
+      .week-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .week-card,
+      .workout,
+      .chat,
+      .action {
+        padding: 18px;
+      }
+
+      .week-card strong {
+        color: var(--coral);
+      }
+
+      .workout-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .mini-pill {
+        min-height: 30px;
+        padding: 0 12px;
+        font-size: 0.86rem;
+        color: var(--muted);
+        background: rgba(15, 155, 142, 0.08);
+        border: 1px solid rgba(15, 155, 142, 0.12);
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .poster {
+        overflow: hidden;
+        background: linear-gradient(140deg, rgba(255, 111, 72, 0.18), rgba(15, 155, 142, 0.22));
+      }
+
+      .poster img {
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .video-link {
+        color: var(--teal);
+        font-weight: 700;
+      }
+
+      @media (max-width: 960px) {
+        .hero,
+        .two-col,
+        .week-grid,
+        .body-grid,
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .metric-wide {
+          grid-column: span 1;
+        }
+
+        .hero-copy,
+        .hero-summary,
+        .panel {
+          padding: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Fitness Plan Preview</p>
+          <h1>让训练计划像私人教练一样，先懂你，再安排你。</h1>
+          <p class="muted">用户填写身体数据、目标、训练场景和饮食限制之后，系统给出可执行的四周计划，并保留随时追问、替换动作和调整饮食的入口。</p>
+          <div class="actions">
+            <a class="primary" href="#today">查看今日计划</a>
+            <a class="secondary" href="#exercise">看动作演示</a>
+          </div>
+        </div>
+
+        <div class="hero-summary">
+          <p class="eyebrow">Preview User</p>
+          <div class="metrics">
+            <article class="metric">
+              <span class="muted">身体数据</span>
+              <strong>168cm / 70kg</strong>
+            </article>
+            <article class="metric">
+              <span class="muted">训练场景</span>
+              <strong>居家 + 健身房</strong>
+            </article>
+            <article class="metric metric-wide">
+              <span class="muted">当前目标</span>
+              <strong>减脂塑形，增强核心稳定，改善久坐导致的肩颈紧张</strong>
+            </article>
+          </div>
+          <div class="safe-box">
+            <h3>安全边界</h3>
+            <p class="muted">软件先按普通新手的安全强度生成，再根据打卡反馈逐步调整。</p>
+            <ul>
+              <li>可以生成普通新手计划；训练强度会从保守水平开始并根据打卡反馈调整。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section two-col">
+        <div class="panel">
+          <p class="eyebrow">Onboarding</p>
+          <h2>首次建档问卷</h2>
+          <p class="muted">第一屏不是冷冰冰的表单，而是一套逐步建档流程，帮助用户说清楚目标、限制和现实条件。</p>
+          <div class="field-list">
+            <div class="field-row"><span>年龄</span><strong>29 岁</strong></div>
+            <div class="field-row"><span>身高 / 体重</span><strong>168 cm / 70 kg</strong></div>
+            <div class="field-row"><span>目标</span><strong>减脂塑形 + 体态改善</strong></div>
+            <div class="field-row"><span>训练场景</span><strong>家中、健身房都可以</strong></div>
+            <div class="field-row"><span>饮食限制</span><strong>不吃牛肉，花生过敏</strong></div>
+          </div>
+          <div class="body-grid">
+            <figure class="card body-card">
+              <img alt="当前状态" src="../public/media/demo/current-shape.svg" />
+              <figcaption>当前状态</figcaption>
+            </figure>
+            <figure class="card body-card">
+              <img alt="目标参考" src="../public/media/demo/target-shape.svg" />
+              <figcaption>目标参考</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <p class="eyebrow">AI Follow-up</p>
+          <h3>生成计划前的追问</h3>
+          <ul>
+            <li>你通常一周能稳定训练几天？</li>
+            <li>家里是否有哑铃、瑜伽垫或弹力带？</li>
+            <li>最近是否出现过膝盖、腰背或肩颈疼痛？</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="panel">
+          <p class="eyebrow">4-Week Plan</p>
+          <h2>四周计划不是一次性给完，而是按周推进、按反馈修正。</h2>
+          <div class="week-grid">
+            <article class="week-card">
+              <span class="mini-pill">Week 1</span>
+              <h3>适应周</h3>
+              <p class="muted">学习动作、建立节奏，强度保持轻到中等。</p>
+              <strong>72%</strong>
+            </article>
+            <article class="week-card">
+              <span class="mini-pill">Week 2</span>
+              <h3>稳定周</h3>
+              <p class="muted">保持动作质量，略微增加训练密度。</p>
+              <strong>48%</strong>
+            </article>
+            <article class="week-card">
+              <span class="mini-pill">Week 3</span>
+              <h3>进阶周</h3>
+              <p class="muted">在没有疼痛的前提下提高挑战度。</p>
+              <strong>16%</strong>
+            </article>
+            <article class="week-card">
+              <span class="mini-pill">Week 4</span>
+              <h3>巩固周</h3>
+              <p class="muted">复盘打卡反馈，形成下一阶段计划依据。</p>
+              <strong>待开始</strong>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section two-col" id="today">
+        <div class="panel">
+          <p class="eyebrow">Today</p>
+          <h2>第 1 周 · 第 3 天</h2>
+          <p class="muted">核心与体态</p>
+          <div class="workouts">
+            <article class="workout">
+              <div class="workout-top">
+                <span class="mini-pill">热身</span>
+                <a href="#exercise">查看演示</a>
+              </div>
+              <h3>原地高抬腿热身</h3>
+              <p class="muted">保持能说短句的强度；任何疼痛都优先降级或停止。</p>
+              <div class="meta"><span>6 分钟</span><span>强度 轻</span></div>
+            </article>
+            <article class="workout">
+              <div class="workout-top">
+                <span class="mini-pill">力量</span>
+                <a href="#exercise">查看演示</a>
+              </div>
+              <h3>徒手深蹲</h3>
+              <p class="muted">保持动作可控，膝盖不适时可改臀桥。</p>
+              <div class="meta"><span>2 组</span><span>8-10 次</span><span>强度 轻</span></div>
+            </article>
+            <article class="workout">
+              <div class="workout-top">
+                <span class="mini-pill">力量</span>
+                <a href="#exercise">查看演示</a>
+              </div>
+              <h3>平板支撑</h3>
+              <p class="muted">宁可缩短时间，也先保证动作标准和呼吸稳定。</p>
+              <div class="meta"><span>2 组</span><span>8-10 次</span><span>强度 轻</span></div>
+            </article>
+          </div>
+          <p class="muted">记录今天完成度、体重、疲劳、疼痛和饥饿感，系统会据此调整下一步建议。</p>
+        </div>
+
+        <aside class="panel">
+          <p class="eyebrow">Nutrition</p>
+          <h3>今天怎么吃</h3>
+          <p class="muted">今日目标 1750 kcal，蛋白质 112 g，饮水 2 L。</p>
+          <ul>
+            <li>早餐：燕麦或全麦面包 + 鸡蛋/无糖酸奶 + 一份水果</li>
+            <li>午餐：米饭/土豆/杂粮饭 + 鸡胸肉或鱼虾豆腐 + 两拳蔬菜</li>
+            <li>晚餐：优质蛋白 + 大量蔬菜 + 适量主食</li>
+            <li>加餐：无糖酸奶、低脂奶、鸡蛋或水果</li>
+          </ul>
+          <h4>可替换食物</h4>
+          <ul>
+            <li>鸡胸肉可替换为鱼、虾、鸡蛋、豆腐或瘦猪肉</li>
+            <li>米饭可替换为土豆、玉米、燕麦或全麦面</li>
+            <li>不方便做饭时可选茶叶蛋、无糖酸奶、饭团和沙拉</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="section two-col" id="exercise">
+        <div class="poster">
+          <img alt="动作演示" src="../public/media/exercises/strength-lower.svg" />
+        </div>
+
+        <div class="panel">
+          <p class="eyebrow">Exercise Detail</p>
+          <h2>徒手深蹲</h2>
+          <p><a class="video-link" href="https://example.com/videos/bodyweight-squat" target="_blank" rel="noreferrer">打开标准动作视频演示</a></p>
+          <div class="detail-grid">
+            <div>
+              <h3>动作要点</h3>
+              <ul>
+                <li>背部保持自然挺直</li>
+                <li>膝盖不要内扣</li>
+                <li>动作全程可控</li>
+              </ul>
+            </div>
+            <div>
+              <h3>常见错误</h3>
+              <ul>
+                <li>膝盖内扣</li>
+                <li>弯腰塌背</li>
+                <li>速度过快</li>
+              </ul>
+            </div>
+          </div>
+          <h3>替代动作</h3>
+          <div class="actions">
+            <span class="mini-pill">坐椅深蹲</span>
+            <span class="mini-pill">臀桥</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section two-col">
+        <div class="panel">
+          <p class="eyebrow">AI Adjustment</p>
+          <h2>用户说“做不到”的时候，系统不是报错，而是改计划。</h2>
+          <div class="chats">
+            <article class="chat">
+              <span class="mini-pill">动作替换</span>
+              <h4>今天深蹲膝盖痛，能不能换一个动作？</h4>
+              <p class="muted">已根据膝盖不适建议替换为更偏髋部发力、膝关节压力更低的动作。若疼痛持续，请停止下肢训练并咨询专业人士。</p>
+            </article>
+            <article class="chat">
+              <span class="mini-pill">饮食替换</span>
+              <h4>我吃不了鸡胸肉，能换别的吗？</h4>
+              <p class="muted">可以替换蛋白质来源，保持总热量和蛋白质目标接近即可。</p>
+            </article>
+            <article class="chat">
+              <span class="mini-pill">训练降载</span>
+              <h4>昨晚没睡好，今天感觉很累。</h4>
+              <p class="muted">今天建议降低训练量：每个力量动作少做 1 组，心肺控制在能完整说话的强度。</p>
+            </article>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <p class="eyebrow">Quick Actions</p>
+          <h3>计划内的即时入口</h3>
+          <div class="actions-grid">
+            <article class="action">
+              <h4>重新生成下一周</h4>
+              <p class="muted">根据本周打卡和疲劳感，自动调整训练量与动作难度。</p>
+            </article>
+            <article class="action">
+              <h4>替换今天的动作</h4>
+              <p class="muted">针对疼痛、器械不足或不会做的动作，立即切换更合适版本。</p>
+            </article>
+            <article class="action">
+              <h4>换一套饮食建议</h4>
+              <p class="muted">保留热量和蛋白质目标，只替换成更容易执行的食物组合。</p>
+            </article>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>

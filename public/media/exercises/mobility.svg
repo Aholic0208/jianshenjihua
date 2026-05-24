@@ -1,0 +1,14 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" rx="48" fill="#EFF8FF"/>
+  <rect x="188" y="118" width="824" height="664" rx="44" fill="white"/>
+  <circle cx="272" cy="678" r="176" fill="#FFD9CD"/>
+  <circle cx="934" cy="206" r="138" fill="#D6F3EB"/>
+  <circle cx="616" cy="246" r="50" fill="#FF6F48"/>
+  <path d="M616 300V486" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M616 364L494 430" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M616 364L748 420" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M616 486L512 636" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M616 486L700 614" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M700 614L826 590" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <text x="420" y="796" fill="#112019" font-family="Arial, sans-serif" font-size="56" font-weight="700">Mobility</text>
+</svg>

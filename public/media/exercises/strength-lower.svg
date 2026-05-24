@@ -1,0 +1,16 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" rx="48" fill="#EFF8FF"/>
+  <rect x="196" y="112" width="808" height="676" rx="44" fill="white"/>
+  <circle cx="320" cy="694" r="150" fill="#FFD9CD"/>
+  <circle cx="930" cy="210" r="130" fill="#CFEFE8"/>
+  <circle cx="605" cy="238" r="50" fill="#FF6F48"/>
+  <path d="M605 288V442" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M605 346L505 410" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M605 346L704 410" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M605 442L498 584" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M498 584L410 658" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M605 442L714 584" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M714 584L800 658" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M372 702H830" stroke="#0F9B8E" stroke-width="20" stroke-linecap="round"/>
+  <text x="338" y="790" fill="#112019" font-family="Arial, sans-serif" font-size="56" font-weight="700">Lower Body</text>
+</svg>

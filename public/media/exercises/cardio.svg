@@ -1,0 +1,13 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" rx="48" fill="#F4FBF8"/>
+  <rect x="172" y="126" width="856" height="648" rx="44" fill="white"/>
+  <circle cx="912" cy="210" r="146" fill="#D6F3EB"/>
+  <circle cx="248" cy="680" r="180" fill="#FFE5A6"/>
+  <path d="M440 620H864" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M480 620L602 474" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M602 474L686 540" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M602 474L742 364" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <path d="M602 474L540 336" stroke="#112019" stroke-width="28" stroke-linecap="round"/>
+  <circle cx="618" cy="270" r="52" fill="#FF6F48"/>
+  <text x="452" y="796" fill="#112019" font-family="Arial, sans-serif" font-size="56" font-weight="700">Cardio</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg width="960" height="1120" viewBox="0 0 960 1120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="1120" rx="40" fill="#F4FBF8"/>
+  <circle cx="718" cy="190" r="144" fill="#FFD9CD"/>
+  <circle cx="244" cy="886" r="182" fill="#D6F3EB"/>
+  <rect x="186" y="110" width="588" height="900" rx="34" fill="white"/>
+  <circle cx="478" cy="282" r="66" fill="#FF6F48"/>
+  <path d="M478 352V610" stroke="#112019" stroke-width="32" stroke-linecap="round"/>
+  <path d="M478 430L360 530" stroke="#112019" stroke-width="32" stroke-linecap="round"/>
+  <path d="M478 430L592 520" stroke="#112019" stroke-width="32" stroke-linecap="round"/>
+  <path d="M478 610L396 826" stroke="#112019" stroke-width="32" stroke-linecap="round"/>
+  <path d="M478 610L566 826" stroke="#112019" stroke-width="32" stroke-linecap="round"/>
+  <rect x="298" y="874" width="358" height="68" rx="34" fill="#112019"/>
+  <text x="372" y="918" fill="white" font-family="Arial, sans-serif" font-size="34" font-weight="700">Current</text>
+</svg>

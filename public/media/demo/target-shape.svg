@@ -1,0 +1,14 @@
+<svg width="960" height="1120" viewBox="0 0 960 1120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="1120" rx="40" fill="#EFF8FF"/>
+  <circle cx="254" cy="220" r="136" fill="#D6F3EB"/>
+  <circle cx="744" cy="896" r="174" fill="#FFE5A6"/>
+  <rect x="182" y="112" width="596" height="896" rx="34" fill="white"/>
+  <circle cx="480" cy="280" r="64" fill="#0F9B8E"/>
+  <path d="M480 346V594" stroke="#112019" stroke-width="30" stroke-linecap="round"/>
+  <path d="M480 420L372 510" stroke="#112019" stroke-width="30" stroke-linecap="round"/>
+  <path d="M480 420L592 500" stroke="#112019" stroke-width="30" stroke-linecap="round"/>
+  <path d="M480 594L416 812" stroke="#112019" stroke-width="30" stroke-linecap="round"/>
+  <path d="M480 594L548 812" stroke="#112019" stroke-width="30" stroke-linecap="round"/>
+  <rect x="286" y="872" width="388" height="68" rx="34" fill="#112019"/>
+  <text x="390" y="916" fill="white" font-family="Arial, sans-serif" font-size="34" font-weight="700">Target</text>
+</svg>
