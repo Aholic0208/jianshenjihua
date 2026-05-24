@@ -58,7 +58,7 @@ export interface PreviewDashboard {
   }>;
 }
 
-const demoAssessment: AssessmentInput = {
+export const previewAssessment: AssessmentInput = {
   userId: "preview-user",
   age: 29,
   sex: "female",
@@ -94,8 +94,12 @@ const demoAssessment: AssessmentInput = {
   ],
 };
 
+export function createPreviewPlan() {
+  return generateFitnessPlan(previewAssessment);
+}
+
 export function createPreviewDashboard(): PreviewDashboard {
-  const plan = generateFitnessPlan(demoAssessment);
+  const plan = createPreviewPlan();
   const today = getPlanDay(plan, 3);
   const spotlight = today.workoutItems[1] ?? today.workoutItems[0];
   const adjustmentSamples = [
@@ -107,10 +111,10 @@ export function createPreviewDashboard(): PreviewDashboard {
   return {
     user: {
       name: "林然",
-      age: demoAssessment.age,
-      heightCm: demoAssessment.heightCm,
-      weightKg: demoAssessment.weightKg,
-      goal: demoAssessment.goalText,
+      age: previewAssessment.age,
+      heightCm: previewAssessment.heightCm,
+      weightKg: previewAssessment.weightKg,
+      goal: previewAssessment.goalText,
       environment: "居家 + 健身房都可",
     },
     safety: {
@@ -121,9 +125,9 @@ export function createPreviewDashboard(): PreviewDashboard {
     onboarding: {
       title: "首次建档问卷",
       fields: [
-        { label: "年龄", value: `${demoAssessment.age} 岁` },
-        { label: "身高 / 体重", value: `${demoAssessment.heightCm} cm / ${demoAssessment.weightKg} kg` },
-        { label: "目标", value: demoAssessment.goalText },
+        { label: "年龄", value: `${previewAssessment.age} 岁` },
+        { label: "身高 / 体重", value: `${previewAssessment.heightCm} cm / ${previewAssessment.weightKg} kg` },
+        { label: "目标", value: previewAssessment.goalText },
         { label: "训练场景", value: "家中、健身房都可以" },
         { label: "饮食限制", value: "不吃牛肉，花生过敏" },
       ],

@@ -1,0 +1,270 @@
+.shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 111, 72, 0.12), transparent 26%),
+    radial-gradient(circle at top right, rgba(15, 155, 142, 0.12), transparent 30%),
+    linear-gradient(180deg, #f4fbf8 0%, #ffffff 44%, #eef8ff 100%);
+  color: #112019;
+}
+
+.wrap {
+  width: min(1120px, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 28px 0 42px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.crumb {
+  color: #0f9b8e;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.action,
+.softAction {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.action {
+  background: #112019;
+  color: #ffffff;
+}
+
+.softAction {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(17, 32, 25, 0.1);
+}
+
+.hero {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: 1fr 0.9fr;
+  margin-bottom: 22px;
+}
+
+.panel,
+.poster,
+.card,
+.message {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow: 0 18px 50px rgba(24, 43, 33, 0.08);
+}
+
+.panel {
+  padding: 24px;
+}
+
+.panel h1,
+.panel h2,
+.panel h3,
+.card h3,
+.message h3 {
+  margin: 0 0 12px;
+}
+
+.lede,
+.muted,
+.list li,
+.metric span,
+.row span,
+.response {
+  color: #556760;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+}
+
+.grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric,
+.card,
+.message {
+  padding: 18px;
+}
+
+.metric strong,
+.row strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.06rem;
+}
+
+.poster {
+  overflow: hidden;
+  background: linear-gradient(140deg, rgba(255, 111, 72, 0.18), rgba(15, 155, 142, 0.22));
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+}
+
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill {
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(15, 155, 142, 0.08);
+  border: 1px solid rgba(15, 155, 142, 0.12);
+  color: #556760;
+  font-size: 0.88rem;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.table {
+  display: grid;
+  gap: 12px;
+}
+
+.row {
+  min-height: 64px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 32, 25, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rowBlock {
+  display: grid;
+  gap: 4px;
+}
+
+.rowBlock p {
+  margin: 0;
+}
+
+.formGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: 700;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(17, 32, 25, 0.12);
+  background: #ffffff;
+  padding: 12px 14px;
+  font: inherit;
+  color: #112019;
+}
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.message {
+  display: grid;
+  gap: 8px;
+}
+
+.messageMeta {
+  margin: 0;
+  color: #556760;
+  font-size: 0.86rem;
+}
+
+.tag {
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(241, 185, 77, 0.16);
+  color: #7b5b14;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.emptyState {
+  display: grid;
+  gap: 16px;
+}
+
+.helper {
+  margin: 0;
+  color: #556760;
+  line-height: 1.6;
+}
+
+.submitRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 960px) {
+  .hero,
+  .grid.two,
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  .wrap {
+    width: min(100vw - 18px, 1120px);
+  }
+}

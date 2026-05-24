@@ -1,287 +1,143 @@
-import { createPreviewDashboard } from "@/lib/preview";
+import Link from "next/link";
 
-const dashboard = createPreviewDashboard();
+import { getSessionUser } from "@/lib/server-app";
 
-export default function HomePage() {
+const entrySteps = [
+  {
+    title: "1. 进入体验",
+    description: "从落地入口进入本地登录或注册，明确你是首次创建计划还是回访查看。",
+  },
+  {
+    title: "2. 完成评估",
+    description: "填写训练频次、目标、身体基础数据和训练条件，先把计划边界说清楚。",
+  },
+  {
+    title: "3. 进入首页",
+    description: "根据当前输入生成今日训练、周安排、饮食提醒和下一步动作入口。",
+  },
+];
+
+const operatingPoints = [
+  "流程先走通，数据用本地 seed 承接。",
+  "页面结构按真实产品边界拆开，后续可接账号与计划服务。",
+  "文案、层级和状态先按 MVP 使用场景收口，不再停留在预览稿。",
+];
+
+const previewItems = [
+  { label: "训练目标", value: "减脂塑形 + 核心稳定" },
+  { label: "每周频次", value: "4 次 / 45 分钟" },
+  { label: "训练场景", value: "居家与健身房混合" },
+  { label: "饮食关注", value: "高蛋白、工作日易执行" },
+];
+
+const schedulePreview = [
+  { day: "周一", title: "下肢力量", state: "已排入" },
+  { day: "周二", title: "恢复与拉伸", state: "轻量" },
+  { day: "周三", title: "上肢推拉", state: "已排入" },
+  { day: "周四", title: "步行与睡眠", state: "恢复" },
+  { day: "周五", title: "全身代谢", state: "已排入" },
+];
+
+export default async function LandingPage() {
+  const sessionUser = await getSessionUser();
+
   return (
-    <main className="page-shell">
-      <section className="hero-band">
-        <div className="content-wrap hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow">Fitness Plan Preview</p>
-            <h1>让训练计划像私人教练一样，先懂你，再安排你。</h1>
-            <p className="hero-text">
-              用户填写身体数据、目标、训练场景和饮食限制之后，系统给出可执行的四周计划，并且保留随时追问、替换动作和调整饮食的入口。
-            </p>
-            <div className="hero-actions">
-              <a className="primary-action" href="#today-plan">
-                查看今日计划
-              </a>
-              <a className="secondary-action" href="#exercise-demo">
-                看动作演示
-              </a>
-            </div>
-          </div>
+    <main className="screen">
+      <div className="page-frame">
+        <header className="topbar">
+          <Link className="brand-mark" href="/">
+            体能计划
+          </Link>
+          <nav className="topbar-nav" aria-label="主导航">
+            <Link href="/auth">登录 / 注册</Link>
+            <Link href="/onboarding">评估问卷</Link>
+            <Link href="/dashboard">仪表盘</Link>
+          </nav>
+        </header>
 
-          <div className="hero-summary">
-            <div className="summary-topline">
-              <span>Preview User</span>
-              <strong>{dashboard.user.name}</strong>
+        <section className="landing-grid">
+          <div className="stack-lg">
+            <div className="stack-md">
+              <span className="status-pill">MVP 本地模式</span>
+              <h1 className="page-title">先完成评估，再进入真正可执行的训练首页。</h1>
+              <p className="lead-text">
+                这一版已经把入口、账号、本地问卷、SQLite 存储和仪表盘主流程接起来了。先建档，再生成计划，后面就能持续查看训练、饮食、打卡和调整记录。
+              </p>
             </div>
-            <div className="metric-grid">
-              <div className="metric-card">
-                <span>身体数据</span>
-                <strong>
-                  {dashboard.user.heightCm}cm / {dashboard.user.weightKg}kg
-                </strong>
-              </div>
-              <div className="metric-card">
-                <span>训练场景</span>
-                <strong>{dashboard.user.environment}</strong>
-              </div>
-              <div className="metric-card metric-card-wide">
-                <span>当前目标</span>
-                <strong>{dashboard.user.goal}</strong>
-              </div>
+
+            <div className="action-row">
+              <Link className="button-primary" href={sessionUser ? "/dashboard" : "/auth"}>
+                {sessionUser ? "继续我的计划" : "开始创建计划"}
+              </Link>
+              <Link className="button-secondary" href={sessionUser ? "/onboarding" : "/auth"}>
+                {sessionUser ? "更新评估信息" : "先登录本地账号"}
+              </Link>
             </div>
-            <div className="safety-strip">
-              <h2>{dashboard.safety.title}</h2>
-              <p>{dashboard.safety.description}</p>
-              <ul>
-                {dashboard.safety.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
+
+            <div className="surface">
+              <div className="section-heading">
+                <h2>这次交付包含什么</h2>
+                <p>不是一张效果图，而是一条完整的本地体验路径。</p>
+              </div>
+              <div className="list-stack">
+                {entrySteps.map((step) => (
+                  <div className="list-row" key={step.title}>
+                    <div>
+                      <strong>{step.title}</strong>
+                      <p>{step.description}</p>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="band">
-        <div className="content-wrap section-grid">
-          <div>
-            <div className="section-intro">
-              <p className="eyebrow">Onboarding</p>
-              <h2>{dashboard.onboarding.title}</h2>
-              <p>第一屏不是冷冰冰的表单，而是一套逐步建档流程，帮助用户说清楚目标、限制和现实条件。</p>
+          <aside className="surface preview-panel">
+            <div className="section-heading">
+              <h2>流程预览</h2>
+              <p>页面先用演示数据驱动，但结构已经按真实产品壳组织。</p>
             </div>
-            <div className="field-list">
-              {dashboard.onboarding.fields.map((field) => (
-                <div className="field-row" key={field.label}>
-                  <span>{field.label}</span>
-                  <strong>{field.value}</strong>
+
+            <div className="metric-strip">
+              {previewItems.map((item) => (
+                <div className="metric-cell" key={item.label}>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
                 </div>
               ))}
             </div>
-            <div className="body-image-grid">
-              {dashboard.onboarding.bodyImages.map((image) => (
-                <figure className="body-image-card" key={image.label}>
-                  <img alt={image.label} src={image.imageUrl} />
-                  <figcaption>{image.label}</figcaption>
-                </figure>
+
+            <div className="section-heading compact-heading">
+              <h3>本周安排示意</h3>
+              <p>首页会把计划浓缩成能直接开始执行的工作面板。</p>
+            </div>
+
+            <div className="list-stack">
+              {schedulePreview.map((item) => (
+                <div className="list-row" key={item.day}>
+                  <div>
+                    <strong>
+                      {item.day} · {item.title}
+                    </strong>
+                    <p>{item.state}</p>
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
+          </aside>
+        </section>
 
-          <div className="followup-panel">
-            <p className="eyebrow">AI Follow-up</p>
-            <h3>生成计划前的追问</h3>
-            <ul className="plain-list">
-              {dashboard.onboarding.followUpQuestions.map((question) => (
-                <li key={question}>{question}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="band accent-band">
-        <div className="content-wrap">
-          <div className="section-intro">
-            <p className="eyebrow">4-Week Plan</p>
-            <h2>四周计划不是一次性给完，而是按周推进、按反馈修正。</h2>
-          </div>
-          <div className="week-grid">
-            {dashboard.weekCards.map((weekCard) => (
-              <article className="week-card" key={weekCard.week}>
-                <span className="week-pill">Week {weekCard.week}</span>
-                <h3>{weekCard.title}</h3>
-                <p>{weekCard.goal}</p>
-                <strong>{weekCard.completionLabel}</strong>
+        <section className="info-band">
+          <div className="band-grid">
+            {operatingPoints.map((point) => (
+              <article className="info-card" key={point}>
+                <span className="mini-label">交付要点</span>
+                <p>{point}</p>
               </article>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="band" id="today-plan">
-        <div className="content-wrap two-column">
-          <div>
-            <div className="section-intro">
-              <p className="eyebrow">Today</p>
-              <h2>{dashboard.today.label}</h2>
-              <p>{dashboard.today.focus}</p>
-            </div>
-
-            <div className="workout-list">
-              {dashboard.today.workoutItems.map((item) => (
-                <article className="workout-card" key={item.id}>
-                  <div className="workout-card-top">
-                    <span className="category-tag">{categoryLabel(item.category)}</span>
-                    <a href="#exercise-demo">查看演示</a>
-                  </div>
-                  <h3>{item.name}</h3>
-                  <p>{item.notes}</p>
-                  <div className="workout-meta">
-                    {item.sets ? <span>{item.sets} 组</span> : null}
-                    {item.reps ? <span>{item.reps}</span> : null}
-                    {item.durationMinutes ? <span>{item.durationMinutes} 分钟</span> : null}
-                    <span>强度 {intensityLabel(item.intensity)}</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className="checkin-text">{dashboard.today.checkInPrompt}</p>
-          </div>
-
-          <div className="nutrition-panel">
-            <p className="eyebrow">Nutrition</p>
-            <h3>今天怎么吃</h3>
-            <p>{dashboard.nutrition.summary}</p>
-            <ul className="plain-list">
-              {dashboard.nutrition.meals.map((meal) => (
-                <li key={meal}>{meal}</li>
-              ))}
-            </ul>
-            <div className="swap-block">
-              <h4>可替换食物</h4>
-              <ul className="plain-list compact">
-                {dashboard.nutrition.swaps.map((swap) => (
-                  <li key={swap}>{swap}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="band media-band" id="exercise-demo">
-        <div className="content-wrap media-grid">
-          <div className="exercise-poster">
-            <img alt={dashboard.exerciseSpotlight.title} src={dashboard.exerciseSpotlight.imageUrl} />
-          </div>
-
-          <div className="exercise-panel">
-            <p className="eyebrow">Exercise Detail</p>
-            <h2>{dashboard.exerciseSpotlight.title}</h2>
-            <a className="video-link" href={dashboard.exerciseSpotlight.videoUrl} target="_blank" rel="noreferrer">
-              {dashboard.exerciseSpotlight.videoLabel}
-            </a>
-
-            <div className="detail-columns">
-              <div>
-                <h3>动作要点</h3>
-                <ul className="plain-list compact">
-                  {dashboard.exerciseSpotlight.cues.map((cue) => (
-                    <li key={cue}>{cue}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3>常见错误</h3>
-                <ul className="plain-list compact">
-                  {dashboard.exerciseSpotlight.mistakes.map((mistake) => (
-                    <li key={mistake}>{mistake}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="alternatives">
-              <h3>替代动作</h3>
-              <div className="pill-row">
-                {dashboard.exerciseSpotlight.alternatives.map((item) => (
-                  <span className="soft-pill" key={item}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="band">
-        <div className="content-wrap section-grid">
-          <div>
-            <div className="section-intro">
-              <p className="eyebrow">AI Adjustment</p>
-              <h2>用户说“做不到”的时候，系统不是报错，而是改计划。</h2>
-            </div>
-            <div className="chat-list">
-              {dashboard.adjustments.map((item) => (
-                <article className="chat-item" key={item.prompt}>
-                  <span className="chat-tag">{adjustmentLabel(item.tag)}</span>
-                  <p className="chat-prompt">{item.prompt}</p>
-                  <p className="chat-response">{item.response}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <div className="action-panel">
-            <p className="eyebrow">Quick Actions</p>
-            <h3>计划内的即时入口</h3>
-            <div className="action-list">
-              {dashboard.quickActions.map((action) => (
-                <article className="action-card" key={action.title}>
-                  <h4>{action.title}</h4>
-                  <p>{action.description}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
-}
-
-function categoryLabel(category: string) {
-  if (category === "warmup") {
-    return "热身";
-  }
-  if (category === "strength") {
-    return "力量";
-  }
-  if (category === "cardio") {
-    return "有氧";
-  }
-  return "拉伸";
-}
-
-function intensityLabel(intensity: string) {
-  if (intensity === "easy") {
-    return "轻";
-  }
-  if (intensity === "moderate") {
-    return "中";
-  }
-  return "高";
-}
-
-function adjustmentLabel(tag: string) {
-  if (tag === "exercise_swap") {
-    return "动作替换";
-  }
-  if (tag === "nutrition_swap") {
-    return "饮食替换";
-  }
-  if (tag === "load_adjustment") {
-    return "训练降载";
-  }
-  if (tag === "safety_referral") {
-    return "安全提醒";
-  }
-  return "一般建议";
 }

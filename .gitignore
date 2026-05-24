@@ -7,6 +7,9 @@ out/
 dist/
 build/
 .turbo/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+.publishrepo/
 
 # Test and coverage output
 coverage/
