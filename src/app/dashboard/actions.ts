@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { buildDashboardHref, resolveDashboardSelection } from "@/lib/dashboard-routing";
 import { getFitnessService, getSessionUser } from "@/lib/server-app";
 
 export async function checkInAction(formData: FormData) {
@@ -10,9 +11,14 @@ export async function checkInAction(formData: FormData) {
     redirect("/auth");
   }
 
+  const selection = resolveDashboardSelection({
+    week: formData.get("week"),
+    day: formData.get("day"),
+    dayIndex: formData.get("dayIndex"),
+  });
   const planId = String(formData.get("planId") ?? "");
   if (!planId) {
-    redirect("/dashboard/check-in?error=还没有可打卡的计划。");
+    redirect(buildDashboardHref(selection, { error: "还没有可打卡的计划。" }));
   }
 
   getFitnessService().recordCheckIn({
@@ -27,7 +33,7 @@ export async function checkInAction(formData: FormData) {
     notes: String(formData.get("notes") ?? ""),
   });
 
-  redirect("/dashboard/check-in?saved=1");
+  redirect(buildDashboardHref(selection, { notice: "check-in-saved" }));
 }
 
 export async function adjustmentAction(formData: FormData) {
@@ -36,15 +42,20 @@ export async function adjustmentAction(formData: FormData) {
     redirect("/auth");
   }
 
+  const selection = resolveDashboardSelection({
+    week: formData.get("week"),
+    day: formData.get("day"),
+    dayIndex: formData.get("dayIndex"),
+  });
   const planId = String(formData.get("planId") ?? "");
   const message = String(formData.get("message") ?? "").trim();
 
   if (!planId) {
-    redirect("/dashboard/adjustments?error=还没有可调整的计划。");
+    redirect(buildDashboardHref(selection, { error: "还没有可调整的计划。" }));
   }
 
   if (!message) {
-    redirect("/dashboard/adjustments?error=请先告诉系统你遇到了什么问题。");
+    redirect(buildDashboardHref(selection, { error: "请先告诉系统你遇到了什么问题。" }));
   }
 
   getFitnessService().recordAdjustmentRequest({
@@ -53,7 +64,7 @@ export async function adjustmentAction(formData: FormData) {
     message,
   });
 
-  redirect("/dashboard/adjustments?saved=1");
+  redirect(buildDashboardHref(selection, { notice: "adjustment-saved" }));
 }
 
 function optionalNumber(value: FormDataEntryValue | null) {

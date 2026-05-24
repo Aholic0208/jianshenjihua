@@ -4,20 +4,27 @@ import { join } from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { buildDashboardHref, resolveDashboardSelection } from "@/lib/dashboard-routing";
 import { findExercise } from "@/lib/exercise-library";
 
 interface ExerciseDetailPageProps {
   params: Promise<{ exerciseId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function ExerciseDetailPage({ params }: ExerciseDetailPageProps) {
+export default async function ExerciseDetailPage({ params, searchParams }: ExerciseDetailPageProps) {
   const { exerciseId } = await params;
+  const rawSearchParams = (await searchParams) ?? {};
   const exercise = findExercise(exerciseId);
 
   if (!exercise) {
     notFound();
   }
 
+  const selection = resolveDashboardSelection({
+    week: readValue(rawSearchParams.week),
+    day: readValue(rawSearchParams.day),
+  });
   const properImageUrl = resolveGeneratedImage(exercise.id, "proper") ?? exercise.imageUrl;
   const mistakeImageUrl = resolveGeneratedImage(exercise.id, "mistake") ?? exercise.mistakeImageUrl ?? exercise.imageUrl;
 
@@ -29,7 +36,7 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
             健身计划
           </Link>
           <nav className="topbar-nav" aria-label="动作详情导航">
-            <Link href="/dashboard">返回计划工作台</Link>
+            <Link href={buildDashboardHref(selection)}>返回计划工作台</Link>
             <a href={exercise.videoUrl} rel="noreferrer" target="_blank">
               打开视频演示
             </a>
@@ -182,4 +189,12 @@ function environmentLabel(value: "home" | "gym" | "both") {
   }
 
   return "居家 / 健身房";
+}
+
+function readValue(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
 }

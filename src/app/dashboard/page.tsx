@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/app/auth/actions";
 import { adjustmentAction, checkInAction } from "@/app/dashboard/actions";
+import { buildExerciseHref } from "@/lib/dashboard-routing";
 import { getFitnessService, getSessionUser } from "@/lib/server-app";
 import { buildWorkoutWorkbench } from "@/lib/workbench";
 import type { AssessmentInput, PlanDay, WorkoutItem } from "@/lib/types";
@@ -28,11 +29,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const params = (await searchParams) ?? {};
   const welcome = readValue(params.welcome);
-  const notice = welcome === "plan-ready"
-    ? "你的建档信息已经保存，下面这份计划来自刚刚提交的真实数据。"
-    : welcome === "back"
-      ? "欢迎回来，继续看你这周的计划。"
-      : "";
+  const notice = readDashboardNotice(welcome, readValue(params.notice));
+  const error = readValue(params.error);
   const dashboardData = getFitnessService().fetchLatestDashboardData(user.id);
   const assessment = dashboardData.assessment;
   const plan = dashboardData.plan;
@@ -84,6 +82,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         revisions: dashboardData.revisions,
       })
     : null;
+  const selectedDay = workbench?.selectedDay ?? null;
 
   return (
     <main className="screen">
@@ -102,6 +101,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </form>
           </nav>
         </header>
+
+        {error ? (
+          <section className="surface notice-banner is-error">
+            <strong>需要处理</strong>
+            <p>{error}</p>
+          </section>
+        ) : null}
 
         {notice ? (
           <section className="surface notice-banner is-success">
@@ -292,27 +298,33 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   </div>
                 </section>
 
-                {workbench.selectedDay ? (
+                {selectedDay ? (
                   <section className="planner-detail-grid">
                     <article className="surface stack-md">
                       <div className="surface-header">
                         <div className="section-heading">
-                          <span className="status-pill">{workbench.selectedDay.label}</span>
-                          <h2>{workbench.selectedDay.focus}</h2>
-                          <p>{workbench.selectedDay.latestRevisionMessage ?? "先按今天的标准计划执行；如果做不到，可以在右侧直接调整。"}</p>
+                          <span className="status-pill">{selectedDay.label}</span>
+                          <h2>{selectedDay.focus}</h2>
+                          <p>{selectedDay.latestRevisionMessage ?? "先按今天的标准计划执行；如果做不到，可以在右侧直接调整。"}</p>
                         </div>
                         <div className="pill-row">
-                          <span className="info-pill">{workbench.selectedDay.completed ? "已完成" : "待执行"}</span>
-                          <span className="info-pill">{workbench.selectedDay.shortLabel}</span>
+                          <span className="info-pill">{selectedDay.completed ? "已完成" : "待执行"}</span>
+                          <span className="info-pill">{selectedDay.shortLabel}</span>
                         </div>
                       </div>
 
                       <div className="list-stack">
-                        {workbench.selectedDay.workoutItems.map((item) => (
+                        {selectedDay.workoutItems.map((item) => (
                           <div className="list-row" key={item.id}>
                             <div>
                               <strong>
-                                <Link className="text-link" href={`/dashboard/exercises/${item.exerciseId}`}>
+                                <Link
+                                  className="text-link"
+                                  href={buildExerciseHref(item.exerciseId, {
+                                    week: workbench.selectedWeek.week,
+                                    day: selectedDay.dayIndex,
+                                  })}
+                                >
                                   {item.name}
                                 </Link>
                               </strong>
@@ -324,7 +336,16 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                       </div>
 
                       <div className="planner-inline-actions">
-                        <Link className="button-tertiary" href={`/dashboard/exercises/${workbench.selectedDay.workoutItems[0]?.exerciseId ?? "bodyweight-squat"}`}>
+                        <Link
+                          className="button-tertiary"
+                          href={buildExerciseHref(
+                            selectedDay.workoutItems[0]?.exerciseId ?? "bodyweight-squat",
+                            {
+                              week: workbench.selectedWeek.week,
+                              day: selectedDay.dayIndex,
+                            },
+                          )}
+                        >
                           查看动作演示
                         </Link>
                         <Link className="button-secondary" href="/dashboard/profile">
@@ -343,19 +364,19 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                         <div className="stats-grid">
                           <div className="planner-detail-card">
                             <span className="planner-day-label">热量</span>
-                            <strong>{workbench.selectedDay.nutrition.calorieTarget} kcal</strong>
+                            <strong>{selectedDay.nutrition.calorieTarget} kcal</strong>
                           </div>
                           <div className="planner-detail-card">
                             <span className="planner-day-label">蛋白质</span>
-                            <strong>{workbench.selectedDay.nutrition.proteinGrams} g</strong>
+                            <strong>{selectedDay.nutrition.proteinGrams} g</strong>
                           </div>
                           <div className="planner-detail-card">
                             <span className="planner-day-label">饮水</span>
-                            <strong>{workbench.selectedDay.nutrition.waterLiters} L</strong>
+                            <strong>{selectedDay.nutrition.waterLiters} L</strong>
                           </div>
                           <div className="planner-detail-card">
                             <span className="planner-day-label">限制提示</span>
-                            <strong>{workbench.selectedDay.nutrition.restrictionNotes[0] ?? "无"}</strong>
+                            <strong>{selectedDay.nutrition.restrictionNotes[0] ?? "无"}</strong>
                           </div>
                         </div>
 
@@ -363,7 +384,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                           <h3>三餐建议</h3>
                         </div>
                         <ol className="number-list">
-                          {workbench.selectedDay.nutrition.meals.map((meal) => (
+                          {selectedDay.nutrition.meals.map((meal) => (
                             <li key={meal}>{meal}</li>
                           ))}
                         </ol>
@@ -372,7 +393,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                           <h3>可替换方案</h3>
                         </div>
                         <ul className="bullet-list">
-                          {workbench.selectedDay.nutrition.swaps.map((swap) => (
+                          {selectedDay.nutrition.swaps.map((swap) => (
                             <li key={swap}>{swap}</li>
                           ))}
                         </ul>
@@ -381,11 +402,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                       <article className="surface stack-md">
                         <div className="section-heading">
                           <h2>打卡</h2>
-                          <p>{workbench.selectedDay.checkInPrompt}</p>
+                          <p>{selectedDay.checkInPrompt}</p>
                         </div>
                         <form action={checkInAction} className="form-stack">
                           <input name="planId" type="hidden" value={plan.id} />
-                          <input name="dayIndex" type="hidden" value={String(workbench.selectedDay.dayIndex)} />
+                          <input name="week" type="hidden" value={String(workbench.selectedWeek.week)} />
+                          <input name="day" type="hidden" value={String(selectedDay.dayIndex)} />
+                          <input name="dayIndex" type="hidden" value={String(selectedDay.dayIndex)} />
 
                           <div className="choice-grid">
                             <label className="choice-chip">
@@ -449,6 +472,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
                         <form action={adjustmentAction} className="form-stack">
                           <input name="planId" type="hidden" value={plan.id} />
+                          <input name="week" type="hidden" value={String(workbench.selectedWeek.week)} />
+                          <input name="day" type="hidden" value={String(selectedDay.dayIndex)} />
                           <div className="field">
                             <label htmlFor="message">你遇到了什么问题？</label>
                             <textarea
@@ -558,4 +583,24 @@ function readValue(value: string | string[] | undefined) {
   }
 
   return value ?? "";
+}
+
+function readDashboardNotice(welcome: string, noticeCode: string) {
+  if (noticeCode === "check-in-saved") {
+    return "今天的打卡已经保存，工作台会继续参考这次反馈来安排后面的节奏。";
+  }
+
+  if (noticeCode === "adjustment-saved") {
+    return "调整请求已经保存，新的建议和修订记录就在当前工作台里继续查看。";
+  }
+
+  if (welcome === "plan-ready") {
+    return "你的建档信息已经保存，下面这份计划来自刚刚提交的真实数据。";
+  }
+
+  if (welcome === "back") {
+    return "欢迎回来，继续看你这周的计划。";
+  }
+
+  return "";
 }
