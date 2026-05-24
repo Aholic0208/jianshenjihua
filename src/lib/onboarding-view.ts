@@ -211,7 +211,7 @@ function resolveState(index: number, currentIndex: number): OnboardingStepState 
   return "upcoming";
 }
 
-function isStepComplete(stepId: OnboardingStepId, answers: OnboardingAnswers) {
+function isStepComplete(stepId: OnboardingStepId, answers: OnboardingAnswers): boolean {
   if (stepId === "basics") {
     return hasAllValues(answers.age, answers.sex, answers.heightCm, answers.weightKg);
   }

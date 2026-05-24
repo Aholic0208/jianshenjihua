@@ -210,7 +210,7 @@ export function proposePlanAdjustment(plan: FitnessPlan, feedback: string): Plan
     const replacement = toWorkoutItem(findExerciseById("glute-bridge"), 1);
     return {
       type: "exercise_swap",
-      message: "已把今天的下肢重点转成髋主导动作，先避开让膝盖受压更大的深蹲模式；如果疼痛持续，请暂停下肢训练。",
+      message: "建议先把今天的下肢重点转成髋主导动作，先避开让膝盖受压更大的深蹲模式；如果疼痛持续，请暂停下肢训练。",
       replacements: [replacement],
       nutritionSuggestions: [],
     };
@@ -219,7 +219,7 @@ export function proposePlanAdjustment(plan: FitnessPlan, feedback: string): Plan
   if (containsAny(text, ["鸡胸", "鸡肉", "吃不了", "不想吃", "没有食材", "can't eat chicken"])) {
     return {
       type: "nutrition_swap",
-      message: "可以换蛋白来源，不需要死守鸡胸肉，关键是总热量和蛋白目标接近。",
+      message: "可以替换蛋白来源，不需要死守鸡胸肉，关键是总热量和蛋白目标接近。",
       replacements: [],
       nutritionSuggestions: ["鱼肉 120-150g", "虾仁 120g", "鸡蛋 2 个 + 无糖酸奶", "豆腐 200g"],
     };

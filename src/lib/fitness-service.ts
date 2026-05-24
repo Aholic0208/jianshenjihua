@@ -129,6 +129,7 @@ export function createFitnessService({ repository, now = () => new Date() }: Fit
 
       const userMessageId = randomUUID();
       const adjustment = proposePlanAdjustment(planToFitnessPlan(plan), input.message);
+      const revisedPlan = applyAdjustmentToPlan(plan, adjustment, now().toISOString());
       const responseMessageId = randomUUID();
       const timestamp = now().toISOString();
 
@@ -165,6 +166,7 @@ export function createFitnessService({ repository, now = () => new Date() }: Fit
         sourceMessageId: userMessageId,
         createdAt: now().toISOString(),
       });
+      repository.savePlan(planToFitnessPlan(revisedPlan));
 
       return {
         adjustment,
@@ -234,5 +236,84 @@ function planToFitnessPlan(plan: SavedPlanRecord): FitnessPlan {
     weeks: plan.weeks,
     days: plan.days,
     createdAt: plan.createdAt,
+  };
+}
+
+function applyAdjustmentToPlan(
+  plan: SavedPlanRecord,
+  adjustment: PlanAdjustment,
+  timestamp: string,
+): SavedPlanRecord {
+  const revisedSummary = adjustment.message ? `${plan.summary} 已根据最新反馈更新今日安排。` : plan.summary;
+
+  if (adjustment.type === "nutrition_swap" && adjustment.nutritionSuggestions.length > 0) {
+    const days = plan.days.map((day, index) =>
+      index === 0
+        ? {
+            ...day,
+            nutrition: {
+              ...day.nutrition,
+              swaps: [...adjustment.nutritionSuggestions, ...day.nutrition.swaps],
+            },
+          }
+        : day,
+    );
+
+    return {
+      ...plan,
+      summary: revisedSummary,
+      createdAt: timestamp,
+      days,
+    };
+  }
+
+  if (adjustment.type === "load_adjustment") {
+    const days = plan.days.map((day, index) =>
+      index === 0
+        ? {
+            ...day,
+            workoutItems: day.workoutItems.map((item) => ({
+              ...item,
+              sets: item.sets ? Math.max(1, item.sets - 1) : item.sets,
+              durationMinutes: item.durationMinutes ? Math.max(5, item.durationMinutes - 2) : item.durationMinutes,
+              notes: `${item.notes} 今天已按疲劳反馈降载。`,
+            })),
+          }
+        : day,
+    );
+
+    return {
+      ...plan,
+      summary: revisedSummary,
+      createdAt: timestamp,
+      days,
+    };
+  }
+
+  if (adjustment.type === "exercise_swap" && adjustment.replacements.length > 0) {
+    const days = plan.days.map((day, index) => {
+      if (index !== 0) {
+        return day;
+      }
+
+      const filtered = day.workoutItems.filter((item) => item.category !== "strength");
+      return {
+        ...day,
+        workoutItems: [...adjustment.replacements, ...filtered],
+      };
+    });
+
+    return {
+      ...plan,
+      summary: revisedSummary,
+      createdAt: timestamp,
+      days,
+    };
+  }
+
+  return {
+    ...plan,
+    summary: revisedSummary,
+    createdAt: timestamp,
   };
 }

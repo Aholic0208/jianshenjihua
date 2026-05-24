@@ -33,6 +33,18 @@ export function buildWorkoutWorkbench(input: {
   const selectedDay = input.plan.days.find((day) => day.dayIndex === selectedDayIndex) ?? null;
   const latestCheckIn = input.checkIns.find((item) => item.dayIndex === selectedDayIndex) ?? input.checkIns[0] ?? null;
   const latestRevision = input.revisions[0] ?? null;
+  const selectedDayDetail: SelectedWorkbenchDay | null = selectedDay
+    ? {
+        ...selectedDay,
+        shortLabel: `Day ${selectedDay.dayIndex - (selectedDay.week - 1) * 7}`,
+        state: days.find((day) => day.dayIndex === selectedDay.dayIndex)?.state ?? "upcoming",
+        completed: completedDays.has(selectedDay.dayIndex),
+        latestCheckInSummary: latestCheckIn
+          ? `完成 ${latestCheckIn.completed ? "是" : "否"} · 疲劳 ${latestCheckIn.fatigue}/5 · 疼痛 ${latestCheckIn.pain}/5`
+          : null,
+        latestRevisionMessage: latestRevision?.message ?? null,
+      }
+    : null;
 
   return {
     weeks: input.plan.weeks.map<PlanWeekSummary>((week) => ({
@@ -48,22 +60,9 @@ export function buildWorkoutWorkbench(input: {
       emphasis: selectedWeek.emphasis ?? [],
     },
     days,
-    selectedDay: selectedDay
-      ? {
-          ...selectedDay,
-          shortLabel: `Day ${selectedDay.dayIndex - (selectedDay.week - 1) * 7}`,
-          state: days.find((day) => day.dayIndex === selectedDay.dayIndex)?.state ?? "upcoming",
-          completed: completedDays.has(selectedDay.dayIndex),
-          latestCheckInSummary: latestCheckIn
-            ? `完成 ${latestCheckIn.completed ? "是" : "否"} · 疲劳 ${latestCheckIn.fatigue}/5 · 疼痛 ${latestCheckIn.pain}/5`
-            : null,
-          latestRevisionMessage: latestRevision?.message ?? null,
-        satisfies SelectedWorkbenchDay
-      : null,
+    selectedDay: selectedDayDetail,
     latestRevisionMessage: latestRevision?.message ?? null,
-    latestCheckInSummary: latestCheckIn
-      ? `疲劳 ${latestCheckIn.fatigue}/5 · 疼痛 ${latestCheckIn.pain}/5`
-      : null,
+    latestCheckInSummary: latestCheckIn ? `疲劳 ${latestCheckIn.fatigue}/5 · 疼痛 ${latestCheckIn.pain}/5` : null,
   };
 }
 

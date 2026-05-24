@@ -2,7 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/app/auth/actions";
+import { adjustmentAction, checkInAction } from "@/app/dashboard/actions";
 import { getFitnessService, getSessionUser } from "@/lib/server-app";
+import { buildWorkoutWorkbench } from "@/lib/workbench";
 import type { AssessmentInput, PlanDay, WorkoutItem } from "@/lib/types";
 
 type SearchParamsInput = Promise<Record<string, string | string[] | undefined>>;
@@ -10,6 +12,13 @@ type SearchParamsInput = Promise<Record<string, string | string[] | undefined>>;
 type DashboardPageProps = {
   searchParams?: SearchParamsInput;
 };
+
+const adjustmentSuggestions = [
+  "今天膝盖不舒服，帮我换掉下肢动作。",
+  "我只有 25 分钟，帮我压缩今天的训练。",
+  "今天太累了，帮我把训练量降一点。",
+  "没有鸡胸肉了，帮我换一套更容易买到的饮食方案。",
+];
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const user = await getSessionUser();
@@ -20,21 +29,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const params = (await searchParams) ?? {};
   const welcome = readValue(params.welcome);
   const notice = welcome === "plan-ready"
-    ? "评估已经保存，下面这份计划来自你刚刚提交的真实本地数据。"
+    ? "你的建档信息已经保存，下面这份计划来自刚刚提交的真实数据。"
     : welcome === "back"
-      ? "欢迎回来，继续看今天的训练安排。"
+      ? "欢迎回来，继续看你这周的计划。"
       : "";
-
   const dashboardData = getFitnessService().fetchLatestDashboardData(user.id);
   const assessment = dashboardData.assessment;
   const plan = dashboardData.plan;
-  const completedDays = new Set(
-    dashboardData.recentCheckIns.filter((item) => item.completed).map((item) => item.dayIndex),
-  );
-  const currentDay = plan ? getCurrentDay(plan.days, completedDays) : null;
-  const currentWeekDays = plan && currentDay ? plan.days.filter((day) => day.week === currentDay.week) : [];
-  const latestAssistantMessages = dashboardData.recentMessages.filter((message) => message.role === "assistant").slice(0, 3);
-  const latestCheckIn = dashboardData.recentCheckIns[0] ?? null;
 
   if (!assessment) {
     return (
@@ -42,7 +43,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div className="page-frame">
           <header className="topbar">
             <Link className="brand-mark" href="/">
-              体能计划
+              健身计划
             </Link>
             <nav className="topbar-nav" aria-label="仪表盘导航">
               <Link href="/auth">账号页</Link>
@@ -55,17 +56,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </header>
 
           <section className="surface stack-md">
-            <span className="status-pill">先完成评估</span>
+            <span className="status-pill">先完成建档</span>
             <h1 className="panel-title">你已经登录，但还没有可生成计划的评估信息。</h1>
             <p className="lead-text">
-              先填写年龄、身高体重、训练场景、伤病与饮食边界，系统才能把训练、饮食和安全提示真正落到你自己的档案上。
+              先把年龄、身高体重、训练场景、器械、伤病和饮食限制写清楚，系统才能把训练、饮食和安全提示真正落到你自己的档案上。
             </p>
             <div className="action-row">
               <Link className="button-primary" href="/onboarding">
-                立即开始评估
-              </Link>
-              <Link className="button-secondary" href="/auth">
-                返回账号页
+                立即开始建档
               </Link>
             </div>
           </section>
@@ -74,16 +72,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
+  const selectedWeek = clampNumber(readValue(params.week), 1, plan?.weeks.length ?? 4);
+  const fallbackDayIndex = plan ? getFirstDayIndexForWeek(plan.days, selectedWeek) : 1;
+  const selectedDayIndex = clampNumber(readValue(params.day), fallbackDayIndex, plan?.days.length ?? 28);
+  const workbench = plan && plan.weeks.length > 0
+    ? buildWorkoutWorkbench({
+        plan,
+        selectedWeek,
+        selectedDayIndex,
+        checkIns: dashboardData.recentCheckIns,
+        revisions: dashboardData.revisions,
+      })
+    : null;
+
   return (
     <main className="screen">
       <div className="page-frame">
         <header className="topbar">
           <Link className="brand-mark" href="/">
-            体能计划
+            健身计划
           </Link>
           <nav className="topbar-nav" aria-label="仪表盘导航">
             <Link href="/dashboard/profile">个人资料</Link>
-            <Link href="/onboarding">重新评估</Link>
+            <Link href="/onboarding">重新建档</Link>
             <form action={logoutAction}>
               <button className="button-secondary" type="submit">
                 退出账号
@@ -94,372 +105,388 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
         {notice ? (
           <section className="surface notice-banner is-success">
-            <strong>已更新</strong>
+            <strong>状态更新</strong>
             <p>{notice}</p>
           </section>
         ) : null}
 
-        <section className="dashboard-shell">
-          <aside className="surface dashboard-nav">
-            <div className="section-heading">
-              <h2>执行面板</h2>
-              <p>先把今天该做什么、接下来去哪一步压缩到一个稳定入口里。</p>
-            </div>
-
-            <div className="profile-block">
-              <strong>{user.name}</strong>
-              <p>{user.email}</p>
-              <span className="status-pill subtle-pill">
-                {plan?.status === "restricted" ? "当前为受限计划" : "活动计划进行中"}
-              </span>
-            </div>
-
-            <div className="list-stack">
-              <div className="list-row">
-                <div>
-                  <strong>当前阶段</strong>
-                  <p>{currentDay ? currentDay.label : "等待重新评估"}</p>
-                </div>
-              </div>
-              <div className="list-row">
-                <div>
-                  <strong>已完成打卡</strong>
-                  <p>{completedDays.size} / {plan?.days.length ?? 0} 天</p>
-                </div>
-              </div>
-              <div className="list-row">
-                <div>
-                  <strong>训练场景</strong>
-                  <p>{environmentLabel(assessment.trainingEnvironment)}</p>
-                </div>
-              </div>
-              <div className="list-row">
-                <div>
-                  <strong>训练频次</strong>
-                  <p>每周 {assessment.trainingDaysPerWeek} 次</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="action-row">
-              <Link className="button-primary" href="/dashboard/check-in">
-                今日打卡
-              </Link>
-              <Link className="button-secondary" href="/dashboard/adjustments">
-                调整计划
-              </Link>
-              <Link className="button-secondary" href="/dashboard/profile">
-                查看档案
-              </Link>
-            </div>
-          </aside>
-
-          <div className="stack-lg">
-            <section className="surface hero-surface">
+        {!plan || plan.status === "restricted" || !workbench ? (
+          <section className="planner-shell">
+            <section className="surface stack-lg">
               <div className="section-heading">
-                <span className="status-pill">
-                  {plan?.status === "restricted" ? "安全限制中" : currentDay?.label ?? "计划摘要"}
-                </span>
-                <h1 className="panel-title">
-                  {plan?.status === "restricted"
-                    ? "当前不建议继续生成高强度计划。"
-                    : currentDay
-                      ? `今天重点：${currentDay.focus}`
-                      : "你的计划已经保存。"}
-                </h1>
-                <p>{plan?.summary ?? "完成评估后会在这里展示你的专属计划摘要。"}</p>
+                <span className="status-pill">安全边界</span>
+                <h1 className="panel-title">当前不建议直接进入常规训练计划。</h1>
+                <p>{plan?.summary ?? "先完成建档，系统再判断是否适合生成计划。"}</p>
               </div>
 
-              <div className="metric-strip">
-                <div className="metric-cell">
-                  <span>计划状态</span>
-                  <strong>{plan?.status === "restricted" ? "需保守处理" : "活动中"}</strong>
-                </div>
-                <div className="metric-cell">
-                  <span>当前体重 / 目标</span>
-                  <strong>
-                    {assessment.weightKg} kg / {assessment.targetWeightKg ? `${assessment.targetWeightKg} kg` : "未填写"}
-                  </strong>
-                </div>
-                <div className="metric-cell">
-                  <span>今日热量目标</span>
-                  <strong>{currentDay?.nutrition.calorieTarget ?? "--"} kcal</strong>
-                </div>
-                <div className="metric-cell">
-                  <span>蛋白质目标</span>
-                  <strong>{currentDay?.nutrition.proteinGrams ?? "--"} g</strong>
-                </div>
+              <div className="warning-list">
+                {(plan?.safety.messages ?? ["请先完成建档，再决定后续训练安排。"]).map((message) => (
+                  <div className="warning-item" key={message}>
+                    <strong>{message}</strong>
+                  </div>
+                ))}
               </div>
 
               <div className="action-row">
-                <Link className="button-primary" href="/dashboard/check-in">
-                  完成今天打卡
+                <Link className="button-primary" href="/onboarding">
+                  返回建档页
                 </Link>
-                <Link className="button-secondary" href="/dashboard/adjustments">
-                  我做不到，帮我调整
-                </Link>
-                <Link className="button-secondary" href="/onboarding">
-                  更新评估输入
+                <Link className="button-secondary" href="/dashboard/profile">
+                  查看当前资料
                 </Link>
               </div>
             </section>
-
-            <section className="surface">
-              <div className="section-heading">
-                <h2>今天该练什么</h2>
-                <p>每个动作都能点进去查看标准图片、步骤、要点、常见错误和视频演示链接。</p>
-              </div>
-
-              {plan?.status === "restricted" ? (
-                <div className="list-stack">
-                  {plan.safety.messages.map((message) => (
-                    <div className="list-row" key={message}>
-                      <div>
-                        <strong>{message}</strong>
-                        <p>先处理安全问题，再决定是否继续生成后续训练安排。</p>
-                      </div>
-                    </div>
-                  ))}
+          </section>
+        ) : (
+          <section className="planner-shell">
+            <section className="surface stack-lg">
+              <div className="surface-header">
+                <div className="section-heading">
+                  <span className="status-pill">{workbench.selectedWeek.title}</span>
+                  <h1 className="panel-title">{workbench.selectedWeek.goal}</h1>
+                  <p>{plan.summary}</p>
                 </div>
-              ) : currentDay ? (
-                <div className="list-stack">
-                  {currentDay.workoutItems.map((item) => (
-                    <div className="list-row" key={item.id}>
-                      <div>
-                        <strong>
-                          <Link className="text-link" href={`/dashboard/exercises/${item.exerciseId}`}>
-                            {item.name}
-                          </Link>
-                        </strong>
-                        <p>{formatWorkoutDescription(item)}</p>
-                      </div>
-                      <span className="list-meta">{formatWorkoutMeta(item)}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="list-stack">
-                  <div className="list-row">
-                    <div>
-                      <strong>还没有可执行的今日训练</strong>
-                      <p>先回到评估页完成资料，系统才会展开每日动作清单。</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
-
-            <section className="surface">
-              <div className="section-heading">
-                <h2>今日饮食建议</h2>
-                <p>这里直接展示热量、蛋白、水分和三餐建议，后面再继续细化替换逻辑。</p>
-              </div>
-
-              {currentDay ? (
-                <>
-                  <div className="metric-strip">
-                    <div className="metric-cell">
-                      <span>热量</span>
-                      <strong>{currentDay.nutrition.calorieTarget} kcal</strong>
-                    </div>
-                    <div className="metric-cell">
-                      <span>蛋白质</span>
-                      <strong>{currentDay.nutrition.proteinGrams} g</strong>
-                    </div>
-                    <div className="metric-cell">
-                      <span>饮水</span>
-                      <strong>{currentDay.nutrition.waterLiters} L</strong>
-                    </div>
-                    <div className="metric-cell">
-                      <span>限制提醒</span>
-                      <strong>{currentDay.nutrition.restrictionNotes[0] ?? "无"}</strong>
-                    </div>
-                  </div>
-
-                  <div className="section-heading compact-heading">
-                    <h3>三餐建议</h3>
-                  </div>
-                  <div className="list-stack">
-                    {currentDay.nutrition.meals.map((meal) => (
-                      <div className="list-row" key={meal}>
-                        <div>
-                          <strong>{meal}</strong>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="section-heading compact-heading">
-                    <h3>可替换方案</h3>
-                  </div>
-                  <div className="list-stack">
-                    {currentDay.nutrition.swaps.map((swap) => (
-                      <div className="list-row" key={swap}>
-                        <div>
-                          <strong>{swap}</strong>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="list-stack">
-                  <div className="list-row">
-                    <div>
-                      <strong>饮食建议会跟随每日计划生成</strong>
-                      <p>完成评估并生成计划后，这里会展示你当天的饮食重点。</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
-
-            <section className="surface">
-              <div className="section-heading">
-                <h2>本周安排</h2>
-                <p>当前周视图会根据你的打卡进度标记进行中、已完成和待执行状态。</p>
-              </div>
-              <div className="list-stack">
-                {currentWeekDays.map((day) => (
-                  <div className="list-row" key={day.dayIndex}>
-                    <div>
-                      <strong>
-                        {day.label} · {day.focus}
-                      </strong>
-                      <p>{day.workoutItems.map((item) => item.name).join("、")}</p>
-                    </div>
-                    <span className={`state-tag ${stateClassForDay(day, currentDay, completedDays)}`}>
-                      {stateLabelForDay(day, currentDay, completedDays)}
+                <div className="pill-row">
+                  {workbench.selectedWeek.emphasis.map((item) => (
+                    <span className="info-pill" key={item}>
+                      {item}
                     </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </section>
-          </div>
 
-          <aside className="stack-md">
-            <section className="surface">
-              <div className="section-heading">
-                <h2>档案摘要</h2>
-                <p>把后续调整最常用的身体信息和偏好先固定在右侧。</p>
-              </div>
-              <div className="list-stack">
-                <div className="list-row">
-                  <div>
-                    <strong>身体数据</strong>
-                    <p>
-                      {assessment.heightCm} cm / {assessment.weightKg} kg / 目标{" "}
-                      {assessment.targetWeightKg ? `${assessment.targetWeightKg} kg` : "未填写"}
-                    </p>
-                  </div>
+              <div className="stats-grid">
+                <div className="planner-detail-card">
+                  <span className="planner-day-label">当前体重 / 目标</span>
+                  <strong>{assessment.weightKg} kg / {assessment.targetWeightKg ? `${assessment.targetWeightKg} kg` : "未填写"}</strong>
                 </div>
-                <div className="list-row">
-                  <div>
-                    <strong>训练边界</strong>
-                    <p>
-                      {experienceLabel(assessment.experience)} · {environmentLabel(assessment.trainingEnvironment)} ·
-                      每次 {assessment.sessionMinutes} 分钟
-                    </p>
-                  </div>
+                <div className="planner-detail-card">
+                  <span className="planner-day-label">每周频率 / 时长</span>
+                  <strong>{assessment.trainingDaysPerWeek} 天 / {assessment.sessionMinutes} 分钟</strong>
                 </div>
-                <div className="list-row">
-                  <div>
-                    <strong>目标描述</strong>
-                    <p>{assessment.goalText}</p>
-                  </div>
+                <div className="planner-detail-card">
+                  <span className="planner-day-label">最新打卡</span>
+                  <strong>{workbench.latestCheckInSummary ?? "还没有打卡记录"}</strong>
                 </div>
-                <div className="list-row">
-                  <div>
-                    <strong>饮食限制</strong>
-                    <p>{joinOrFallback(assessment.dietaryRestrictions, "暂未填写")}</p>
-                  </div>
+                <div className="planner-detail-card">
+                  <span className="planner-day-label">最近调整</span>
+                  <strong>{workbench.latestRevisionMessage ?? "还没有计划调整"}</strong>
                 </div>
               </div>
             </section>
 
-            <section className="surface">
-              <div className="section-heading">
-                <h2>安全与提醒</h2>
-                <p>先告诉你现在最重要的边界，而不是把提醒藏在深层页面里。</p>
-              </div>
-              <div className="list-stack">
-                {plan?.safety.messages.map((message) => (
-                  <div className="list-row" key={message}>
-                    <div>
-                      <strong>{message}</strong>
+            <section className="planner-grid">
+              <aside className="stack-md">
+                <section className="surface">
+                  <div className="section-heading">
+                    <h2>你的档案</h2>
+                    <p>计划会根据目标、场景、器械和限制条件来分配内容。</p>
+                  </div>
+                  <div className="list-stack">
+                    <div className="list-row">
+                      <div>
+                        <strong>{user.name}</strong>
+                        <p>{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="list-row">
+                      <div>
+                        <strong>训练场景</strong>
+                        <p>{environmentLabel(assessment.trainingEnvironment)}</p>
+                      </div>
+                    </div>
+                    <div className="list-row">
+                      <div>
+                        <strong>经验水平</strong>
+                        <p>{experienceLabel(assessment.experience)}</p>
+                      </div>
+                    </div>
+                    <div className="list-row">
+                      <div>
+                        <strong>器械条件</strong>
+                        <p>{joinOrFallback(assessment.equipment, "未填写")}</p>
+                      </div>
+                    </div>
+                    <div className="list-row">
+                      <div>
+                        <strong>饮食限制</strong>
+                        <p>{joinOrFallback(assessment.dietaryRestrictions, "暂无特殊限制")}</p>
+                      </div>
                     </div>
                   </div>
-                ))}
-                {!plan?.safety.messages.length ? (
-                  <div className="list-row">
-                    <div>
-                      <strong>暂无额外安全提醒</strong>
-                    </div>
+                </section>
+
+                <section className="surface">
+                  <div className="section-heading">
+                    <h2>安全提醒</h2>
+                    <p>第一版优先保证合理和可执行，不追求激进速度。</p>
                   </div>
+                  <div className="warning-list">
+                    {plan.safety.messages.map((message) => (
+                      <div className="warning-item" key={message}>
+                        {message}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="muted-copy">{plan.disclaimer}</p>
+                </section>
+
+                <section className="surface">
+                  <div className="section-heading">
+                    <h2>最近修订</h2>
+                    <p>每次调整都会留痕，后面可以回看。</p>
+                  </div>
+                  <div className="list-stack">
+                    {dashboardData.revisions.slice(0, 3).map((revision) => (
+                      <div className="list-row" key={revision.id}>
+                        <div>
+                          <strong>{revision.adjustmentType}</strong>
+                          <p>{revision.message}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {dashboardData.revisions.length === 0 ? (
+                      <div className="list-row">
+                        <div>
+                          <strong>还没有修订</strong>
+                          <p>当你说“太累了”“膝盖不舒服”“吃不了这个”时，新的修订会出现在这里。</p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </section>
+              </aside>
+
+              <div className="stack-lg">
+                <section className="surface stack-md">
+                  <div className="section-heading">
+                    <h2>4 周计划</h2>
+                    <p>先选周，再选当天，下面的训练、饮食和反馈都会随之切换。</p>
+                  </div>
+                  <div className="planner-week-tabs">
+                    {workbench.weeks.map((week) => (
+                      <Link
+                        className={`planner-week-tab ${week.week === workbench.selectedWeek.week ? "is-active" : ""}`}
+                        href={`/dashboard?week=${week.week}&day=${getFirstDayIndexForWeek(plan.days, week.week)}`}
+                        key={week.week}
+                      >
+                        第 {week.week} 周
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="planner-day-grid">
+                    {workbench.days.map((day) => (
+                      <Link
+                        className={`planner-day-card ${cardStateClass(day.state)}`}
+                        href={`/dashboard?week=${day.week}&day=${day.dayIndex}`}
+                        key={day.dayIndex}
+                      >
+                        <div className="planner-day-top">
+                          <span className="planner-day-label">{day.shortLabel}</span>
+                          <span className="state-tag">{stateLabel(day.state)}</span>
+                        </div>
+                        <strong className="planner-day-focus">{day.focus}</strong>
+                        <span className="planner-day-label">{day.workoutCount} 个安排</span>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+
+                {workbench.selectedDay ? (
+                  <section className="planner-detail-grid">
+                    <article className="surface stack-md">
+                      <div className="surface-header">
+                        <div className="section-heading">
+                          <span className="status-pill">{workbench.selectedDay.label}</span>
+                          <h2>{workbench.selectedDay.focus}</h2>
+                          <p>{workbench.selectedDay.latestRevisionMessage ?? "先按今天的标准计划执行；如果做不到，可以在右侧直接调整。"}</p>
+                        </div>
+                        <div className="pill-row">
+                          <span className="info-pill">{workbench.selectedDay.completed ? "已完成" : "待执行"}</span>
+                          <span className="info-pill">{workbench.selectedDay.shortLabel}</span>
+                        </div>
+                      </div>
+
+                      <div className="list-stack">
+                        {workbench.selectedDay.workoutItems.map((item) => (
+                          <div className="list-row" key={item.id}>
+                            <div>
+                              <strong>
+                                <Link className="text-link" href={`/dashboard/exercises/${item.exerciseId}`}>
+                                  {item.name}
+                                </Link>
+                              </strong>
+                              <p>{formatWorkoutDescription(item)}</p>
+                            </div>
+                            <span className="list-meta">{formatWorkoutMeta(item)}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="planner-inline-actions">
+                        <Link className="button-tertiary" href={`/dashboard/exercises/${workbench.selectedDay.workoutItems[0]?.exerciseId ?? "bodyweight-squat"}`}>
+                          查看动作演示
+                        </Link>
+                        <Link className="button-secondary" href="/dashboard/profile">
+                          编辑资料
+                        </Link>
+                      </div>
+                    </article>
+
+                    <div className="stack-md">
+                      <article className="surface stack-md">
+                        <div className="section-heading">
+                          <h2>今日饮食</h2>
+                          <p>热量和蛋白目标会跟着你的目标、体重和恢复状态走。</p>
+                        </div>
+
+                        <div className="stats-grid">
+                          <div className="planner-detail-card">
+                            <span className="planner-day-label">热量</span>
+                            <strong>{workbench.selectedDay.nutrition.calorieTarget} kcal</strong>
+                          </div>
+                          <div className="planner-detail-card">
+                            <span className="planner-day-label">蛋白质</span>
+                            <strong>{workbench.selectedDay.nutrition.proteinGrams} g</strong>
+                          </div>
+                          <div className="planner-detail-card">
+                            <span className="planner-day-label">饮水</span>
+                            <strong>{workbench.selectedDay.nutrition.waterLiters} L</strong>
+                          </div>
+                          <div className="planner-detail-card">
+                            <span className="planner-day-label">限制提示</span>
+                            <strong>{workbench.selectedDay.nutrition.restrictionNotes[0] ?? "无"}</strong>
+                          </div>
+                        </div>
+
+                        <div className="section-heading compact-heading">
+                          <h3>三餐建议</h3>
+                        </div>
+                        <ol className="number-list">
+                          {workbench.selectedDay.nutrition.meals.map((meal) => (
+                            <li key={meal}>{meal}</li>
+                          ))}
+                        </ol>
+
+                        <div className="section-heading compact-heading">
+                          <h3>可替换方案</h3>
+                        </div>
+                        <ul className="bullet-list">
+                          {workbench.selectedDay.nutrition.swaps.map((swap) => (
+                            <li key={swap}>{swap}</li>
+                          ))}
+                        </ul>
+                      </article>
+
+                      <article className="surface stack-md">
+                        <div className="section-heading">
+                          <h2>打卡</h2>
+                          <p>{workbench.selectedDay.checkInPrompt}</p>
+                        </div>
+                        <form action={checkInAction} className="form-stack">
+                          <input name="planId" type="hidden" value={plan.id} />
+                          <input name="dayIndex" type="hidden" value={String(workbench.selectedDay.dayIndex)} />
+
+                          <div className="choice-grid">
+                            <label className="choice-chip">
+                              <input defaultChecked name="completed" type="radio" value="yes" />
+                              <span>按计划完成</span>
+                            </label>
+                            <label className="choice-chip">
+                              <input name="completed" type="radio" value="no" />
+                              <span>没有完全完成</span>
+                            </label>
+                          </div>
+
+                          <div className="form-grid">
+                            <div className="field">
+                              <label htmlFor="weightKg">今日体重（kg）</label>
+                              <input id="weightKg" name="weightKg" placeholder="可选" step="0.1" type="number" />
+                            </div>
+                            <div className="field">
+                              <label htmlFor="fatigue">疲劳（1-5）</label>
+                              <input defaultValue="3" id="fatigue" max="5" min="1" name="fatigue" type="range" />
+                            </div>
+                            <div className="field">
+                              <label htmlFor="pain">疼痛（0-5）</label>
+                              <input defaultValue="1" id="pain" max="5" min="0" name="pain" type="range" />
+                            </div>
+                            <div className="field">
+                              <label htmlFor="hunger">饥饿感（1-5）</label>
+                              <input defaultValue="3" id="hunger" max="5" min="1" name="hunger" type="range" />
+                            </div>
+                          </div>
+
+                          <div className="field">
+                            <label htmlFor="notes">补充说明</label>
+                            <textarea
+                              id="notes"
+                              name="notes"
+                              placeholder="比如：今天只完成了前两个动作，或者某个动作不舒服。"
+                              rows={4}
+                            />
+                          </div>
+
+                          <button className="button-primary" type="submit">
+                            保存今天的打卡
+                          </button>
+                        </form>
+                      </article>
+
+                      <article className="surface stack-md">
+                        <div className="section-heading">
+                          <h2>调整计划</h2>
+                          <p>如果做不到、不舒服、时间不够或者饮食执行不了，直接说出来。</p>
+                        </div>
+
+                        <div className="pill-row">
+                          {adjustmentSuggestions.map((suggestion) => (
+                            <span className="info-pill" key={suggestion}>
+                              {suggestion}
+                            </span>
+                          ))}
+                        </div>
+
+                        <form action={adjustmentAction} className="form-stack">
+                          <input name="planId" type="hidden" value={plan.id} />
+                          <div className="field">
+                            <label htmlFor="message">你遇到了什么问题？</label>
+                            <textarea
+                              id="message"
+                              name="message"
+                              placeholder="比如：今天深蹲膝盖疼，换成更稳一点的动作。"
+                              required
+                              rows={4}
+                            />
+                          </div>
+                          <button className="button-primary" type="submit">
+                            发送调整请求
+                          </button>
+                        </form>
+                      </article>
+                    </div>
+                  </section>
                 ) : null}
               </div>
             </section>
-
-            <section className="surface">
-              <div className="section-heading">
-                <h2>最近反馈</h2>
-                <p>打卡和计划调整都能在这里快速回看。</p>
-              </div>
-              <div className="list-stack">
-                <div className="list-row">
-                  <div>
-                    <strong>最近一次打卡</strong>
-                    <p>
-                      {latestCheckIn
-                        ? `第 ${latestCheckIn.dayIndex} 天 · 疲劳 ${latestCheckIn.fatigue}/5 · 疼痛 ${latestCheckIn.pain}/5`
-                        : "还没有打卡记录"}
-                    </p>
-                  </div>
-                </div>
-                {latestAssistantMessages.map((message) => (
-                  <div className="list-row" key={message.id}>
-                    <div>
-                      <strong>调整建议</strong>
-                      <p>{message.content}</p>
-                    </div>
-                  </div>
-                ))}
-                {!latestAssistantMessages.length ? (
-                  <div className="list-row">
-                    <div>
-                      <strong>还没有调整记录</strong>
-                      <p>当你反馈“做不到”“太累”“膝盖不舒服”时，新的建议会出现在这里。</p>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </section>
-
-            <section className="surface">
-              <div className="section-heading">
-                <h2>计划说明</h2>
-                <p>{plan?.disclaimer ?? "完成评估后会展示计划说明。"}</p>
-              </div>
-              <div className="list-stack">
-                {dashboardData.revisions.slice(0, 2).map((revision) => (
-                  <div className="list-row" key={revision.id}>
-                    <div>
-                      <strong>{revision.adjustmentType}</strong>
-                      <p>{revision.message}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </aside>
-        </section>
+          </section>
+        )}
       </div>
     </main>
   );
 }
 
-function getCurrentDay(days: PlanDay[], completedDays: Set<number>) {
-  return days.find((day) => !completedDays.has(day.dayIndex)) ?? days[days.length - 1] ?? null;
+function getFirstDayIndexForWeek(days: PlanDay[], week: number) {
+  return days.find((day) => day.week === week)?.dayIndex ?? 1;
+}
+
+function clampNumber(value: string, fallback: number, max: number) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(max, Math.max(1, parsed));
 }
 
 function formatWorkoutMeta(item: WorkoutItem) {
@@ -479,28 +506,30 @@ function formatWorkoutDescription(item: WorkoutItem) {
   return `${cue} ${item.notes}`;
 }
 
-function stateLabelForDay(day: PlanDay, currentDay: PlanDay | null, completedDays: Set<number>) {
-  if (completedDays.has(day.dayIndex)) {
+function cardStateClass(state: "completed" | "current" | "upcoming" | "recovery") {
+  if (state === "completed") {
+    return "is-complete";
+  }
+  if (state === "current") {
+    return "is-active";
+  }
+  if (state === "recovery") {
+    return "is-recovery";
+  }
+  return "";
+}
+
+function stateLabel(state: "completed" | "current" | "upcoming" | "recovery") {
+  if (state === "completed") {
     return "已完成";
   }
-
-  if (currentDay?.dayIndex === day.dayIndex) {
-    return "进行中";
+  if (state === "current") {
+    return "当前";
   }
-
-  return day.focus.includes("恢复") ? "恢复日" : "待执行";
-}
-
-function stateClassForDay(day: PlanDay, currentDay: PlanDay | null, completedDays: Set<number>) {
-  if (completedDays.has(day.dayIndex) || currentDay?.dayIndex === day.dayIndex) {
-    return "is-training";
+  if (state === "recovery") {
+    return "恢复";
   }
-
-  return day.focus.includes("恢复") ? "is-recovery" : "is-training";
-}
-
-function experienceLabel(value: AssessmentInput["experience"]) {
-  return value === "intermediate" ? "有训练基础" : "新手起步";
+  return "待执行";
 }
 
 function environmentLabel(value: AssessmentInput["trainingEnvironment"]) {
@@ -513,6 +542,10 @@ function environmentLabel(value: AssessmentInput["trainingEnvironment"]) {
   }
 
   return "居家与健身房都可";
+}
+
+function experienceLabel(value: AssessmentInput["experience"]) {
+  return value === "intermediate" ? "已有基础" : "新手起步";
 }
 
 function joinOrFallback(values: string[], fallback: string) {
