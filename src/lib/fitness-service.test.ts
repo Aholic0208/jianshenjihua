@@ -176,6 +176,70 @@ describe("fitness service", () => {
     expect(dashboard.recentMessages.map((item) => item.id)).toEqual(savedMessages.map((item) => item.id));
     expect(dashboard.revisions[0]?.id).toBe(savedRevisions[0]?.id);
   });
+
+  it("builds differentiated planner data for different user profiles", () => {
+    const repository = createRepository();
+    const service = createFitnessService({ repository, now: createClock() });
+
+    const strengthUser = service.registerUser({
+      name: "Strength User",
+      email: "strength@example.com",
+      password: "StrongPass123!",
+    });
+    const fatLossUser = service.registerUser({
+      name: "Fat Loss User",
+      email: "fatloss@example.com",
+      password: "StrongPass123!",
+    });
+
+    const strengthAssessment: AssessmentInput = {
+      ...createAssessment(strengthUser.user.id),
+      goalText: "提升基础力量和上肢稳定",
+      trainingEnvironment: "gym",
+      equipment: ["mat", "dumbbells", "lat pulldown machine"],
+    };
+    const fatLossAssessment: AssessmentInput = {
+      ...createAssessment(fatLossUser.user.id),
+      goalText: "稳定减脂并改善久坐后的僵硬感",
+      trainingEnvironment: "home",
+      equipment: ["mat", "band"],
+    };
+
+    service.generatePlanFromAssessment(strengthAssessment);
+    service.generatePlanFromAssessment(fatLossAssessment);
+
+    const strengthDashboard = service.fetchLatestDashboardData(strengthUser.user.id);
+    const fatLossDashboard = service.fetchLatestDashboardData(fatLossUser.user.id);
+
+    expect(strengthDashboard.plan?.days[0]?.workoutItems.map((item) => item.name)).not.toEqual(
+      fatLossDashboard.plan?.days[0]?.workoutItems.map((item) => item.name),
+    );
+    expect(strengthDashboard.plan?.weeks).toHaveLength(4);
+    expect(fatLossDashboard.today?.label).toContain("第 1 周");
+  });
+
+  it("creates a revised plan snapshot after an actionable adjustment", () => {
+    const repository = createRepository();
+    const service = createFitnessService({ repository, now: createClock() });
+    const registration = service.registerUser({
+      name: "Revision User",
+      email: "revision@example.com",
+      password: "StrongPass123!",
+    });
+    const assessment = createAssessment(registration.user.id);
+    const plan = service.generatePlanFromAssessment(assessment);
+
+    service.recordAdjustmentRequest({
+      userId: registration.user.id,
+      planId: plan.id,
+      message: "今天深蹲膝盖疼，换成更稳一点的动作。",
+    });
+
+    const dashboard = service.fetchLatestDashboardData(registration.user.id);
+
+    expect(dashboard.revisions.length).toBeGreaterThan(0);
+    expect(dashboard.plan?.days[0]?.workoutItems.some((item) => item.name.includes("臀桥"))).toBe(true);
+  });
 });
 
 function createRepository() {

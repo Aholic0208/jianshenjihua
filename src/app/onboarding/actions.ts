@@ -20,11 +20,11 @@ export async function saveOnboardingAction(formData: FormData) {
     heightCm: toNumber(formData.get("heightCm"), 168),
     weightKg: toNumber(formData.get("weightKg"), 70),
     targetWeightKg: toOptionalNumber(formData.get("targetWeightKg")),
-    goalText: String(formData.get("goalText") ?? ""),
+    goalText: String(formData.get("goalText") ?? "").trim(),
     experience: toExperience(formData.get("experience")),
     trainingDaysPerWeek: toNumber(formData.get("trainingDays"), 4),
     sessionMinutes: toNumber(formData.get("sessionMinutes"), 45),
-    trainingEnvironment: toEnvironment(formData.get("environment")),
+    trainingEnvironment: toEnvironment(readFirstValue(formData, ["trainingEnvironment", "environment"])),
     equipment: splitLines(formData.get("equipment")),
     injuries: splitLines(formData.get("injuries")),
     chronicConditions: splitLines(formData.get("chronicConditions")),
@@ -52,6 +52,7 @@ function toOptionalNumber(value: FormDataEntryValue | null) {
   if (!text) {
     return undefined;
   }
+
   const parsed = Number.parseFloat(text);
   return Number.isFinite(parsed) ? parsed : undefined;
 }
@@ -68,6 +69,7 @@ function toEnvironment(value: FormDataEntryValue | null): TrainingEnvironment {
   if (text === "home" || text === "gym" || text === "both") {
     return text;
   }
+
   return "both";
 }
 
@@ -76,6 +78,7 @@ function toSex(value: FormDataEntryValue | null): "male" | "female" | "other" {
   if (text === "male" || text === "female" || text === "other") {
     return text;
   }
+
   return "female";
 }
 
@@ -88,6 +91,7 @@ function toBudget(value: FormDataEntryValue | null): "low" | "normal" | "high" {
   if (text === "low" || text === "high" || text === "normal") {
     return text;
   }
+
   return "normal";
 }
 
@@ -103,6 +107,17 @@ function collectImages(formData: FormData) {
       id: randomUUID(),
       kind: image.kind,
       url: image.url,
-      aiSummary: "已保存为参考图，仅用于理解训练目标，不作为医学结论。",
+      aiSummary: "已保存为参考图，仅用于帮助理解训练目标，不作为医疗结论。",
     }));
+}
+
+function readFirstValue(formData: FormData, names: string[]) {
+  for (const name of names) {
+    const value = formData.get(name);
+    if (value !== null) {
+      return value;
+    }
+  }
+
+  return null;
 }

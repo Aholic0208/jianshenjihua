@@ -49,7 +49,9 @@ export interface ExerciseMedia {
   environment: TrainingEnvironment;
   equipment: string[];
   imageUrl: string;
+  mistakeImageUrl?: string;
   videoUrl: string;
+  videoTitle?: string;
   steps: string[];
   cues: string[];
   commonMistakes: string[];
@@ -69,7 +71,10 @@ export interface WorkoutItem {
   restSeconds?: number;
   intensity: "easy" | "moderate" | "challenging";
   notes: string;
-  media: Pick<ExerciseMedia, "imageUrl" | "videoUrl" | "steps" | "cues" | "commonMistakes" | "alternatives">;
+  media: Pick<
+    ExerciseMedia,
+    "imageUrl" | "mistakeImageUrl" | "videoUrl" | "videoTitle" | "steps" | "cues" | "commonMistakes" | "alternatives" | "contraindications"
+  >;
 }
 
 export interface NutritionDay {
@@ -95,6 +100,7 @@ export interface PlanWeek {
   week: number;
   title: string;
   goal: string;
+  emphasis?: string[];
 }
 
 export interface FitnessPlan {
@@ -126,4 +132,38 @@ export interface CheckInInput {
   pain: number;
   hunger: number;
   notes?: string;
+}
+
+export interface PlanWeekSummary {
+  week: number;
+  title: string;
+  goal: string;
+  emphasis: string[];
+}
+
+export interface DayPlannerCard {
+  dayIndex: number;
+  week: number;
+  label: string;
+  shortLabel: string;
+  focus: string;
+  state: "completed" | "current" | "upcoming" | "recovery";
+  workoutCount: number;
+}
+
+export interface SelectedWorkbenchDay extends PlanDay {
+  shortLabel: string;
+  state: DayPlannerCard["state"];
+  completed: boolean;
+  latestCheckInSummary: string | null;
+  latestRevisionMessage: string | null;
+}
+
+export interface WorkoutWorkbench {
+  weeks: PlanWeekSummary[];
+  selectedWeek: PlanWeekSummary;
+  days: DayPlannerCard[];
+  selectedDay: SelectedWorkbenchDay | null;
+  latestRevisionMessage: string | null;
+  latestCheckInSummary: string | null;
 }

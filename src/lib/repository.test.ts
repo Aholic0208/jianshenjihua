@@ -194,6 +194,56 @@ describe("app repository", () => {
     expect(revisions[0]?.replacements.length).toBe(1);
   });
 
+  it("stores richer plan metadata and latest revision context", () => {
+    const repository = createRepository();
+    const assessment = { ...assessmentTemplate, userId: "repo-rich-user" };
+    const plan = generateFitnessPlan(assessment);
+
+    plan.weeks[0] = {
+      ...plan.weeks[0],
+      title: "建立节奏",
+      goal: "先把动作质量和训练频率稳定下来。",
+      emphasis: ["动作学习", "恢复感知", "基础力量"],
+    };
+    plan.days[0] = {
+      ...plan.days[0],
+      focus: "下肢力量 + 核心稳定",
+      checkInPrompt: "记录膝盖感觉、疲劳和完成度。",
+    };
+
+    repository.upsertUser({
+      id: assessment.userId,
+      name: "Rich Repo",
+      email: "rich@example.com",
+      passwordHash: "hash:rich",
+      createdAt: "2026-05-24T12:00:00.000Z",
+      updatedAt: "2026-05-24T12:00:00.000Z",
+    });
+    repository.saveAssessment(assessment, "2026-05-24T12:01:00.000Z");
+    repository.savePlan(plan);
+    repository.savePlanRevision({
+      id: "revision-rich-1",
+      userId: assessment.userId,
+      planId: plan.id,
+      reason: "膝盖不舒服",
+      adjustmentType: "exercise_swap",
+      message: "把深蹲替换为臀桥。",
+      replacements: plan.days[0]?.workoutItems.slice(0, 1) ?? [],
+      nutritionSuggestions: [],
+      sourceMessageId: "message-rich-1",
+      createdAt: "2026-05-24T12:02:00.000Z",
+    });
+
+    const latestPlan = repository.getLatestPlan(assessment.userId);
+    const revisions = repository.listPlanRevisions(plan.id);
+
+    expect(latestPlan?.weeks[0]?.title).toBe("建立节奏");
+    expect(latestPlan?.weeks[0]?.emphasis).toContain("动作学习");
+    expect(latestPlan?.days[0]?.focus).toBe("下肢力量 + 核心稳定");
+    expect(revisions[0]?.reason).toBe("膝盖不舒服");
+    expect(revisions[0]?.message).toContain("臀桥");
+  });
+
   it("can revoke sessions without deleting stored records", () => {
     const repository = createRepository();
 
