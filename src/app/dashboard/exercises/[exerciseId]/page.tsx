@@ -26,7 +26,7 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
     day: readValue(rawSearchParams.day),
   });
   const properImageUrl = resolveGeneratedImage(exercise.id, "proper") ?? exercise.imageUrl;
-  const mistakeImageUrl = resolveGeneratedImage(exercise.id, "mistake") ?? exercise.mistakeImageUrl ?? exercise.imageUrl;
+  const mistakeImageUrl = resolveGeneratedImage(exercise.id, "mistake") ?? exercise.mistakeImageUrl ?? null;
 
   return (
     <main className="screen">
@@ -80,15 +80,28 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
                 <h2>常见错误示意</h2>
                 <p>先避开最常见的错误，动作稳定性会提升得很快。</p>
               </div>
-              <img alt={`${exercise.name} 常见错误示意`} src={mistakeImageUrl} />
+              {mistakeImageUrl ? (
+                <img alt={`${exercise.name} 常见错误示意`} src={mistakeImageUrl} />
+              ) : (
+                <div className="surface stack-md">
+                  <div className="section-heading compact-heading">
+                    <h3>先重点避开这几种错误</h3>
+                  </div>
+                  <ul className="bullet-list">
+                    {exercise.commonMistakes.map((mistake) => (
+                      <li key={mistake}>{mistake}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </article>
           </section>
 
           <section className="planner-detail-grid">
             <article className="surface stack-md">
               <div className="section-heading">
-                <h2>怎么做</h2>
-                <p>每一步都尽量做得可控，不要急着追求速度。</p>
+                <h2>动作要领</h2>
+                <p>先把姿势做干净，再慢慢把节奏带起来，不用一开始就追求幅度和速度。</p>
               </div>
               <ol className="number-list">
                 {exercise.steps.map((step) => (
@@ -99,8 +112,8 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
 
             <article className="surface stack-md">
               <div className="section-heading">
-                <h2>你应该感觉到哪里发力</h2>
-                <p>这些提示能帮助你区分“正常吃力”和“动作跑偏”。</p>
+                <h2>发力技巧</h2>
+                <p>这些提示能帮你找到正确的主动发力点，避免靠甩腿、耸肩或憋气硬撑。</p>
               </div>
               <ul className="bullet-list">
                 {exercise.cues.map((cue) => (

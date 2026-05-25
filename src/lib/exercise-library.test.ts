@@ -10,4 +10,12 @@ describe("exercise library teaching quality", () => {
     expect(squat?.commonMistakes.length).toBeGreaterThanOrEqual(3);
     expect(squat?.contraindications.length).toBeGreaterThan(0);
   });
+
+  it("keeps warm-up march detailed enough for a teaching page", () => {
+    const warmup = exerciseLibrary.find((item) => item.id === "warmup-march");
+
+    expect(warmup?.steps.length).toBeGreaterThanOrEqual(3);
+    expect(warmup?.cues.length).toBeGreaterThanOrEqual(3);
+    expect(warmup?.commonMistakes.length).toBeGreaterThanOrEqual(3);
+  });
 });
