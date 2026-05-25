@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { generateFitnessPlan } from "./fitness";
+import type { SavedPlanRecord } from "./repository";
 import { buildWorkoutWorkbench } from "./workbench";
 import type { AssessmentInput } from "./types";
 
@@ -24,9 +25,15 @@ const assessment: AssessmentInput = {
   foodBudget: "normal",
 };
 
+const toSavedPlanRecord = (plan: ReturnType<typeof generateFitnessPlan>): SavedPlanRecord => ({
+  ...plan,
+  dayCount: plan.days.length,
+  faqEntries: plan.faqEntries ?? [],
+});
+
 describe("workbench view model", () => {
   it("builds week tabs and selected day detail", () => {
-    const plan = generateFitnessPlan(assessment);
+    const plan = toSavedPlanRecord(generateFitnessPlan(assessment));
     const workbench = buildWorkoutWorkbench({
       plan,
       selectedWeek: 2,
@@ -43,7 +50,7 @@ describe("workbench view model", () => {
   });
 
   it("switches visible days when another week is selected", () => {
-    const plan = generateFitnessPlan(assessment);
+    const plan = toSavedPlanRecord(generateFitnessPlan(assessment));
     const weekOne = buildWorkoutWorkbench({
       plan,
       selectedWeek: 1,
@@ -65,7 +72,7 @@ describe("workbench view model", () => {
   });
 
   it("shows day-specific adjustment details for the selected day", () => {
-    const plan = generateFitnessPlan(assessment);
+    const plan = toSavedPlanRecord(generateFitnessPlan(assessment));
     const workbench = buildWorkoutWorkbench({
       plan,
       selectedWeek: 2,

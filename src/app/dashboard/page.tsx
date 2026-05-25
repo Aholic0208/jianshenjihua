@@ -529,6 +529,25 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                           </button>
                         </form>
                       </article>
+
+                      {plan.faqEntries?.length ? (
+                        <article className="surface stack-md">
+                          <div className="section-heading">
+                            <h2>常见问题</h2>
+                            <p>这些说明会跟着你的计划类型一起变化，帮助你理解为什么这样安排。</p>
+                          </div>
+                          <div className="list-stack">
+                            {plan.faqEntries.map((entry) => (
+                              <div className="list-row" key={entry.id}>
+                                <div>
+                                  <strong>{entry.question}</strong>
+                                  <p>{entry.answer}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </article>
+                      ) : null}
                     </div>
                   </section>
                 ) : null}

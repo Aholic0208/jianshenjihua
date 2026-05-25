@@ -3,6 +3,7 @@ import { classifyPlanProfile } from "./plan-profile";
 import { chooseLowerBodyPrimary, type LowerBodyPrimary } from "./planner-rules";
 import { buildProgramTemplate } from "./program-template";
 import { buildNutritionStrategy } from "./nutrition-strategy";
+import { buildFaqEntries } from "./faq-rules";
 import type {
   AssessmentInput,
   ExerciseMedia,
@@ -112,6 +113,12 @@ export function generateFitnessPlan(input: AssessmentInput): FitnessPlan {
   );
   const exercises = getExercisesForEnvironment(input.trainingEnvironment, input.equipment);
   const nutrition = buildNutritionStrategy(input, profile);
+  const faqEntries = buildFaqEntries({
+    goalText: input.goalText,
+    profile,
+    program,
+    nutrition,
+  });
   const weeks = buildWeeks(profile.primaryGoal, lowerBodyPrimary);
 
   const days: PlanDay[] = [];
@@ -167,6 +174,8 @@ export function generateFitnessPlan(input: AssessmentInput): FitnessPlan {
     disclaimer: DISCLAIMER,
     weeks,
     days,
+    profile,
+    faqEntries,
   };
 }
 

@@ -7,6 +7,7 @@ import type {
   CheckInInput,
   ExerciseMedia,
   FitnessPlan,
+  PlanFaqEntry,
   PlanAdjustment,
   PlanDay,
   WorkoutItem,
@@ -52,6 +53,8 @@ export interface SavedPlanRecord {
   safety: FitnessPlan["safety"];
   weeks: FitnessPlan["weeks"];
   days: PlanDay[];
+  profile?: FitnessPlan["profile"];
+  faqEntries: PlanFaqEntry[];
 }
 
 export interface CheckInRecord extends CheckInInput {
@@ -192,9 +195,9 @@ export function createAppRepository(databasePath: string) {
       database
         .prepare(`
           INSERT INTO plans (
-            id, user_id, status, summary, disclaimer, safety_json, weeks_json, days_json, day_count, created_at
+            id, user_id, status, summary, disclaimer, safety_json, weeks_json, days_json, profile_json, faq_entries_json, day_count, created_at
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             user_id = excluded.user_id,
             status = excluded.status,
@@ -203,6 +206,8 @@ export function createAppRepository(databasePath: string) {
             safety_json = excluded.safety_json,
             weeks_json = excluded.weeks_json,
             days_json = excluded.days_json,
+            profile_json = excluded.profile_json,
+            faq_entries_json = excluded.faq_entries_json,
             day_count = excluded.day_count,
             created_at = excluded.created_at
         `)
@@ -215,6 +220,8 @@ export function createAppRepository(databasePath: string) {
           serialize(plan.safety),
           serialize(plan.weeks),
           serialize(plan.days),
+          serialize(plan.profile ?? null),
+          serialize(plan.faqEntries ?? []),
           plan.days.length,
           plan.createdAt,
         );
@@ -223,7 +230,7 @@ export function createAppRepository(databasePath: string) {
       const row = readOne<PlanRow>(
         database
           .prepare(`
-            SELECT id, user_id, status, summary, disclaimer, safety_json, weeks_json, days_json, day_count, created_at
+            SELECT id, user_id, status, summary, disclaimer, safety_json, weeks_json, days_json, profile_json, faq_entries_json, day_count, created_at
             FROM plans
             WHERE id = ?
             LIMIT 1
@@ -237,7 +244,7 @@ export function createAppRepository(databasePath: string) {
       const row = readOne<PlanRow>(
         database
           .prepare(`
-            SELECT id, user_id, status, summary, disclaimer, safety_json, weeks_json, days_json, day_count, created_at
+            SELECT id, user_id, status, summary, disclaimer, safety_json, weeks_json, days_json, profile_json, faq_entries_json, day_count, created_at
             FROM plans
             WHERE user_id = ?
             ORDER BY datetime(created_at) DESC
@@ -438,6 +445,8 @@ function initializeSchema(database: DatabaseSyncInstance) {
       safety_json TEXT NOT NULL,
       weeks_json TEXT NOT NULL,
       days_json TEXT NOT NULL,
+      profile_json TEXT,
+      faq_entries_json TEXT NOT NULL DEFAULT '[]',
       day_count INTEGER NOT NULL,
       created_at TEXT NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id)
@@ -492,6 +501,7 @@ function initializeSchema(database: DatabaseSyncInstance) {
   `);
 
   ensurePlanRevisionDayIndexColumn(database);
+  ensurePlanMetadataColumns(database);
 }
 
 function seedExerciseMedia(database: DatabaseSyncInstance) {
@@ -581,6 +591,8 @@ function mapPlan(row: PlanRow): SavedPlanRecord {
     safety: parseJson<FitnessPlan["safety"]>(row.safety_json),
     weeks: parseJson<FitnessPlan["weeks"]>(row.weeks_json),
     days: parseJson<PlanDay[]>(row.days_json),
+    profile: row.profile_json ? parseJson<FitnessPlan["profile"]>(row.profile_json) ?? undefined : undefined,
+    faqEntries: row.faq_entries_json ? parseJson<PlanFaqEntry[]>(row.faq_entries_json) : [],
     dayCount: row.day_count,
     createdAt: row.created_at,
   };
@@ -677,6 +689,8 @@ interface PlanRow {
   safety_json: string;
   weeks_json: string;
   days_json: string;
+  profile_json: string | null;
+  faq_entries_json: string;
   day_count: number;
   created_at: string;
 }
@@ -729,5 +743,19 @@ function ensurePlanRevisionDayIndexColumn(database: DatabaseSyncInstance) {
 
   if (!columns.some((column) => column.name === "day_index")) {
     database.exec("ALTER TABLE plan_revisions ADD COLUMN day_index INTEGER NOT NULL DEFAULT 1");
+  }
+}
+
+function ensurePlanMetadataColumns(database: DatabaseSyncInstance) {
+  const columns = readMany<{ name: string }>(
+    database.prepare("PRAGMA table_info(plans)").all(),
+  );
+
+  if (!columns.some((column) => column.name === "profile_json")) {
+    database.exec("ALTER TABLE plans ADD COLUMN profile_json TEXT");
+  }
+
+  if (!columns.some((column) => column.name === "faq_entries_json")) {
+    database.exec("ALTER TABLE plans ADD COLUMN faq_entries_json TEXT NOT NULL DEFAULT '[]'");
   }
 }

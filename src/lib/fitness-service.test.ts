@@ -65,6 +65,7 @@ describe("fitness service", () => {
     expect(plan.userId).toBe(registration.user.id);
     expect(dashboard.assessment?.goalText).toBe(assessment.goalText);
     expect(dashboard.plan?.id).toBe(plan.id);
+    expect(dashboard.plan?.faqEntries?.length).toBeGreaterThan(0);
     expect(dashboard.today?.dayIndex).toBe(1);
     expect(dashboard.recentCheckIns).toHaveLength(0);
     expect(dashboard.recentMessages).toHaveLength(0);

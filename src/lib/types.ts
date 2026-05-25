@@ -122,6 +122,13 @@ export interface PlanWeek {
   emphasis?: string[];
 }
 
+export interface PlanFaqEntry {
+  id: string;
+  question: string;
+  answer: string;
+  category: "training" | "nutrition" | "recovery" | "cardio" | "equipment" | "misconception";
+}
+
 export interface FitnessPlan {
   id: string;
   userId: string;
@@ -132,6 +139,8 @@ export interface FitnessPlan {
   disclaimer: string;
   weeks: PlanWeek[];
   days: PlanDay[];
+  profile?: PlanProfile;
+  faqEntries?: PlanFaqEntry[];
 }
 
 export interface PlanAdjustment {

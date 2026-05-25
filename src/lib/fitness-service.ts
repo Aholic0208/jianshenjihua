@@ -238,6 +238,8 @@ function planToFitnessPlan(plan: SavedPlanRecord): FitnessPlan {
     weeks: plan.weeks,
     days: plan.days,
     createdAt: plan.createdAt,
+    profile: plan.profile,
+    faqEntries: plan.faqEntries,
   };
 }
 
