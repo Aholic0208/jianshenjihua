@@ -14,6 +14,13 @@ export function buildNutritionStrategy(
   profile: PlanProfile,
 ): NutritionDay {
   const maintenance = estimateMaintenanceCalories(input);
+  const restrictionNotes = [
+    ...input.dietaryRestrictions.filter(Boolean),
+    ...input.allergies.filter(Boolean),
+  ];
+  const normalizedRestrictionNotes = restrictionNotes.length > 0
+    ? [`已避开或提示限制：${restrictionNotes.join("、")}`]
+    : ["没有填写明显忌口，仍建议根据个人耐受做调整。"];
 
   if (profile.primaryGoal === "lean_gain_strength") {
     return {
@@ -31,7 +38,7 @@ export function buildNutritionStrategy(
         "米饭可换面、燕麦、土豆。",
         "食欲不足时可用奶昔补足蛋白和热量。",
       ],
-      restrictionNotes: [],
+      restrictionNotes: normalizedRestrictionNotes,
       indulgenceGuidance: "可以安排放松餐，但不要用它替代大部分正餐。",
     };
   }
@@ -52,7 +59,7 @@ export function buildNutritionStrategy(
         "零食替换为酸奶、水果或即食蛋白。",
         "没时间做饭时，先保证蛋白来源而不是只吃零食。",
       ],
-      restrictionNotes: [],
+      restrictionNotes: normalizedRestrictionNotes,
       indulgenceGuidance: "放松餐可以保留，更关键的是周平均热量和蛋白完成度。",
     };
   }
@@ -72,7 +79,7 @@ export function buildNutritionStrategy(
       "米饭可换土豆、玉米、燕麦。",
       "嘴馋时先用高蛋白加餐顶住。",
     ],
-    restrictionNotes: [],
+    restrictionNotes: normalizedRestrictionNotes,
     indulgenceGuidance: "每周可以安排一次放松餐，但把它控制在一餐，而不是一天失控。",
   };
 }

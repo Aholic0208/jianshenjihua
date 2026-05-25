@@ -170,6 +170,27 @@ export const exerciseLibrary: ExerciseMedia[] = [
     contraindications: ["头晕、胸闷或膝踝疼痛加重时立即停止"],
   },
   {
+    id: "step-cardio",
+    name: "台阶踏步有氧",
+    category: "cardio",
+    difficulty: "beginner",
+    muscles: ["心肺", "下肢", "核心"],
+    environment: "home",
+    equipment: [],
+    imageUrl: "/media/exercises/cardio.svg",
+    videoUrl: "https://www.verywellfit.com/step-aerobics-guide-1230824",
+    videoTitle: "Step Cardio Basics",
+    steps: [
+      "选择稳定台阶或低凳，先用较慢节奏上下踏步热身。",
+      "逐渐提高节奏，保持能完整说短句但呼吸明显加快。",
+      "结束前放慢 1 到 2 分钟，让心率逐步回落。",
+    ],
+    cues: ["全脚掌踩稳再换脚", "上台阶时髋和膝一起发力", "躯干保持直立，不要含胸弯腰"],
+    commonMistakes: ["台阶太高导致动作变形", "速度过快踩不稳", "一直低头看脚影响节奏"],
+    alternatives: ["warmup-march", "户外快走", "室内低冲击循环"],
+    contraindications: ["头晕或膝踝疼痛加剧时停止", "地面不稳时暂停"],
+  },
+  {
     id: "lat-pulldown",
     name: "高位下拉",
     category: "strength",
@@ -242,6 +263,7 @@ function matchesEquipment(required: string, owned: string[]) {
   }
 
   const synonyms: Record<string, string[]> = {
+    band: ["band", "bands", "弹力带"],
     dumbbell: ["dumbbell", "dumbbells", "哑铃"],
     treadmill: ["treadmill", "跑步机"],
     "lat pulldown machine": ["lat pulldown", "lat pulldown machine", "高位下拉", "下拉器"],

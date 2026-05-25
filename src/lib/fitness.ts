@@ -1,12 +1,17 @@
 import { exerciseLibrary, getExercisesForEnvironment } from "./exercise-library";
-import { buildWeekEmphasis, chooseGoalTrack, chooseLowerBodyPrimary, deriveCalorieAdjustment, type GoalTrack, type LowerBodyPrimary } from "./planner-rules";
+import { classifyPlanProfile } from "./plan-profile";
+import { chooseLowerBodyPrimary, type LowerBodyPrimary } from "./planner-rules";
+import { buildProgramTemplate } from "./program-template";
+import { buildNutritionStrategy } from "./nutrition-strategy";
 import type {
   AssessmentInput,
   ExerciseMedia,
   FitnessPlan,
   NutritionDay,
+  PlanPrimaryGoal,
   PlanAdjustment,
   PlanDay,
+  PlanWeek,
   SafetyAnalysis,
   WorkoutItem,
 } from "./types";
@@ -95,75 +100,46 @@ export function generateFitnessPlan(input: AssessmentInput): FitnessPlan {
     };
   }
 
-  const goalTrack = chooseGoalTrack(input.goalText);
+  const profile = classifyPlanProfile(input);
   const lowerBodyPrimary = chooseLowerBodyPrimary(input.injuries);
   const trainingDays = normalizeTrainingDays(input.trainingDaysPerWeek, input.experience);
+  const program = buildProgramTemplate(
+    {
+      ...input,
+      trainingDaysPerWeek: trainingDays,
+    },
+    profile,
+  );
   const exercises = getExercisesForEnvironment(input.trainingEnvironment, input.equipment);
-  const workoutTemplates = buildWorkoutTemplates({
-    exercises,
-    sessionMinutes: input.sessionMinutes,
-    goalTrack,
-    lowerBodyPrimary,
-    trainingEnvironment: input.trainingEnvironment,
-  });
-  const nutrition = buildNutrition(input, goalTrack);
-  const weekEmphasis = buildWeekEmphasis({
-    goalTrack,
-    lowerBodyPrimary,
-    experience: input.experience,
-  });
-
-  const weeks = [
-    {
-      week: 1,
-      title: "建立节奏",
-      goal: "先把动作质量、恢复感知和训练出勤稳定下来。",
-      emphasis: weekEmphasis[0],
-    },
-    {
-      week: 2,
-      title: "稳定推进",
-      goal: "在动作不变形的前提下，提升训练密度和完成度。",
-      emphasis: weekEmphasis[1],
-    },
-    {
-      week: 3,
-      title: "渐进挑战",
-      goal: "如果恢复良好，再小幅提高组数或有氧时长。",
-      emphasis: weekEmphasis[2],
-    },
-    {
-      week: 4,
-      title: "巩固复盘",
-      goal: "复盘四周反馈，为下一阶段计划积累依据。",
-      emphasis: weekEmphasis[3],
-    },
-  ];
+  const nutrition = buildNutritionStrategy(input, profile);
+  const weeks = buildWeeks(profile.primaryGoal, lowerBodyPrimary);
 
   const days: PlanDay[] = [];
 
   for (let dayIndex = 1; dayIndex <= 28; dayIndex += 1) {
     const week = Math.ceil(dayIndex / 7);
     const weekday = ((dayIndex - 1) % 7) + 1;
-    const isTrainingDay = weekday <= trainingDays;
-    const template = workoutTemplates[(weekday - 1) % workoutTemplates.length] ?? workoutTemplates[0] ?? [];
+    const dayTag = program.weeklyStructure[weekday - 1] ?? "recovery";
+    const isTrainingDay = dayTag !== "recovery";
     const workoutItems = isTrainingDay
-      ? template.map((item) => scaleWorkout(item, week, goalTrack))
+      ? buildWorkoutItemsForTag({
+          dayTag,
+          exercises,
+          trainingEnvironment: input.trainingEnvironment,
+          sessionMinutes: input.sessionMinutes,
+          lowerBodyPrimary,
+          week,
+          primaryGoal: profile.primaryGoal,
+        })
       : buildRecoveryItems(exercises, input.trainingEnvironment);
 
     days.push({
       dayIndex,
       week,
       label: `第 ${week} 周 · 第 ${weekday} 天`,
-      focus: isTrainingDay
-        ? getFocusForDay({
-            weekday,
-            goalTrack,
-            lowerBodyPrimary,
-          })
-        : "恢复、轻活动与拉伸",
+      focus: getFocusForDayTag(dayTag, lowerBodyPrimary),
       workoutItems,
-      nutrition: buildDailyNutrition(nutrition, isTrainingDay, week, goalTrack),
+      nutrition: buildDailyNutrition(nutrition, isTrainingDay, week, profile.primaryGoal),
       checkInPrompt: "记录完成度、疲劳、疼痛、饥饿感和备注，系统会据此微调下一次训练。",
     });
   }
@@ -174,7 +150,7 @@ export function generateFitnessPlan(input: AssessmentInput): FitnessPlan {
     .join("；");
   const summary = [
     `4 周个性化计划：每周 ${trainingDays} 天训练，每次约 ${input.sessionMinutes} 分钟。`,
-    `目标重点：${summarizeGoalTrack(goalTrack)}。`,
+    `目标重点：${summarizePlanPrimaryGoal(profile.primaryGoal)}。`,
     `当前场景：${describeEnvironment(input.trainingEnvironment)}。`,
     imageInsight ? `图像参考：${imageInsight}` : "",
   ]
@@ -265,12 +241,14 @@ export function proposePlanAdjustment(plan: FitnessPlan, feedback: string): Plan
   };
 }
 
-function buildWorkoutTemplates(input: {
+function buildWorkoutItemsForTag(input: {
+  dayTag: string;
   exercises: ExerciseMedia[];
   sessionMinutes: number;
-  goalTrack: GoalTrack;
   lowerBodyPrimary: LowerBodyPrimary;
   trainingEnvironment: AssessmentInput["trainingEnvironment"];
+  week: number;
+  primaryGoal: PlanPrimaryGoal;
 }) {
   const warmup = pick(input.exercises, "warmup", "warmup-march");
   const squat = input.lowerBodyPrimary === "hip_dominant"
@@ -286,131 +264,61 @@ function buildWorkoutTemplates(input: {
   const core = pick(input.exercises, "strength", "plank");
   const cardio = input.trainingEnvironment === "gym"
     ? pick(input.exercises, "cardio", "treadmill-walk")
-    : pick(input.exercises, "cardio", "warmup-march");
+    : pick(input.exercises, "cardio", "step-cardio");
   const stretch = pick(input.exercises, "mobility", "stretch-full-body");
-  const cardioMinutes = input.goalTrack === "fat_loss"
-    ? input.sessionMinutes >= 45 ? 16 : 10
-    : input.sessionMinutes >= 45
-      ? 12
-      : 8;
+  const cardioMinutes = readCardioMinutes(input.primaryGoal, input.sessionMinutes, input.dayTag.includes("recovery"));
+  const template = input.dayTag === "push"
+    ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(push, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+    : input.dayTag === "pull"
+      ? [toWorkoutItem(warmup, 1), toWorkoutItem(row, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+      : input.dayTag === "legs"
+        ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+        : input.dayTag === "upper_accessory"
+          ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+          : input.dayTag === "upper_gym"
+            ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(stretch, 1)]
+            : input.dayTag === "lower_home"
+              ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+              : input.dayTag === "upper_home"
+                ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+                : input.dayTag === "lower_gym"
+                  ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)]
+                  : input.dayTag.includes("cardio")
+                    ? [toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1, 8)]
+                    : [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)];
 
-  if (input.goalTrack === "muscle_gain") {
-    return [
-      [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(bridge, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)],
-    ];
-  }
-
-  if (input.goalTrack === "posture") {
-    return [
-      [toWorkoutItem(warmup, 1), toWorkoutItem(core, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1, 10)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(bridge, 1), toWorkoutItem(push, 1), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(core, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1, 10)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)],
-    ];
-  }
-
-  if (input.goalTrack === "body_shape") {
-    return [
-      [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(bridge, 1), toWorkoutItem(row, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)],
-      [toWorkoutItem(warmup, 1), toWorkoutItem(bridge, 1), toWorkoutItem(push, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)],
-    ];
-  }
-
-  return [
-    [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)],
-    [toWorkoutItem(warmup, 1), toWorkoutItem(bridge, 1), toWorkoutItem(row, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)],
-    [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)],
-    [toWorkoutItem(warmup, 1), toWorkoutItem(bridge, 1), toWorkoutItem(push, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)],
-  ];
+  return template.map((item) => scaleWorkout(item, input.week, input.primaryGoal));
 }
 
 function buildRecoveryItems(exercises: ExerciseMedia[], environment: AssessmentInput["trainingEnvironment"]) {
   const stretch = pick(exercises, "mobility", "stretch-full-body");
   const walk = environment === "gym"
     ? pick(exercises, "cardio", "treadmill-walk")
-    : pick(exercises, "cardio", "warmup-march");
+    : pick(exercises, "cardio", "step-cardio");
 
   return [toWorkoutItem(walk, 1, 8), toWorkoutItem(stretch, 1, 8)];
 }
 
-function buildNutrition(input: AssessmentInput, goalTrack: GoalTrack): NutritionDay {
-  const bmr = input.sex === "female"
-    ? 10 * input.weightKg + 6.25 * input.heightCm - 5 * input.age - 161
-    : 10 * input.weightKg + 6.25 * input.heightCm - 5 * input.age + 5;
-  const maintenance = bmr * (input.trainingDaysPerWeek >= 4 ? 1.5 : 1.42);
-  const wantsWeightLoss = Boolean(input.targetWeightKg && input.targetWeightKg < input.weightKg) || goalTrack === "fat_loss";
-  const calorieAdjustment = deriveCalorieAdjustment({
-    wantsWeightLoss,
-    sex: input.sex,
-  });
-  const calorieTarget = Math.round((maintenance + calorieAdjustment) / 50) * 50;
-  const safeCalories = Math.max(input.sex === "female" ? 1300 : 1500, calorieTarget);
-  const proteinMultiplier = goalTrack === "muscle_gain" ? 1.8 : 1.6;
-  const proteinGrams = Math.round(input.weightKg * proteinMultiplier);
-  const restrictions = [...input.dietaryRestrictions, ...input.allergies].filter(Boolean);
-
-  const meals = [
-    "早餐：燕麦或全麦主食 + 鸡蛋/无糖酸奶 + 一份水果。",
-    "午餐：米饭/土豆/杂粮饭 + 优质蛋白 + 两份蔬菜。",
-    "晚餐：优质蛋白 + 大量蔬菜 + 适量主食，训练日不要完全不吃碳水。",
-    "加餐：无糖酸奶、低脂奶、鸡蛋或水果，按饥饿感选择。",
-  ].map((meal) => applyFoodRestrictions(meal, restrictions));
-
-  return {
-    calorieTarget: safeCalories,
-    proteinGrams,
-    waterLiters: input.weightKg >= 80 ? 2.6 : 2.2,
-    meals,
-    swaps: [
-      "鸡胸肉可替换成鱼、虾、鸡蛋、豆腐或瘦猪肉。",
-      "米饭可替换成土豆、玉米、燕麦或全麦面。",
-      "不方便做饭时，优先选便利店里有蛋白质和主食的组合，而不是只吃零食。",
-    ],
-    restrictionNotes: restrictions.length > 0
-      ? [`已避开或提示限制：${restrictions.join("、")}`]
-      : ["没有填写明显忌口，仍建议根据个人耐受做调整。"],
-  };
-}
-
-function buildDailyNutrition(base: NutritionDay, isTrainingDay: boolean, week: number, goalTrack: GoalTrack): NutritionDay {
+function buildDailyNutrition(base: NutritionDay, isTrainingDay: boolean, week: number, primaryGoal: PlanPrimaryGoal): NutritionDay {
   if (!isTrainingDay) {
     return {
       ...base,
-      calorieTarget: goalTrack === "muscle_gain" ? base.calorieTarget : base.calorieTarget - 100,
+      calorieTarget: primaryGoal === "lean_gain_strength" ? base.calorieTarget : base.calorieTarget - 100,
       meals: [...base.meals],
       swaps: [...base.swaps, "恢复日如果活动量较低，可把主食分量略减半拳到一拳。"],
       restrictionNotes: [...base.restrictionNotes],
+      indulgenceGuidance: base.indulgenceGuidance,
     };
   }
 
   return {
     ...base,
-    calorieTarget: week >= 3 && goalTrack === "muscle_gain" ? base.calorieTarget + 100 : base.calorieTarget,
+    calorieTarget: week >= 3 && primaryGoal === "lean_gain_strength" ? base.calorieTarget + 100 : base.calorieTarget,
     meals: [...base.meals],
     swaps: [...base.swaps],
     restrictionNotes: [...base.restrictionNotes],
+    indulgenceGuidance: base.indulgenceGuidance,
   };
-}
-
-function applyFoodRestrictions(meal: string, restrictions: string[]) {
-  let updated = meal;
-  for (const restriction of restrictions) {
-    if (restriction.includes("牛肉")) {
-      updated = updated.replaceAll("牛肉", "鱼虾豆腐");
-    }
-    if (restriction.includes("花生")) {
-      updated = updated.replaceAll("花生", "无糖酸奶");
-    }
-    if (restriction.toLowerCase().includes("lactose")) {
-      updated = updated.replaceAll("无糖酸奶", "无乳糖酸奶");
-    }
-  }
-  return updated;
 }
 
 function toWorkoutItem(exercise: ExerciseMedia | undefined, week: number, durationMinutes?: number): WorkoutItem {
@@ -443,11 +351,11 @@ function toWorkoutItem(exercise: ExerciseMedia | undefined, week: number, durati
   };
 }
 
-function scaleWorkout(item: WorkoutItem, week: number, goalTrack: GoalTrack): WorkoutItem {
+function scaleWorkout(item: WorkoutItem, week: number, primaryGoal: PlanPrimaryGoal): WorkoutItem {
   if (item.sets) {
     return {
       ...item,
-      sets: Math.min(goalTrack === "muscle_gain" ? 5 : 4, item.sets + (week >= 3 ? 1 : 0)),
+      sets: Math.min(primaryGoal === "lean_gain_strength" ? 5 : 4, item.sets + (week >= 3 ? 1 : 0)),
       intensity: week >= 3 ? "moderate" : item.intensity,
     };
   }
@@ -455,7 +363,7 @@ function scaleWorkout(item: WorkoutItem, week: number, goalTrack: GoalTrack): Wo
   if (item.durationMinutes && item.category === "cardio") {
     return {
       ...item,
-      durationMinutes: item.durationMinutes + (goalTrack === "fat_loss" ? week : Math.max(0, week - 2)),
+      durationMinutes: item.durationMinutes + (primaryGoal === "fat_loss_preserve_muscle" ? week : Math.max(0, week - 2)),
       intensity: week >= 3 ? "moderate" : item.intensity,
     };
   }
@@ -471,42 +379,91 @@ function pick(exercises: ExerciseMedia[], category: ExerciseMedia["category"], p
     ?? exerciseLibrary[0];
 }
 
-function getFocusForDay(input: {
-  weekday: number;
-  goalTrack: GoalTrack;
-  lowerBodyPrimary: LowerBodyPrimary;
-}) {
-  const lowerBodyFocus = input.lowerBodyPrimary === "hip_dominant" ? "臀腿控制" : "下肢力量";
-
-  if (input.goalTrack === "muscle_gain") {
-    return [lowerBodyFocus, "上肢推拉", "核心稳定", "全身强化"][input.weekday - 1] ?? "基础力量";
+function getFocusForDayTag(dayTag: string, lowerBodyPrimary: LowerBodyPrimary) {
+  const lowerBodyFocus = lowerBodyPrimary === "hip_dominant" ? "臀腿控制" : "下肢力量";
+  if (dayTag === "push") {
+    return "推训练";
   }
-
-  if (input.goalTrack === "posture") {
-    return ["核心稳定", "肩髋活动", lowerBodyFocus, "姿态整合"][input.weekday - 1] ?? "体态恢复";
+  if (dayTag === "pull") {
+    return "拉训练";
   }
-
-  if (input.goalTrack === "body_shape") {
-    return [lowerBodyFocus, "上肢线条", "核心与代谢", "全身塑形"][input.weekday - 1] ?? "塑形训练";
+  if (dayTag === "legs") {
+    return lowerBodyFocus;
   }
-
-  return [lowerBodyFocus, "上肢力量", "全身代谢", "核心与步数"][input.weekday - 1] ?? "减脂训练";
+  if (dayTag === "upper_accessory" || dayTag === "upper_gym" || dayTag === "upper_home") {
+    return "上肢强化";
+  }
+  if (dayTag === "lower_home" || dayTag === "lower_gym") {
+    return lowerBodyFocus;
+  }
+  if (dayTag.includes("cardio")) {
+    return "有氧与恢复";
+  }
+  if (dayTag.includes("full_body")) {
+    return "全身训练";
+  }
+  return "恢复、轻活动与拉伸";
 }
 
-function summarizeGoalTrack(goalTrack: GoalTrack) {
-  if (goalTrack === "muscle_gain") {
-    return "以基础力量和训练渐进为主";
+function summarizePlanPrimaryGoal(primaryGoal: PlanPrimaryGoal) {
+  if (primaryGoal === "lean_gain_strength") {
+    return "以增肌增力和渐进超负荷为主";
   }
-
-  if (goalTrack === "posture") {
-    return "以体态改善、核心稳定和活动度为主";
+  if (primaryGoal === "recomposition") {
+    return "以增肌降体脂和训练质量为主";
   }
+  return "以减脂保肌、出勤和恢复为主";
+}
 
-  if (goalTrack === "body_shape") {
-    return "以塑形、训练密度和动作质量为主";
-  }
+function buildWeeks(primaryGoal: PlanPrimaryGoal, lowerBodyPrimary: LowerBodyPrimary): PlanWeek[] {
+  const lowerBodyCue = lowerBodyPrimary === "hip_dominant" ? "臀后链控制" : "下肢发力模式";
+  const weekEmphasis = primaryGoal === "lean_gain_strength"
+    ? [
+        ["动作稳定", "记录主动作表现", lowerBodyCue],
+        ["增加训练完成度", "稳定组数", "保留恢复"],
+        ["渐进超负荷", "核心动作推进", "小幅加量"],
+        ["巩固表现", "复盘恢复", "为下一阶段做准备"],
+      ]
+    : primaryGoal === "recomposition"
+      ? [
+          ["动作质量", "力量输出", lowerBodyCue],
+          ["维持训练节奏", "蛋白完成度", "保留有氧"],
+          ["提升完成度", "观察围度与主观状态", "稳步推进"],
+          ["巩固习惯", "复盘反馈", "准备下一轮计划"],
+        ]
+      : [
+          ["规律出勤", "动作学习", lowerBodyCue],
+          ["抗阻训练优先", "逐步增加活动量", "恢复跟上"],
+          ["维持力量", "提高有氧完成度", "避免激进节食"],
+          ["巩固执行", "复盘饥饿与疲劳", "准备下一轮"],
+        ];
 
-  return "以稳定减脂、出勤和恢复为主";
+  return [
+    {
+      week: 1,
+      title: "建立节奏",
+      goal: "先把动作质量、恢复感知和训练出勤稳定下来。",
+      emphasis: weekEmphasis[0],
+    },
+    {
+      week: 2,
+      title: "稳定推进",
+      goal: "在动作不变形的前提下，提升训练密度和完成度。",
+      emphasis: weekEmphasis[1],
+    },
+    {
+      week: 3,
+      title: "渐进挑战",
+      goal: "如果恢复良好，再小幅提高组数或有氧时长。",
+      emphasis: weekEmphasis[2],
+    },
+    {
+      week: 4,
+      title: "巩固复盘",
+      goal: "复盘四周反馈，为下一阶段计划积累依据。",
+      emphasis: weekEmphasis[3],
+    },
+  ];
 }
 
 function describeEnvironment(environment: AssessmentInput["trainingEnvironment"]) {
@@ -532,6 +489,16 @@ function normalizeTrainingDays(days: number, experience: AssessmentInput["experi
     return Math.min(capped, 4);
   }
   return capped;
+}
+
+function readCardioMinutes(primaryGoal: PlanPrimaryGoal, sessionMinutes: number, isRecoveryDay: boolean) {
+  if (primaryGoal === "fat_loss_preserve_muscle") {
+    return isRecoveryDay ? Math.max(12, Math.round(sessionMinutes * 0.4)) : Math.max(10, Math.round(sessionMinutes * 0.25));
+  }
+  if (primaryGoal === "lean_gain_strength") {
+    return isRecoveryDay ? 12 : 8;
+  }
+  return isRecoveryDay ? 14 : 10;
 }
 
 function containsAny(text: string, terms: string[]) {

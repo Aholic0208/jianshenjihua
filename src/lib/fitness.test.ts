@@ -100,6 +100,52 @@ describe("fitness plan generation", () => {
     expect(mealText).not.toContain("牛肉");
     expect(plan.days[0]?.nutrition.restrictionNotes.join(" ")).toContain("花生");
   });
+
+  it("creates a lean-gain gym plan with split-oriented focus and moderate cardio", () => {
+    const plan = generateFitnessPlan({
+      ...baseAssessment,
+      weightKg: 64,
+      targetWeightKg: 69,
+      goalText: "想增肌变壮并提升力量",
+      experience: "intermediate",
+      trainingEnvironment: "gym",
+      trainingDaysPerWeek: 5,
+      sessionMinutes: 60,
+      equipment: ["哑铃", "跑步机", "高位下拉", "器械"],
+    });
+
+    const focusText = plan.days.slice(0, 7).map((day) => day.focus).join(" ");
+    const cardioCount = plan.days
+      .flatMap((day) => day.workoutItems)
+      .filter((item) => item.category === "cardio").length;
+
+    expect(focusText).toMatch(/推|拉|腿|上肢|下肢/);
+    expect(cardioCount).toBeGreaterThan(0);
+    expect(plan.days[0]?.nutrition.indulgenceGuidance).toContain("放松");
+  });
+
+  it("creates a higher-cardio fat-loss plan without dropping resistance work", () => {
+    const plan = generateFitnessPlan({
+      ...baseAssessment,
+      weightKg: 96,
+      targetWeightKg: 85,
+      goalText: "想减脂减重，但不想掉太多肌肉",
+      trainingEnvironment: "home",
+      trainingDaysPerWeek: 4,
+      equipment: ["瑜伽垫", "弹力带"],
+    });
+
+    const strengthCount = plan.days
+      .flatMap((day) => day.workoutItems)
+      .filter((item) => item.category === "strength").length;
+    const cardioCount = plan.days
+      .flatMap((day) => day.workoutItems)
+      .filter((item) => item.category === "cardio").length;
+
+    expect(strengthCount).toBeGreaterThan(0);
+    expect(cardioCount).toBeGreaterThan(0);
+    expect(plan.days[0]?.focus).toContain("全身");
+  });
 });
 
 describe("plan adjustments", () => {
