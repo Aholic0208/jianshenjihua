@@ -7,7 +7,7 @@ import { exerciseLibrary } from "./exercise-library";
 import { resolveExerciseTeachingMedia } from "./exercise-teaching-media";
 
 describe("exercise teaching media", () => {
-  it("prefers generated images and a local rendered demo video when they exist", () => {
+  it("prefers generated svg images and a local rendered demo video when they exist", () => {
     const media = resolveExerciseTeachingMedia(
       {
         exerciseId: "dumbbell-row",
@@ -16,12 +16,13 @@ describe("exercise teaching media", () => {
         videoUrl: "https://example.com/external-video",
       },
       (assetPath) =>
-        assetPath === "public/media/exercises/generated/dumbbell-row-proper.png"
+        assetPath === "public/media/exercises/generated/dumbbell-row-proper.svg"
+        || assetPath === "public/media/exercises/generated/dumbbell-row-mistake.svg"
         || assetPath === "public/media/exercises/generated/dumbbell-row-demo.mp4",
     );
 
-    expect(media.properImageUrl).toBe("/media/exercises/generated/dumbbell-row-proper.png");
-    expect(media.mistakeImageUrl).toBeNull();
+    expect(media.properImageUrl).toBe("/media/exercises/generated/dumbbell-row-proper.svg");
+    expect(media.mistakeImageUrl).toBe("/media/exercises/generated/dumbbell-row-mistake.svg");
     expect(media.localVideoUrl).toBe("/media/exercises/generated/dumbbell-row-demo.mp4");
     expect(media.externalVideoUrl).toBe("https://example.com/external-video");
   });
@@ -43,10 +44,25 @@ describe("exercise teaching media", () => {
     expect(media.externalVideoUrl).toBe("https://example.com/plank-video");
   });
 
-  it("ships a local dynamic demo video for every exercise in the library", () => {
+  it("ships a local proper image, mistake image, and dynamic demo video for every exercise in the library", () => {
     const missing = exerciseLibrary
       .map((exercise) => exercise.id)
-      .filter((exerciseId) => !existsSync(join(process.cwd(), "public", "media", "exercises", "generated", `${exerciseId}-demo.mp4`)));
+      .flatMap((exerciseId) => {
+        const generatedDir = join(process.cwd(), "public", "media", "exercises", "generated");
+        const properExists =
+          existsSync(join(generatedDir, `${exerciseId}-proper.svg`))
+          || existsSync(join(generatedDir, `${exerciseId}-proper.png`));
+        const mistakeExists =
+          existsSync(join(generatedDir, `${exerciseId}-mistake.svg`))
+          || existsSync(join(generatedDir, `${exerciseId}-mistake.png`));
+        const demoExists = existsSync(join(generatedDir, `${exerciseId}-demo.mp4`));
+
+        return [
+          ...(properExists ? [] : [`${exerciseId}:proper`]),
+          ...(mistakeExists ? [] : [`${exerciseId}:mistake`]),
+          ...(demoExists ? [] : [`${exerciseId}:demo`]),
+        ];
+      });
 
     expect(missing).toEqual([]);
   });

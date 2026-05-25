@@ -3,12 +3,14 @@ node_modules/
 
 # Next.js and build output
 .next/
+.next-cache*/
 out/
 dist/
 build/
 .turbo/
 *.tsbuildinfo
 tsconfig.tsbuildinfo
+*.tsbuildinfo*.bak
 .publishrepo/
 
 # Test and coverage output

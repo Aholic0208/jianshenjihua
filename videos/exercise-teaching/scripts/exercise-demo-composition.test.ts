@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildCompositionHtml } from "./exercise-demo-composition.mjs";
 
 describe("buildCompositionHtml", () => {
-  it("renders a moving robot demo scene with red muscle highlights for stretch-full-body", () => {
+  it("renders a stable proper-vs-mistake explainer scene for stretch-full-body", () => {
     const html = buildCompositionHtml({
       exerciseId: "stretch-full-body",
       exercise: {
@@ -16,18 +16,16 @@ describe("buildCompositionHtml", () => {
       },
     });
 
-    expect(html).toContain('data-robot-stage="true"');
-    expect(html).toContain('data-motion-profile="mobility-flow"');
-    expect(html).toContain('class="hotspot hotspot-primary"');
-    expect(html).toContain('class="robot-figure"');
-    expect(html).toContain("tl.to(\"#pose-arms\"");
-    expect(html).toContain("tl.to(\"#hotspot-primary\"");
-    expect(html).toContain('id="motion-arc-left"');
-    expect(html).toContain('class="motion-path motion-path-primary"');
-    expect(html).toContain('id="highlight-shoulders"');
-    expect(html).toContain('class="highlight-shell highlight-shell-primary"');
-    expect(html).toContain('attr: { cx: 360, cy: 246');
-    expect(html).toContain('attr: { cx: 300, cy: 314');
-    expect(html).toContain("tl.to(\"#highlight-shoulders\"");
+    expect(html).toContain('data-explainer-scene="true"');
+    expect(html).toContain('data-exercise-id="stretch-full-body"');
+    expect(html).toContain('class="pose-card pose-card-proper"');
+    expect(html).toContain('class="pose-card pose-card-mistake"');
+    expect(html).toContain("正确示范");
+    expect(html).toContain("常见错误");
+    expect(html).toContain("green-marker");
+    expect(html).toContain("red-marker");
+    expect(html).toContain("tl.to(\".pose-card-proper\"");
+    expect(html).toContain("tl.to(\".pose-card-mistake\"");
+    expect(html).not.toContain('data-robot-stage="true"');
   });
 });

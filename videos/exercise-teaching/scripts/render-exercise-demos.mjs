@@ -1,9 +1,10 @@
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
-import { buildCompositionHtml as buildExerciseDemoCompositionHtml } from "./exercise-demo-composition.mjs";
+import { buildCompositionHtml } from "./exercise-demo-composition.mjs";
+import { buildExerciseTeachingIllustration } from "./exercise-pose-library.mjs";
 import { buildHyperframesCommand } from "./hyperframes-command.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -12,187 +13,142 @@ const workspaceRoot = resolve(projectDir, "..", "..");
 const publicGeneratedDir = join(workspaceRoot, "public", "media", "exercises", "generated");
 const assetDir = join(projectDir, "assets", "exercise-media");
 const indexPath = join(projectDir, "index.html");
-const DEFAULT_RENDER_PROFILE = { quality: "draft" };
-const EXERCISE_RENDER_PROFILES = {
-  "stretch-full-body": { quality: null },
-};
 
 const exerciseCatalog = {
   "warmup-march": {
     name: "原地高抬腿热身",
-    focus: "把心率慢慢带起来，同时保持身体立直和脚步轻。",
-    steps: [
-      "下巴微收，肋骨叠在骨盆上方，先让身体站稳。",
-      "交替提膝到接近髋部的舒服高度，配合对侧手臂摆动。",
-      "前脚掌轻触地面后再平稳落下，全程呼吸顺畅。",
-    ],
-    cues: [
-      "主动用髋前侧把膝盖提起，不要靠后仰甩腿。",
-      "核心轻轻收紧，上身像被向上提着一样保持直立。",
-      "先做稳，再逐渐提节奏，不用一开始就追求很快。",
-    ],
-    mistakes: ["上身后仰", "落地太重", "抬腿过高导致骨盆前倾"],
-    caution: "如果踝关节疼痛、胸闷或头晕，先立即停下。",
+    muscles: ["髋前侧", "核心", "心肺"],
+    focus: "先把心率和节奏带起来，同时保持上身稳定和脚步轻。",
+    steps: ["站稳后再开始交替抬膝", "用髋前侧主动提膝", "脚步轻落地，呼吸自然"],
+    cues: ["别靠后仰甩腿", "核心轻收紧", "先稳住节奏再提速"],
+    mistakes: ["上身后仰", "落地太重", "抬膝过高导致骨盆前倾"],
+    caution: "踝、膝、胸闷或头晕不适时先停下来。",
   },
   "bodyweight-squat": {
     name: "徒手深蹲",
-    focus: "先把坐髋、膝盖方向和脚底重心控制住。",
-    steps: [
-      "双脚略宽于肩，脚尖自然微微外开，站稳后再开始下蹲。",
-      "像坐向身后椅子一样把髋向后坐，膝盖顺着脚尖方向弯曲。",
-      "下降到腰背还能稳定的深度，再用脚掌发力站起。",
-    ],
-    cues: [
-      "想象脚底把地面轻轻踩开，膝盖保持和脚尖同向。",
-      "胸口保持打开，脊柱中立，不要塌腰也不要弓背。",
-      "站起时先让臀部和大腿一起发力，不要借惯性弹起来。",
-    ],
-    mistakes: ["膝盖内扣", "塌腰或圆背", "重心跑到前脚掌"],
-    caution: "膝盖或腰髋出现锐痛时，不要继续加深幅度。",
+    muscles: ["股四头肌", "臀部", "核心"],
+    focus: "先把髋膝配合和脚底重心做对，再谈深度。",
+    steps: ["双脚站稳，脚尖微外开", "臀部向后坐，膝盖顺脚尖方向弯曲", "全脚掌发力站起"],
+    cues: ["膝盖和脚尖同向", "胸口打开，脊柱中立", "全程可控，不要弹起"],
+    mistakes: ["膝盖内扣", "塌腰圆背", "重心全跑到前脚掌"],
+    caution: "膝或腰髋有锐痛时，先缩小幅度或停止。",
   },
   "glute-bridge": {
     name: "臀桥",
-    focus: "把发力从下背转到臀部，让髋伸展更干净。",
-    steps: [
-      "仰卧屈膝，双脚踩稳地面，脚跟与臀部保持舒适距离。",
-      "先轻轻收紧腹部，再用臀部发力把髋抬起。",
-      "顶端停一秒，感受臀部收紧，再慢慢落回地面。",
-    ],
-    cues: [
-      "想象脚掌把地面向下踩开，臀部主动向上推。",
-      "顶端时肋骨别外翻，避免用腰去顶。",
-      "下降过程也要控制，别直接掉下去。",
-    ],
-    mistakes: ["用腰猛顶", "脚离臀太远", "顶端过度后仰"],
-    caution: "如果腰椎急性疼痛，先暂停这个动作。",
+    muscles: ["臀大肌", "腿后侧", "核心"],
+    focus: "把发力从下背转到臀部，让髋伸更干净。",
+    steps: ["仰卧屈膝，双脚踩稳", "收紧腹部后再抬髋", "顶端停一下再受控落下"],
+    cues: ["像把地面向下踩开", "发力重点在臀部", "回程也要控制"],
+    mistakes: ["顶腰", "脚离臀太远", "过度后仰"],
+    caution: "腰椎急性疼痛时先暂停。",
   },
   "incline-push-up": {
     name: "上斜俯卧撑",
-    focus: "保持整条身体像一块板，别让肩和腰代偿。",
-    steps: [
-      "双手放在稳定台面上，手距略宽于肩，身体从头到脚保持一条直线。",
-      "屈肘下降，让胸口靠近支撑面，肘部大约朝后外侧 30 到 45 度。",
-      "腹部收紧，把身体整体推回起始位置。",
-    ],
-    cues: [
-      "下压时先把肩膀远离耳朵，别耸肩。",
-      "核心要一直收紧，避免塌腰或屁股翘太高。",
-      "推起时想象把支撑面推远，而不是只用手臂乱顶。",
-    ],
-    mistakes: ["耸肩", "塌腰或抬臀过高", "肘部完全外张"],
-    caution: "肩前侧或手腕有明显刺痛时先停。",
+    muscles: ["胸肌", "肱三头肌", "核心"],
+    focus: "身体像一块板，先把胸肩稳定做干净。",
+    steps: ["双手放稳，身体成一条斜线", "胸口靠近支撑面", "整体推回起点"],
+    cues: ["别耸肩", "核心持续收紧", "推起时把支撑面推远"],
+    mistakes: ["塌腰", "臀部抬太高", "肘完全外张"],
+    caution: "肩前侧或手腕刺痛时，先抬高支撑面。",
   },
   "dumbbell-row": {
     name: "哑铃划船",
-    focus: "先收肩胛，再拉手肘，让背部真正参与。",
-    steps: [
-      "一手扶稳支撑物，髋向后折叠，背部保持平直。",
-      "另一只手握住哑铃，先轻轻后收肩胛，再把手肘朝髋部方向拉近身体。",
-      "顶端停顿一下，再控制哑铃慢慢放回起始位置。",
-    ],
-    cues: [
-      "先让肩胛向后下方收紧，再开始拉手臂。",
-      "脖子保持放松，肩膀不要耸到耳边。",
-      "身体稳定住，不要靠扭腰或甩身体借力。",
-    ],
-    mistakes: ["圆背", "靠甩身体提重量", "只用手臂发力"],
-    caution: "急性下背痛时先减轻负荷，必要时改成胸托版本。",
+    muscles: ["背阔肌", "菱形肌", "肱二头肌"],
+    focus: "先收肩胛，再把手肘往后拉，别只靠手臂。",
+    steps: ["扶稳支撑物，髋折叠", "先后收肩胛，再把肘往髋拉", "顶端停顿后再受控放回"],
+    cues: ["胸口打开", "脖子放松", "躯干别左右乱扭"],
+    mistakes: ["圆背", "耸肩", "甩身体借力"],
+    caution: "下背不适时先减轻重量或改支撑版本。",
   },
   "band-row": {
     name: "弹力带划船",
-    focus: "拉的时候先稳定身体，再让肩胛和背部带动动作。",
-    steps: [
-      "把弹力带固定在稳定位置，双手握住后先站稳或坐稳。",
-      "收紧腹部，先后收肩胛，再把手肘沿身体两侧向后拉。",
-      "顶端停一秒，再慢慢送回起始位置。",
-    ],
-    cues: [
-      "肩膀远离耳朵，拉的时候胸口保持展开。",
-      "回程也要控制，不要让弹力带突然弹回去。",
-      "全程先稳定核心，再去拉手臂。",
-    ],
-    mistakes: ["身体后仰借力", "耸肩", "回放太快失去张力"],
-    caution: "固定点不稳时不要继续拉，先确认安全。",
+    muscles: ["背阔肌", "菱形肌", "后束三角肌"],
+    focus: "先固定躯干，再让肩胛和背部带动拉力。",
+    steps: ["固定弹力带并站稳", "先收肩胛，再把手肘向后拉", "回程受控保持张力"],
+    cues: ["肩膀远离耳朵", "别后仰借力", "回程不要弹回去"],
+    mistakes: ["身体后仰", "耸肩", "回放过快"],
+    caution: "固定点不稳时先别继续拉。",
   },
   plank: {
     name: "平板支撑",
-    focus: "让核心和臀部共同稳定身体，别用腰硬撑。",
-    steps: [
-      "前臂撑地，肘部放在肩下方，双脚向后伸直。",
-      "收紧腹部和臀部，让头、肩、髋、脚跟尽量成一直线。",
-      "保持自然呼吸，坚持到动作还能稳定为止。",
-    ],
-    cues: [
-      "想象肋骨往里收，腰不要往下掉。",
-      "屁股不要翘太高，保持身体像平板一样稳定。",
-      "宁可时间短一点，也不要姿势越来越散。",
-    ],
-    mistakes: ["腰部下沉", "臀部抬太高", "耸肩"],
-    caution: "腰背或肩腕出现锐痛时立刻停下。",
+    muscles: ["核心", "肩部稳定肌", "臀部"],
+    focus: "让核心持续收紧，而不是靠下背硬撑。",
+    steps: ["肘在肩下，双脚向后伸直", "头肩髋脚跟尽量一条线", "自然呼吸并保持稳定"],
+    cues: ["肋骨微收", "臀部别翘太高", "宁可时间短也别散架"],
+    mistakes: ["塌腰", "臀部过高", "耸肩"],
+    caution: "腰背或肩肘刺痛时立刻停。",
   },
   "treadmill-walk": {
     name: "跑步机快走",
-    focus: "通过稳定步频和自然摆臂把心率抬起来。",
-    steps: [
-      "先用较低速度走 2 到 3 分钟热身。",
-      "逐渐调整到能说短句但心率明显提高的快走速度。",
-      "结束前再降速 2 分钟，让呼吸慢慢回落。",
-    ],
-    cues: [
-      "目视前方，肩膀放松，不要一直低头看脚。",
-      "摆臂自然，别死死抓着扶手。",
-      "步幅自然，不需要刻意迈得很大。",
-    ],
-    mistakes: ["一开始就速度过快", "一直抓扶手", "突然停下不降速"],
-    caution: "头晕、胸闷或膝踝不适加重时立即停止。",
+    muscles: ["心肺", "下肢"],
+    focus: "通过稳定步频和自然摆臂把心率带起来。",
+    steps: ["先低速热身", "把速度提到能说短句的强度", "结束前降速缓下来"],
+    cues: ["别一直扶把手", "视线看前方", "步幅自然"],
+    mistakes: ["一开始就太快", "死抓扶手", "突然停下不减速"],
+    caution: "胸闷、头晕或膝踝痛加重时停止。",
   },
   "step-cardio": {
     name: "台阶踏步有氧",
-    focus: "先稳住脚步和重心，再把节奏和心率带起来。",
-    steps: [
-      "选择稳定的低台阶或矮凳，先用较慢节奏上下踏步热身。",
-      "上台阶时让整只脚踩稳，再换另一只脚跟上；下台阶时同样稳稳落地。",
-      "逐渐提速，但始终保持上身直立、呼吸顺畅，结束前再慢下来。",
-    ],
-    cues: [
-      "全脚掌踩稳再换脚，不要只用前脚掌点一下就急着起步。",
-      "髋和膝一起发力，身体向上而不是向前扑。",
-      "眼睛看前方，手臂自然配合摆动，不要一直低头找脚。",
-    ],
-    mistakes: ["台阶过高导致动作变形", "速度过快踩不稳", "一直低头看脚影响节奏"],
-    caution: "如果头晕或膝踝疼痛加剧，先立刻停下来。",
+    muscles: ["心肺", "下肢", "核心"],
+    focus: "先把踩稳和重心控制做好，再提节奏。",
+    steps: ["先低节奏热身", "整脚踩稳再换脚", "结束前放慢恢复"],
+    cues: ["全脚掌踩稳", "髋膝一起发力", "眼睛看前方"],
+    mistakes: ["台阶太高", "踩不稳", "一直低头看脚"],
+    caution: "头晕或膝踝疼痛加重时先停。",
   },
   "lat-pulldown": {
     name: "高位下拉",
-    focus: "先沉肩，再拉肘，避免用身体后仰去拽重量。",
-    steps: [
-      "坐稳并固定大腿，双手略宽于肩握住横杆。",
-      "先把肩膀轻轻向下沉，再把横杆拉向上胸位置。",
-      "控制回放，不要让重量把手臂突然带回去。",
-    ],
-    cues: [
-      "胸口轻轻抬起，但不要大幅后仰借力。",
-      "想象手肘向下向后走，而不是只想着手往下拉。",
-      "整个动作都让肩胛保持稳定，不要耸肩。",
-    ],
-    mistakes: ["身体后仰过多", "耸肩", "借惯性猛拉"],
-    caution: "肩前侧或肘腕不适明显时，先减轻重量或停下。",
+    muscles: ["背阔肌", "肱二头肌", "肩胛稳定肌"],
+    focus: "先沉肩，再把横杆拉向上胸，不要拉到脑后。",
+    steps: ["坐稳并固定大腿", "先沉肩，再把横杆拉向上胸", "受控还原，不要猛放"],
+    cues: ["胸口轻轻抬起", "别大幅后仰", "整套动作都别耸肩"],
+    mistakes: ["横杆拉到脑后", "后仰太多", "靠惯性猛拉"],
+    caution: "肩前侧或肘不适明显时先减重。",
+  },
+  "machine-chest-press": {
+    name: "器械胸推",
+    muscles: ["胸肌", "肱三头肌", "前三角"],
+    focus: "手腕中立、肩膀下沉，让胸口把把手推出去。",
+    steps: ["调好座椅，让把手对到胸口中部", "收紧肩胛和腹部后推出把手", "受控回程，不让配重反弹"],
+    cues: ["别扣腕", "别耸肩", "推起时像把把手送远"],
+    mistakes: ["手腕后扣", "耸肩顶重量", "座椅位置不对"],
+    caution: "肩前侧刺痛时先减重或调整握法。",
+  },
+  "seated-cable-row": {
+    name: "坐姿划船器",
+    muscles: ["背阔肌", "菱形肌", "后束三角肌"],
+    focus: "胸口打开，先收肩胛，再把把手拉向下肋。",
+    steps: ["坐稳踩住踏板", "先收肩胛，再把肘沿身体两侧拉回", "慢慢伸回去保持张力"],
+    cues: ["别圆背", "别靠前后晃借力", "回程也要受控"],
+    mistakes: ["猛然后仰", "圆背前冲", "全靠手臂拉"],
+    caution: "下背不适时先减重或缩小幅度。",
+  },
+  "goblet-squat": {
+    name: "哑铃杯状深蹲",
+    muscles: ["股四头肌", "臀部", "核心"],
+    focus: "哑铃贴近胸前，先把膝盖轨迹和躯干稳定做好。",
+    steps: ["双手托住哑铃贴近胸前", "臀部向后坐，膝盖顺脚尖方向弯曲", "全脚掌发力站起"],
+    cues: ["别让重量离身", "膝盖别内扣", "先稳住再求深"],
+    mistakes: ["抱铃离身", "膝盖内扣", "上身前栽"],
+    caution: "腕、肘、膝髋有锐痛时先减重或停。",
+  },
+  "leg-press": {
+    name: "腿举机推腿",
+    muscles: ["股四头肌", "臀部", "腿后侧"],
+    focus: "臀部和下背贴稳座椅，膝盖顺着脚尖方向发力。",
+    steps: ["背部和臀部贴稳靠背", "受控屈膝让踏板靠近", "推回接近伸直时停住"],
+    cues: ["别锁死膝盖", "别让臀部离座", "全程受控别弹起"],
+    mistakes: ["膝盖锁死", "臀部离座", "膝盖内扣"],
+    caution: "膝前侧或下背不适明显时先减重。",
   },
   "stretch-full-body": {
     name: "全身拉伸放松",
+    muscles: ["髋部", "胸椎", "肩颈", "小腿"],
     focus: "用缓慢呼吸把身体放松下来，不要追求疼痛感。",
-    steps: [
-      "按小腿、大腿前侧、臀部、胸部和肩颈的顺序依次放松。",
-      "每个位置停留 20 到 30 秒，以轻微拉伸感为准。",
-      "保持自然呼吸，慢慢让肌肉放松下来。",
-    ],
-    cues: [
-      "呼气时放松一点点，不要突然弹震。",
-      "动作越慢越好，别急着切换下一个部位。",
-      "只要有刺痛，就立刻缩小幅度或停下。",
-    ],
-    mistakes: ["拉到疼痛", "弹震式拉伸", "憋气"],
-    caution: "急性拉伤或关节肿胀时，不要强行拉伸。",
+    steps: ["先上举延展", "再做轻柔侧屈", "每个位置停留并自然呼吸"],
+    cues: ["动作越慢越好", "呼气时再放松一点", "有刺痛立刻缩小幅度"],
+    mistakes: ["拉到疼痛", "弹震式拉伸", "塌腰耸肩"],
+    caution: "关节明显肿胀或急性拉伤时先休息评估。",
   },
 };
 
@@ -208,65 +164,44 @@ for (const exerciseId of exerciseIds) {
     throw new Error(`Unknown exercise id: ${exerciseId}`);
   }
 
-  const properSource = resolveImageSource(exerciseId, "proper");
-  const localAssetName = `${exerciseId}-proper${properSource.ext}`;
-  const localAssetPath = join(assetDir, localAssetName);
-  copyFileSync(properSource.sourcePath, localAssetPath);
-
-  writeFileSync(indexPath, buildExerciseDemoCompositionHtml({
+  const properSvg = buildExerciseTeachingIllustration({
     exerciseId,
     exercise,
-    imagePath: `assets/exercise-media/${localAssetName}`,
-  }));
+    variant: "proper",
+  });
+  const mistakeSvg = buildExerciseTeachingIllustration({
+    exerciseId,
+    exercise,
+    variant: "mistake",
+  });
+
+  const publicProperPath = join(publicGeneratedDir, `${exerciseId}-proper.svg`);
+  const publicMistakePath = join(publicGeneratedDir, `${exerciseId}-mistake.svg`);
+  const assetProperPath = join(assetDir, `${exerciseId}-proper.svg`);
+  const assetMistakePath = join(assetDir, `${exerciseId}-mistake.svg`);
+
+  writeFileSync(publicProperPath, properSvg);
+  writeFileSync(publicMistakePath, mistakeSvg);
+  writeFileSync(assetProperPath, properSvg);
+  writeFileSync(assetMistakePath, mistakeSvg);
+
+  writeFileSync(
+    indexPath,
+    buildCompositionHtml({
+      exerciseId,
+      exercise,
+      properImagePath: `assets/exercise-media/${exerciseId}-proper.svg`,
+      mistakeImagePath: `assets/exercise-media/${exerciseId}-mistake.svg`,
+    }),
+  );
 
   runHyperframes(["lint"], projectDir);
   runHyperframes(["validate"], projectDir);
   runHyperframes(["inspect"], projectDir, { allowFailure: true });
-  const renderProfile = EXERCISE_RENDER_PROFILES[exerciseId] ?? DEFAULT_RENDER_PROFILE;
-  const renderArgs = [
-    "render",
-    "--output",
-    join(publicGeneratedDir, `${exerciseId}-demo.mp4`),
-  ];
-  if (renderProfile.quality) {
-    renderArgs.push("--quality", renderProfile.quality);
-  }
-
   runHyperframes(
-    renderArgs,
+    ["render", "--output", join(publicGeneratedDir, `${exerciseId}-demo.mp4`)],
     projectDir,
   );
-}
-
-function resolveImageSource(exerciseId, kind) {
-  const generatedName = `${exerciseId}-${kind}.png`;
-  const generatedPath = join(publicGeneratedDir, generatedName);
-  if (existsSync(generatedPath)) {
-    return { sourcePath: generatedPath, ext: ".png" };
-  }
-
-  const fallbackMap = {
-    "warmup-march": "warmup.svg",
-    "bodyweight-squat": "strength-lower.svg",
-    "glute-bridge": "strength-lower.svg",
-    "incline-push-up": "strength-upper.svg",
-    "dumbbell-row": "strength-upper.svg",
-    "band-row": "strength-upper.svg",
-    plank: "core.svg",
-    "treadmill-walk": "cardio.svg",
-    "step-cardio": "cardio.svg",
-    "lat-pulldown": "strength-upper.svg",
-    "stretch-full-body": "mobility.svg",
-  };
-  const fallback = fallbackMap[exerciseId];
-  if (!fallback) {
-    throw new Error(`No fallback image configured for ${exerciseId}`);
-  }
-
-  return {
-    sourcePath: join(workspaceRoot, "public", "media", "exercises", fallback),
-    ext: ".svg",
-  };
 }
 
 function runHyperframes(args, cwd, options = {}) {
@@ -292,190 +227,7 @@ function runHyperframes(args, cwd, options = {}) {
       throw error;
     }
 
-    console.warn(`[hyperframes] ${args.join(" ")} exited non-zero in this environment; continuing with render.`);
+    console.warn(`[hyperframes] ${args.join(" ")} exited non-zero in this environment; continuing.`);
     return false;
   }
-}
-
-function buildCompositionHtml({ exerciseId, exercise, imagePath }) {
-  const steps = exercise.steps.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  const cues = exercise.cues.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  const mistakes = exercise.mistakes.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-
-  return `<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1920, height=1080" />
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body {
-        width: 1920px;
-        height: 1080px;
-        overflow: hidden;
-        background: #f4f7f5;
-        font-family: "Segoe UI", "Roboto", "Inter", sans-serif;
-        color: #16211d;
-      }
-      #root {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 28%),
-          linear-gradient(180deg, #f4f7f5 0%, #eef4f2 100%);
-      }
-      .clip { position: absolute; }
-      .eyebrow {
-        top: 64px;
-        left: 72px;
-        display: inline-flex;
-        align-items: center;
-        gap: 14px;
-        padding: 12px 20px;
-        border-radius: 999px;
-        background: #e9f5ef;
-        color: #1c6b4b;
-        font-size: 22px;
-        font-weight: 700;
-        letter-spacing: 0;
-      }
-      .title-block {
-        top: 132px;
-        left: 72px;
-        width: 760px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-      .title-block h1 {
-        font-size: 74px;
-        line-height: 1.05;
-        font-weight: 800;
-      }
-      .title-block p {
-        font-size: 28px;
-        line-height: 1.5;
-        color: #44544d;
-      }
-      .hero-card {
-        top: 298px;
-        left: 72px;
-        width: 760px;
-        height: 690px;
-        padding: 36px;
-        border-radius: 32px;
-        background: rgba(255,255,255,0.96);
-        box-shadow: 0 28px 80px rgba(22, 33, 29, 0.12);
-      }
-      .hero-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      .panel {
-        right: 72px;
-        width: 944px;
-        padding: 34px 38px;
-        border-radius: 28px;
-        background: rgba(255,255,255,0.96);
-        box-shadow: 0 22px 64px rgba(22, 33, 29, 0.1);
-      }
-      .panel h2 {
-        font-size: 34px;
-        margin-bottom: 18px;
-      }
-      .panel ol,
-      .panel ul {
-        padding-left: 28px;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        font-size: 26px;
-        line-height: 1.45;
-        color: #33413b;
-      }
-      .panel-steps { top: 152px; height: 286px; }
-      .panel-cues { top: 470px; height: 252px; border: 2px solid rgba(28, 107, 75, 0.14); }
-      .panel-mistakes { top: 754px; height: 234px; border: 2px solid rgba(183, 110, 31, 0.18); }
-      .panel-mistakes ul {
-        gap: 10px;
-        font-size: 24px;
-        line-height: 1.35;
-      }
-      .mistake-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 14px;
-        padding: 10px 16px;
-        border-radius: 999px;
-        background: #fff6ea;
-        color: #9a5b16;
-        font-size: 22px;
-        font-weight: 700;
-      }
-      .footer-note {
-        left: 72px;
-        bottom: 34px;
-        width: 1776px;
-        padding: 20px 28px;
-        border-radius: 22px;
-        background: rgba(22, 33, 29, 0.92);
-        color: #ffffff;
-        font-size: 26px;
-        line-height: 1.45;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
-      <div id="eyebrow" class="clip eyebrow" data-start="0" data-duration="10" data-track-index="1">站内讲解视频 · ${escapeHtml(exercise.name)}</div>
-      <div id="title" class="clip title-block" data-start="0" data-duration="10" data-track-index="2">
-        <h1>${escapeHtml(exercise.name)}</h1>
-        <p>${escapeHtml(exercise.focus)}</p>
-      </div>
-      <div id="hero" class="clip hero-card" data-start="0.2" data-duration="9.8" data-track-index="3">
-        <img src="${imagePath}" alt="${escapeHtml(exercise.name)} 标准动作示意" crossorigin="anonymous" />
-      </div>
-      <div id="steps" class="clip panel panel-steps" data-start="0.5" data-duration="9.5" data-track-index="4">
-        <h2>动作要领</h2>
-        <ol>${steps}</ol>
-      </div>
-      <div id="cues" class="clip panel panel-cues" data-start="2.3" data-duration="7.7" data-track-index="5">
-        <h2>发力技巧</h2>
-        <ul>${cues}</ul>
-      </div>
-      <div id="mistakes" class="clip panel panel-mistakes" data-start="5.1" data-duration="4.9" data-track-index="6">
-        <div class="mistake-tag">新手最容易错的地方</div>
-        <ul>${mistakes}</ul>
-      </div>
-      <div id="footer" class="clip footer-note" data-start="7.3" data-duration="2.7" data-track-index="7">${escapeHtml(exercise.caution)}</div>
-    </div>
-
-    <script>
-      window.__timelines = window.__timelines || {};
-      const tl = gsap.timeline({ paused: true });
-      tl.from("#eyebrow", { y: 24, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.15);
-      tl.from("#title", { y: 40, opacity: 0, duration: 0.7, ease: "expo.out" }, 0.28);
-      tl.from("#hero", { x: -42, opacity: 0, duration: 0.85, ease: "power3.out" }, 0.45);
-      tl.from("#steps", { x: 54, opacity: 0, duration: 0.7, ease: "power2.out" }, 0.6);
-      tl.from("#cues", { x: 42, opacity: 0, duration: 0.62, ease: "power3.out" }, 2.35);
-      tl.from("#mistakes", { x: 40, opacity: 0, duration: 0.58, ease: "expo.out" }, 5.15);
-      tl.from("#footer", { y: 26, opacity: 0, duration: 0.5, ease: "power2.out" }, 7.35);
-      tl.to("#root", { opacity: 0, duration: 0.45, ease: "power2.in" }, 9.45);
-      window.__timelines["main"] = tl;
-    </script>
-  </body>
-</html>`;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll("\"", "&quot;")
-    .replaceAll("'", "&#39;");
 }
