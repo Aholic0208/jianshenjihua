@@ -259,42 +259,50 @@ function buildWorkoutItemsForTag(input: {
   week: number;
   primaryGoal: PlanPrimaryGoal;
 }) {
+  const normalizedDayTag = normalizeDayTag(input.dayTag);
+  const dayEnvironment = resolveDayEnvironment(input.dayTag, input.trainingEnvironment);
   const warmup = pick(input.exercises, "warmup", "warmup-march");
   const squat = input.lowerBodyPrimary === "hip_dominant"
     ? pick(input.exercises, "strength", "glute-bridge")
     : pick(input.exercises, "strength", "bodyweight-squat");
   const bridge = pick(input.exercises, "strength", "glute-bridge");
   const push = pick(input.exercises, "strength", "incline-push-up");
-  const preferredHomePull = input.exercises.some((exercise) => exercise.id === "band-row") ? "band-row" : "dumbbell-row";
-  const row = input.trainingEnvironment === "gym"
+  const preferredHomePull = input.exercises.some((exercise) => exercise.id === "band-row")
+    ? "band-row"
+    : "dumbbell-row";
+  const row = dayEnvironment === "gym"
     ? pick(input.exercises, "strength", "lat-pulldown")
     : pick(input.exercises, "strength", preferredHomePull);
-  const secondaryPull = pick(input.exercises, "strength", preferredHomePull);
+  const secondaryPull = dayEnvironment === "gym"
+    ? pick(input.exercises, "strength", "dumbbell-row")
+    : pick(
+        input.exercises,
+        "strength",
+        input.exercises.some((exercise) => exercise.id === "dumbbell-row") ? "dumbbell-row" : preferredHomePull,
+      );
   const core = pick(input.exercises, "strength", "plank");
-  const cardio = input.trainingEnvironment === "gym"
+  const cardio = dayEnvironment === "gym"
     ? pick(input.exercises, "cardio", "treadmill-walk")
     : pick(input.exercises, "cardio", "step-cardio");
   const stretch = pick(input.exercises, "mobility", "stretch-full-body");
   const cardioMinutes = readCardioMinutes(input.primaryGoal, input.sessionMinutes, input.dayTag.includes("recovery"));
-  const template = input.dayTag === "push"
+  const template = normalizedDayTag === "push"
     ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(push, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
-    : input.dayTag === "pull"
+    : normalizedDayTag === "pull"
       ? [toWorkoutItem(warmup, 1), toWorkoutItem(row, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
-      : input.dayTag === "legs"
+      : normalizedDayTag === "legs"
         ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
-        : input.dayTag === "upper_accessory"
+        : normalizedDayTag === "upper_accessory"
           ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
-          : input.dayTag === "upper_gym"
+          : normalizedDayTag === "upper"
             ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(stretch, 1)]
-            : input.dayTag === "lower_home"
-              ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
-              : input.dayTag === "upper_home"
-                ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
-                : input.dayTag === "lower_gym"
-                  ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)]
-                  : input.dayTag.includes("cardio")
-                    ? [toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1, 8)]
-                    : [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)];
+            : normalizedDayTag === "lower"
+              ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)]
+              : normalizedDayTag === "cardio"
+                ? [toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1, 8)]
+                : normalizedDayTag === "full_body"
+                  ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)]
+                  : [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)];
 
   return template.map((item) => scaleWorkout(item, input.week, input.primaryGoal));
 }
@@ -388,27 +396,48 @@ function pick(exercises: ExerciseMedia[], category: ExerciseMedia["category"], p
     ?? exerciseLibrary[0];
 }
 
+function normalizeDayTag(dayTag: string) {
+  return dayTag.replace(/_(gym|home|recovery)$/, "");
+}
+
+function resolveDayEnvironment(
+  dayTag: string,
+  trainingEnvironment: AssessmentInput["trainingEnvironment"],
+): "home" | "gym" {
+  if (dayTag.includes("_gym")) {
+    return "gym";
+  }
+
+  if (dayTag.includes("_home")) {
+    return "home";
+  }
+
+  if (trainingEnvironment === "both") {
+    return "home";
+  }
+
+  return trainingEnvironment;
+}
+
 function getFocusForDayTag(dayTag: string, lowerBodyPrimary: LowerBodyPrimary) {
+  const normalizedDayTag = normalizeDayTag(dayTag);
   const lowerBodyFocus = lowerBodyPrimary === "hip_dominant" ? "臀腿控制" : "下肢力量";
-  if (dayTag === "push") {
+  if (normalizedDayTag === "push") {
     return "推训练";
   }
-  if (dayTag === "pull") {
+  if (normalizedDayTag === "pull") {
     return "拉训练";
   }
-  if (dayTag === "legs") {
+  if (normalizedDayTag === "legs" || normalizedDayTag === "lower") {
     return lowerBodyFocus;
   }
-  if (dayTag === "upper_accessory" || dayTag === "upper_gym" || dayTag === "upper_home") {
+  if (normalizedDayTag === "upper_accessory" || normalizedDayTag === "upper") {
     return "上肢强化";
   }
-  if (dayTag === "lower_home" || dayTag === "lower_gym") {
-    return lowerBodyFocus;
-  }
-  if (dayTag.includes("cardio")) {
+  if (normalizedDayTag === "cardio") {
     return "有氧与恢复";
   }
-  if (dayTag.includes("full_body")) {
+  if (normalizedDayTag === "full_body") {
     return "全身训练";
   }
   return "恢复、轻活动与拉伸";

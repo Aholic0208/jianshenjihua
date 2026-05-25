@@ -51,9 +51,9 @@ describe("buildProgramTemplate", () => {
     const program = buildProgramTemplate(baseAssessment, profileMap.gain);
 
     expect(program.splitStyle).toBe("push_pull_legs");
-    expect(program.weeklyStructure).toContain("push");
-    expect(program.weeklyStructure).toContain("pull");
-    expect(program.weeklyStructure).toContain("legs");
+    expect(program.weeklyStructure).toContain("push_gym");
+    expect(program.weeklyStructure).toContain("pull_gym");
+    expect(program.weeklyStructure).toContain("legs_gym");
   });
 
   it("builds a full-body plus cardio home template for fat-loss users", () => {
@@ -85,5 +85,35 @@ describe("buildProgramTemplate", () => {
     expect(program.splitStyle).toBe("modified_split");
     expect(program.weeklyStructure.some((day) => day.includes("gym"))).toBe(true);
     expect(program.weeklyStructure.some((day) => day.includes("home"))).toBe(true);
+  });
+
+  it("builds a four-day gym lean-gain template with explicit upper and lower gym days", () => {
+    const program = buildProgramTemplate(
+      {
+        ...baseAssessment,
+        trainingEnvironment: "gym",
+        trainingDaysPerWeek: 4,
+      },
+      profileMap.gain,
+    );
+
+    expect(program.weeklyStructure).toContain("upper_gym");
+    expect(program.weeklyStructure).toContain("lower_gym");
+    expect(program.weeklyStructure.every((day) => !day.includes("_home"))).toBe(true);
+  });
+
+  it("keeps mixed lean-gain templates gym-forward while preserving home sessions", () => {
+    const program = buildProgramTemplate(
+      {
+        ...baseAssessment,
+        trainingEnvironment: "both",
+        equipment: ["mat", "band", "dumbbell", "lat pulldown machine", "treadmill"],
+      },
+      profileMap.gain,
+    );
+
+    expect(program.weeklyStructure).toContain("push_gym");
+    expect(program.weeklyStructure).toContain("legs_gym");
+    expect(program.weeklyStructure.some((day) => day.includes("_home"))).toBe(true);
   });
 });
