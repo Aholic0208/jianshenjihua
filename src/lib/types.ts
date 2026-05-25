@@ -52,6 +52,12 @@ export interface PlanProfile {
   calorieStrategy: "deficit" | "maintenance_or_small_deficit" | "small_surplus";
 }
 
+export interface ProgramTemplate {
+  splitStyle: "full_body" | "upper_lower" | "modified_split" | "push_pull_legs";
+  weeklyStructure: string[];
+  cardioMinutesPerWeek: number;
+}
+
 export interface ExerciseMedia {
   id: string;
   name: string;
