@@ -3,6 +3,10 @@ export type ExperienceLevel = "beginner" | "intermediate";
 export type TrainingEnvironment = "home" | "gym" | "both";
 export type RiskLevel = "normal" | "caution" | "medical_review" | "blocked";
 export type GoalKind = "fat_loss" | "body_shape" | "muscle_gain" | "posture";
+export type PlanPrimaryGoal =
+  | "fat_loss_preserve_muscle"
+  | "recomposition"
+  | "lean_gain_strength";
 
 export interface UploadedImageInput {
   id: string;
@@ -38,6 +42,14 @@ export interface SafetyAnalysis {
   canGeneratePlan: boolean;
   riskLevel: RiskLevel;
   messages: string[];
+}
+
+export interface PlanProfile {
+  primaryGoal: PlanPrimaryGoal;
+  environmentBias: "home" | "gym" | "mixed";
+  trainingPriority: "adherence" | "hypertrophy" | "strength_hypertrophy";
+  cardioPriority: "low" | "moderate" | "high";
+  calorieStrategy: "deficit" | "maintenance_or_small_deficit" | "small_surplus";
 }
 
 export interface ExerciseMedia {
