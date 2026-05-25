@@ -102,6 +102,7 @@ export interface NutritionDay {
   meals: string[];
   swaps: string[];
   restrictionNotes: string[];
+  indulgenceGuidance: string;
 }
 
 export interface PlanDay {
