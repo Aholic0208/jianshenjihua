@@ -1,5 +1,9 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
+import { exerciseLibrary } from "./exercise-library";
 import { resolveExerciseTeachingMedia } from "./exercise-teaching-media";
 
 describe("exercise teaching media", () => {
@@ -37,5 +41,13 @@ describe("exercise teaching media", () => {
     expect(media.mistakeImageUrl).toBeNull();
     expect(media.localVideoUrl).toBeNull();
     expect(media.externalVideoUrl).toBe("https://example.com/plank-video");
+  });
+
+  it("ships a local dynamic demo video for every exercise in the library", () => {
+    const missing = exerciseLibrary
+      .map((exercise) => exercise.id)
+      .filter((exerciseId) => !existsSync(join(process.cwd(), "public", "media", "exercises", "generated", `${exerciseId}-demo.mp4`)));
+
+    expect(missing).toEqual([]);
   });
 });

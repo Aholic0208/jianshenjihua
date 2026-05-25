@@ -141,6 +141,22 @@ const exerciseCatalog = {
     mistakes: ["一开始就速度过快", "一直抓扶手", "突然停下不降速"],
     caution: "头晕、胸闷或膝踝不适加重时立即停止。",
   },
+  "step-cardio": {
+    name: "台阶踏步有氧",
+    focus: "先稳住脚步和重心，再把节奏和心率带起来。",
+    steps: [
+      "选择稳定的低台阶或矮凳，先用较慢节奏上下踏步热身。",
+      "上台阶时让整只脚踩稳，再换另一只脚跟上；下台阶时同样稳稳落地。",
+      "逐渐提速，但始终保持上身直立、呼吸顺畅，结束前再慢下来。",
+    ],
+    cues: [
+      "全脚掌踩稳再换脚，不要只用前脚掌点一下就急着起步。",
+      "髋和膝一起发力，身体向上而不是向前扑。",
+      "眼睛看前方，手臂自然配合摆动，不要一直低头找脚。",
+    ],
+    mistakes: ["台阶过高导致动作变形", "速度过快踩不稳", "一直低头看脚影响节奏"],
+    caution: "如果头晕或膝踝疼痛加剧，先立刻停下来。",
+  },
   "lat-pulldown": {
     name: "高位下拉",
     focus: "先沉肩，再拉肘，避免用身体后仰去拽重量。",
@@ -229,6 +245,7 @@ function resolveImageSource(exerciseId, kind) {
     "band-row": "strength-upper.svg",
     plank: "core.svg",
     "treadmill-walk": "cardio.svg",
+    "step-cardio": "cardio.svg",
     "lat-pulldown": "strength-upper.svg",
     "stretch-full-body": "mobility.svg",
   };
