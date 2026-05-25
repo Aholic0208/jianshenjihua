@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { buildDashboardHref, resolveDashboardSelection } from "@/lib/dashboard-routing";
 import { findExercise } from "@/lib/exercise-library";
+import { resolveExerciseTeachingMedia } from "@/lib/exercise-teaching-media";
 
 interface ExerciseDetailPageProps {
   params: Promise<{ exerciseId: string }>;
@@ -25,8 +26,15 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
     week: readValue(rawSearchParams.week),
     day: readValue(rawSearchParams.day),
   });
-  const properImageUrl = resolveGeneratedImage(exercise.id, "proper") ?? exercise.imageUrl;
-  const mistakeImageUrl = resolveGeneratedImage(exercise.id, "mistake") ?? exercise.mistakeImageUrl ?? null;
+  const teachingMedia = resolveExerciseTeachingMedia(
+    {
+      exerciseId: exercise.id,
+      imageUrl: exercise.imageUrl,
+      mistakeImageUrl: exercise.mistakeImageUrl,
+      videoUrl: exercise.videoUrl,
+    },
+    (assetPath) => existsSync(join(process.cwd(), assetPath)),
+  );
 
   return (
     <main className="screen">
@@ -37,7 +45,7 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
           </Link>
           <nav className="topbar-nav" aria-label="动作详情导航">
             <Link href={buildDashboardHref(selection)}>返回计划工作台</Link>
-            <a href={exercise.videoUrl} rel="noreferrer" target="_blank">
+            <a href={teachingMedia.localVideoUrl ?? teachingMedia.externalVideoUrl} rel="noreferrer" target="_blank">
               打开视频演示
             </a>
           </nav>
@@ -53,9 +61,15 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
                   这页专门给新手看动作标准、常见错误、注意事项和替代方案。先保证动作干净，再追求组数和强度。
                 </p>
               </div>
-              <a className="button-primary" href={exercise.videoUrl} rel="noreferrer" target="_blank">
-                观看视频演示
-              </a>
+              {teachingMedia.localVideoUrl ? (
+                <a className="button-primary" href={teachingMedia.localVideoUrl} rel="noreferrer" target="_blank">
+                  播放站内讲解视频
+                </a>
+              ) : (
+                <a className="button-primary" href={teachingMedia.externalVideoUrl} rel="noreferrer" target="_blank">
+                  观看视频演示
+                </a>
+              )}
             </div>
 
             <div className="pill-row">
@@ -72,7 +86,7 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
                 <h2>标准动作</h2>
                 <p>优先看身体线条和重心位置，而不是只看手脚摆放。</p>
               </div>
-              <img alt={`${exercise.name} 标准动作示意`} src={properImageUrl} />
+              <img alt={`${exercise.name} 标准动作示意`} src={teachingMedia.properImageUrl} />
             </article>
 
             <article className="teaching-card stack-md">
@@ -80,8 +94,8 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
                 <h2>常见错误示意</h2>
                 <p>先避开最常见的错误，动作稳定性会提升得很快。</p>
               </div>
-              {mistakeImageUrl ? (
-                <img alt={`${exercise.name} 常见错误示意`} src={mistakeImageUrl} />
+              {teachingMedia.mistakeImageUrl ? (
+                <img alt={`${exercise.name} 常见错误示意`} src={teachingMedia.mistakeImageUrl} />
               ) : (
                 <div className="surface stack-md">
                   <div className="section-heading compact-heading">
@@ -171,25 +185,35 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
                 <h2>视频演示</h2>
                 <p>这是一条更完整的动态示范，适合跟着看节奏、幅度和动作连贯性。</p>
               </div>
-              <a className="button-primary" href={exercise.videoUrl} rel="noreferrer" target="_blank">
-                {exercise.videoTitle ?? "打开动作视频"}
-              </a>
-              <p className="muted-copy">
-                当前版本先使用外部高质量教学视频链接；后面可以继续替换成站内视频资源。
-              </p>
+              {teachingMedia.localVideoUrl ? (
+                <>
+                  <video
+                    controls
+                    playsInline
+                    preload="metadata"
+                    src={teachingMedia.localVideoUrl}
+                    style={{ width: "100%", borderRadius: "10px", background: "#0f1720" }}
+                  />
+                  <p className="muted-copy">
+                    这是站内生成的动作讲解视频，重点会围绕姿势、发力和新手容易错的地方展开。
+                  </p>
+                </>
+              ) : (
+                <>
+                  <a className="button-primary" href={teachingMedia.externalVideoUrl} rel="noreferrer" target="_blank">
+                    {exercise.videoTitle ?? "打开动作视频"}
+                  </a>
+                  <p className="muted-copy">
+                    当前版本先使用外部高质量教学视频链接；站内讲解视频会在本地渲染完成后自动替换到这里。
+                  </p>
+                </>
+              )}
             </article>
           </section>
         </section>
       </div>
     </main>
   );
-}
-
-function resolveGeneratedImage(exerciseId: string, kind: "proper" | "mistake") {
-  const relativePath = `/media/exercises/generated/${exerciseId}-${kind}.png`;
-  const absolutePath = join(process.cwd(), "public", "media", "exercises", "generated", `${exerciseId}-${kind}.png`);
-
-  return existsSync(absolutePath) ? relativePath : null;
 }
 
 function environmentLabel(value: "home" | "gym" | "both") {

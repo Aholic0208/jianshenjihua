@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #f4f7f5;
+        font-family: "Segoe UI", "Roboto", "Inter", sans-serif;
+        color: #16211d;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 28%),
+          linear-gradient(180deg, #f4f7f5 0%, #eef4f2 100%);
+      }
+      .clip { position: absolute; }
+      .eyebrow {
+        top: 64px;
+        left: 72px;
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 20px;
+        border-radius: 999px;
+        background: #e9f5ef;
+        color: #1c6b4b;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+      .title-block {
+        top: 132px;
+        left: 72px;
+        width: 760px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .title-block h1 {
+        font-size: 74px;
+        line-height: 1.05;
+        font-weight: 800;
+      }
+      .title-block p {
+        font-size: 28px;
+        line-height: 1.5;
+        color: #44544d;
+      }
+      .hero-card {
+        top: 298px;
+        left: 72px;
+        width: 760px;
+        height: 690px;
+        padding: 36px;
+        border-radius: 32px;
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 28px 80px rgba(22, 33, 29, 0.12);
+      }
+      .hero-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .panel {
+        right: 72px;
+        width: 944px;
+        padding: 34px 38px;
+        border-radius: 28px;
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 22px 64px rgba(22, 33, 29, 0.1);
+      }
+      .panel h2 {
+        font-size: 34px;
+        margin-bottom: 18px;
+      }
+      .panel ol,
+      .panel ul {
+        padding-left: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        font-size: 26px;
+        line-height: 1.45;
+        color: #33413b;
+      }
+      .panel-steps { top: 152px; height: 286px; }
+      .panel-cues { top: 470px; height: 252px; border: 2px solid rgba(28, 107, 75, 0.14); }
+      .panel-mistakes { top: 754px; height: 234px; border: 2px solid rgba(183, 110, 31, 0.18); }
+      .panel-mistakes ul {
+        gap: 10px;
+        font-size: 24px;
+        line-height: 1.35;
+      }
+      .mistake-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: #fff6ea;
+        color: #9a5b16;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .footer-note {
+        left: 72px;
+        bottom: 34px;
+        width: 1776px;
+        padding: 20px 28px;
+        border-radius: 22px;
+        background: rgba(22, 33, 29, 0.92);
+        color: #ffffff;
+        font-size: 26px;
+        line-height: 1.45;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+      <div id="eyebrow" class="clip eyebrow" data-start="0" data-duration="10" data-track-index="1">站内讲解视频 · 全身拉伸放松</div>
+      <div id="title" class="clip title-block" data-start="0" data-duration="10" data-track-index="2">
+        <h1>全身拉伸放松</h1>
+        <p>用缓慢呼吸把身体放松下来，不要追求疼痛感。</p>
+      </div>
+      <div id="hero" class="clip hero-card" data-start="0.2" data-duration="9.8" data-track-index="3">
+        <img src="assets/exercise-media/stretch-full-body-proper.png" alt="全身拉伸放松 标准动作示意" crossorigin="anonymous" />
+      </div>
+      <div id="steps" class="clip panel panel-steps" data-start="0.5" data-duration="9.5" data-track-index="4">
+        <h2>动作要领</h2>
+        <ol><li>按小腿、大腿前侧、臀部、胸部和肩颈的顺序依次放松。</li><li>每个位置停留 20 到 30 秒，以轻微拉伸感为准。</li><li>保持自然呼吸，慢慢让肌肉放松下来。</li></ol>
+      </div>
+      <div id="cues" class="clip panel panel-cues" data-start="2.3" data-duration="7.7" data-track-index="5">
+        <h2>发力技巧</h2>
+        <ul><li>呼气时放松一点点，不要突然弹震。</li><li>动作越慢越好，别急着切换下一个部位。</li><li>只要有刺痛，就立刻缩小幅度或停下。</li></ul>
+      </div>
+      <div id="mistakes" class="clip panel panel-mistakes" data-start="5.1" data-duration="4.9" data-track-index="6">
+        <div class="mistake-tag">新手最容易错的地方</div>
+        <ul><li>拉到疼痛</li><li>弹震式拉伸</li><li>憋气</li></ul>
+      </div>
+      <div id="footer" class="clip footer-note" data-start="7.3" data-duration="2.7" data-track-index="7">急性拉伤或关节肿胀时，不要强行拉伸。</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.from("#eyebrow", { y: 24, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.15);
+      tl.from("#title", { y: 40, opacity: 0, duration: 0.7, ease: "expo.out" }, 0.28);
+      tl.from("#hero", { x: -42, opacity: 0, duration: 0.85, ease: "power3.out" }, 0.45);
+      tl.from("#steps", { x: 54, opacity: 0, duration: 0.7, ease: "power2.out" }, 0.6);
+      tl.from("#cues", { x: 42, opacity: 0, duration: 0.62, ease: "power3.out" }, 2.35);
+      tl.from("#mistakes", { x: 40, opacity: 0, duration: 0.58, ease: "expo.out" }, 5.15);
+      tl.from("#footer", { y: 26, opacity: 0, duration: 0.5, ease: "power2.out" }, 7.35);
+      tl.to("#root", { opacity: 0, duration: 0.45, ease: "power2.in" }, 9.45);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
