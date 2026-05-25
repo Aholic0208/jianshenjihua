@@ -61,15 +61,6 @@ export default async function ExerciseDetailPage({ params, searchParams }: Exerc
                   这页专门给新手看动作标准、常见错误、注意事项和替代方案。先保证动作干净，再追求组数和强度。
                 </p>
               </div>
-              {teachingMedia.localVideoUrl ? (
-                <a className="button-primary" href={teachingMedia.localVideoUrl} rel="noreferrer" target="_blank">
-                  播放站内讲解视频
-                </a>
-              ) : (
-                <a className="button-primary" href={teachingMedia.externalVideoUrl} rel="noreferrer" target="_blank">
-                  观看视频演示
-                </a>
-              )}
             </div>
 
             <div className="pill-row">
