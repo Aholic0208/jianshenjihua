@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
+import { buildCompositionHtml as buildExerciseDemoCompositionHtml } from "./exercise-demo-composition.mjs";
 import { buildHyperframesCommand } from "./hyperframes-command.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -11,6 +12,10 @@ const workspaceRoot = resolve(projectDir, "..", "..");
 const publicGeneratedDir = join(workspaceRoot, "public", "media", "exercises", "generated");
 const assetDir = join(projectDir, "assets", "exercise-media");
 const indexPath = join(projectDir, "index.html");
+const DEFAULT_RENDER_PROFILE = { quality: "draft" };
+const EXERCISE_RENDER_PROFILES = {
+  "stretch-full-body": { quality: null },
+};
 
 const exerciseCatalog = {
   "warmup-march": {
@@ -208,7 +213,7 @@ for (const exerciseId of exerciseIds) {
   const localAssetPath = join(assetDir, localAssetName);
   copyFileSync(properSource.sourcePath, localAssetPath);
 
-  writeFileSync(indexPath, buildCompositionHtml({
+  writeFileSync(indexPath, buildExerciseDemoCompositionHtml({
     exerciseId,
     exercise,
     imagePath: `assets/exercise-media/${localAssetName}`,
@@ -217,14 +222,18 @@ for (const exerciseId of exerciseIds) {
   runHyperframes(["lint"], projectDir);
   runHyperframes(["validate"], projectDir);
   runHyperframes(["inspect"], projectDir, { allowFailure: true });
+  const renderProfile = EXERCISE_RENDER_PROFILES[exerciseId] ?? DEFAULT_RENDER_PROFILE;
+  const renderArgs = [
+    "render",
+    "--output",
+    join(publicGeneratedDir, `${exerciseId}-demo.mp4`),
+  ];
+  if (renderProfile.quality) {
+    renderArgs.push("--quality", renderProfile.quality);
+  }
+
   runHyperframes(
-    [
-      "render",
-      "--output",
-      join(publicGeneratedDir, `${exerciseId}-demo.mp4`),
-      "--quality",
-      "draft",
-    ],
+    renderArgs,
     projectDir,
   );
 }

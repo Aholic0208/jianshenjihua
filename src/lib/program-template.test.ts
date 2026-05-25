@@ -87,7 +87,7 @@ describe("buildProgramTemplate", () => {
     expect(program.weeklyStructure.some((day) => day.includes("home"))).toBe(true);
   });
 
-  it("builds a four-day gym lean-gain template with explicit upper and lower gym days", () => {
+  it("routes four-day gym lean-gain users into a three-way split structure", () => {
     const program = buildProgramTemplate(
       {
         ...baseAssessment,
@@ -97,22 +97,62 @@ describe("buildProgramTemplate", () => {
       profileMap.gain,
     );
 
-    expect(program.weeklyStructure).toContain("upper_gym");
-    expect(program.weeklyStructure).toContain("lower_gym");
+    expect(program.splitStyle).toBe("push_pull_legs");
+    expect(program.weeklyStructure).toContain("push_gym");
+    expect(program.weeklyStructure).toContain("pull_gym");
+    expect(program.weeklyStructure).toContain("legs_gym");
     expect(program.weeklyStructure.every((day) => !day.includes("_home"))).toBe(true);
   });
 
-  it("keeps mixed lean-gain templates gym-forward while preserving home sessions", () => {
+  it("keeps four-day mixed lean-gain templates gym-forward with a home top-up day", () => {
     const program = buildProgramTemplate(
       {
         ...baseAssessment,
         trainingEnvironment: "both",
+        trainingDaysPerWeek: 4,
         equipment: ["mat", "band", "dumbbell", "lat pulldown machine", "treadmill"],
       },
       profileMap.gain,
     );
 
     expect(program.weeklyStructure).toContain("push_gym");
+    expect(program.weeklyStructure).toContain("pull_gym");
+    expect(program.weeklyStructure).toContain("legs_gym");
+    expect(program.weeklyStructure.filter((day) => day.includes("_gym")).length).toBe(3);
+    expect(program.weeklyStructure.filter((day) => day.includes("_home")).length).toBe(1);
+  });
+
+  it("lets intermediate gym recomposition users who explicitly ask for 三分化 use a gym split", () => {
+    const program = buildProgramTemplate(
+      {
+        ...baseAssessment,
+        goalText: "体脂高一些，但我想在减脂同时练出薄肌，要三分化训练",
+        trainingEnvironment: "gym",
+        trainingDaysPerWeek: 5,
+      },
+      profileMap.recomp,
+    );
+
+    expect(program.splitStyle).toBe("push_pull_legs");
+    expect(program.weeklyStructure).toContain("push_gym");
+    expect(program.weeklyStructure).toContain("pull_gym");
+    expect(program.weeklyStructure).toContain("legs_gym");
+  });
+
+  it("recognizes Chinese gym equipment wording when mixed recomposition users ask for 三分化", () => {
+    const program = buildProgramTemplate(
+      {
+        ...baseAssessment,
+        goalText: "想减脂增肌一起做，也想按推拉腿三分化来练",
+        trainingEnvironment: "both",
+        trainingDaysPerWeek: 5,
+        equipment: ["哑铃", "一体化机器", "跑步机"],
+      },
+      profileMap.recomp,
+    );
+
+    expect(program.weeklyStructure).toContain("push_gym");
+    expect(program.weeklyStructure).toContain("pull_gym");
     expect(program.weeklyStructure).toContain("legs_gym");
     expect(program.weeklyStructure.some((day) => day.includes("_home"))).toBe(true);
   });

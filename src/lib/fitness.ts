@@ -133,6 +133,7 @@ export function generateFitnessPlan(input: AssessmentInput): FitnessPlan {
           dayTag,
           exercises,
           trainingEnvironment: input.trainingEnvironment,
+          experience: input.experience,
           sessionMinutes: input.sessionMinutes,
           lowerBodyPrimary,
           week,
@@ -253,6 +254,7 @@ export function proposePlanAdjustment(plan: FitnessPlan, feedback: string): Plan
 function buildWorkoutItemsForTag(input: {
   dayTag: string;
   exercises: ExerciseMedia[];
+  experience: AssessmentInput["experience"];
   sessionMinutes: number;
   lowerBodyPrimary: LowerBodyPrimary;
   trainingEnvironment: AssessmentInput["trainingEnvironment"];
@@ -261,50 +263,57 @@ function buildWorkoutItemsForTag(input: {
 }) {
   const normalizedDayTag = normalizeDayTag(input.dayTag);
   const dayEnvironment = resolveDayEnvironment(input.dayTag, input.trainingEnvironment);
-  const warmup = pick(input.exercises, "warmup", "warmup-march");
-  const squat = input.lowerBodyPrimary === "hip_dominant"
-    ? pick(input.exercises, "strength", "glute-bridge")
-    : pick(input.exercises, "strength", "bodyweight-squat");
-  const bridge = pick(input.exercises, "strength", "glute-bridge");
-  const push = pick(input.exercises, "strength", "incline-push-up");
-  const preferredHomePull = input.exercises.some((exercise) => exercise.id === "band-row")
-    ? "band-row"
-    : "dumbbell-row";
+  const dayExercises = filterExercisesForDayEnvironment(input.exercises, dayEnvironment);
+  const warmup = pick(dayExercises, "warmup", "warmup-march");
+  const primaryLower = dayEnvironment === "gym"
+    ? input.lowerBodyPrimary === "hip_dominant"
+      ? pickStrengthByIds(dayExercises, ["leg-press", "goblet-squat", "glute-bridge", "bodyweight-squat"])
+      : pickStrengthByIds(dayExercises, ["goblet-squat", "leg-press", "bodyweight-squat", "glute-bridge"])
+    : input.lowerBodyPrimary === "hip_dominant"
+      ? pickStrengthByIds(dayExercises, ["glute-bridge", "bodyweight-squat"])
+      : pickStrengthByIds(dayExercises, ["bodyweight-squat", "glute-bridge"]);
+  const secondaryLower = dayEnvironment === "gym"
+    ? input.lowerBodyPrimary === "hip_dominant"
+      ? pickStrengthByIds(dayExercises, ["glute-bridge", "goblet-squat", "bodyweight-squat"])
+      : pickStrengthByIds(dayExercises, ["leg-press", "glute-bridge", "bodyweight-squat"])
+    : pickStrengthByIds(dayExercises, ["glute-bridge", "bodyweight-squat"]);
+  const push = dayEnvironment === "gym"
+    ? pickStrengthByIds(dayExercises, ["machine-chest-press", "incline-push-up"])
+    : pickStrengthByIds(dayExercises, ["incline-push-up"]);
+  const secondaryPush = dayEnvironment === "gym"
+    ? pickStrengthByIds(dayExercises, ["incline-push-up", "machine-chest-press"])
+    : push;
   const row = dayEnvironment === "gym"
-    ? pick(input.exercises, "strength", "lat-pulldown")
-    : pick(input.exercises, "strength", preferredHomePull);
+    ? pickStrengthByIds(dayExercises, ["lat-pulldown", "seated-cable-row", "dumbbell-row"])
+    : pickStrengthByIds(dayExercises, ["band-row", "dumbbell-row"]);
   const secondaryPull = dayEnvironment === "gym"
-    ? pick(input.exercises, "strength", "dumbbell-row")
-    : pick(
-        input.exercises,
-        "strength",
-        input.exercises.some((exercise) => exercise.id === "dumbbell-row") ? "dumbbell-row" : preferredHomePull,
-      );
-  const core = pick(input.exercises, "strength", "plank");
+    ? pickStrengthByIds(dayExercises, ["seated-cable-row", "dumbbell-row", "lat-pulldown"])
+    : pickStrengthByIds(dayExercises, ["dumbbell-row", "band-row"]);
+  const core = pickStrengthByIds(dayExercises, ["plank"]);
   const cardio = dayEnvironment === "gym"
-    ? pick(input.exercises, "cardio", "treadmill-walk")
-    : pick(input.exercises, "cardio", "step-cardio");
-  const stretch = pick(input.exercises, "mobility", "stretch-full-body");
+    ? pick(dayExercises, "cardio", "treadmill-walk")
+    : pick(dayExercises, "cardio", "step-cardio");
+  const stretch = pick(dayExercises, "mobility", "stretch-full-body");
   const cardioMinutes = readCardioMinutes(input.primaryGoal, input.sessionMinutes, input.dayTag.includes("recovery"));
   const template = normalizedDayTag === "push"
-    ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(push, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+    ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(secondaryPush, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
     : normalizedDayTag === "pull"
       ? [toWorkoutItem(warmup, 1), toWorkoutItem(row, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
       : normalizedDayTag === "legs"
-        ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+        ? [toWorkoutItem(warmup, 1), toWorkoutItem(primaryLower, 1), toWorkoutItem(secondaryLower, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
         : normalizedDayTag === "upper_accessory"
-          ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
+          ? [toWorkoutItem(warmup, 1), toWorkoutItem(secondaryPush, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(core, 1), toWorkoutItem(stretch, 1)]
           : normalizedDayTag === "upper"
             ? [toWorkoutItem(warmup, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(secondaryPull, 1), toWorkoutItem(stretch, 1)]
             : normalizedDayTag === "lower"
-              ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(bridge, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)]
+              ? [toWorkoutItem(warmup, 1), toWorkoutItem(primaryLower, 1), toWorkoutItem(secondaryLower, 1), toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1)]
               : normalizedDayTag === "cardio"
                 ? [toWorkoutItem(cardio, 1, cardioMinutes), toWorkoutItem(stretch, 1, 8)]
                 : normalizedDayTag === "full_body"
-                  ? [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)]
-                  : [toWorkoutItem(warmup, 1), toWorkoutItem(squat, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)];
+                  ? [toWorkoutItem(warmup, 1), toWorkoutItem(primaryLower, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)]
+                  : [toWorkoutItem(warmup, 1), toWorkoutItem(primaryLower, 1), toWorkoutItem(push, 1), toWorkoutItem(row, 1), toWorkoutItem(stretch, 1)];
 
-  return template.map((item) => scaleWorkout(item, input.week, input.primaryGoal));
+  return template.map((item) => scaleWorkout(item, input.week, input.primaryGoal, input.experience));
 }
 
 function buildRecoveryItems(exercises: ExerciseMedia[], environment: AssessmentInput["trainingEnvironment"]) {
@@ -368,12 +377,23 @@ function toWorkoutItem(exercise: ExerciseMedia | undefined, week: number, durati
   };
 }
 
-function scaleWorkout(item: WorkoutItem, week: number, primaryGoal: PlanPrimaryGoal): WorkoutItem {
+function scaleWorkout(
+  item: WorkoutItem,
+  week: number,
+  primaryGoal: PlanPrimaryGoal,
+  experience: AssessmentInput["experience"],
+): WorkoutItem {
   if (item.sets) {
+    const experienceSetBonus = experience === "intermediate" ? 1 : 0;
+    const intensity = experience === "intermediate"
+      ? (week >= 3 ? "challenging" : "moderate")
+      : (week >= 3 ? "moderate" : item.intensity);
+
     return {
       ...item,
-      sets: Math.min(primaryGoal === "lean_gain_strength" ? 5 : 4, item.sets + (week >= 3 ? 1 : 0)),
-      intensity: week >= 3 ? "moderate" : item.intensity,
+      sets: Math.min(primaryGoal === "lean_gain_strength" ? 5 : 4, item.sets + experienceSetBonus + (week >= 3 ? 1 : 0)),
+      restSeconds: experience === "intermediate" ? 90 : item.restSeconds,
+      intensity,
     };
   }
 
@@ -393,6 +413,22 @@ function pick(exercises: ExerciseMedia[], category: ExerciseMedia["category"], p
     ?? exercises.find((exercise) => exercise.category === category)
     ?? exerciseLibrary.find((exercise) => exercise.id === preferredId)
     ?? exerciseLibrary.find((exercise) => exercise.category === category)
+    ?? exerciseLibrary[0];
+}
+
+function filterExercisesForDayEnvironment(exercises: ExerciseMedia[], dayEnvironment: "home" | "gym") {
+  return exercises.filter((exercise) =>
+    exercise.environment === "both" || exercise.environment === dayEnvironment
+  );
+}
+
+function pickStrengthByIds(exercises: ExerciseMedia[], preferredIds: string[]) {
+  return preferredIds
+    .map((preferredId) => exercises.find((exercise) => exercise.id === preferredId))
+    .find(Boolean)
+    ?? exercises.find((exercise) => exercise.category === "strength")
+    ?? exerciseLibrary.find((exercise) => preferredIds.includes(exercise.id))
+    ?? exerciseLibrary.find((exercise) => exercise.category === "strength")
     ?? exerciseLibrary[0];
 }
 

@@ -5,14 +5,55 @@ function clampTrainingDays(days: number) {
   return Math.max(3, Math.min(5, days));
 }
 
+function hasGymForwardEquipment(equipment: string[]) {
+  return equipment.some((item) =>
+    /(machine|pulldown|cable|smith|barbell|bench|rack|treadmill|机器|器械|一体化|高位下拉|跑步机)/i.test(item),
+  );
+}
+
+function wantsThreeWaySplitPreference(goalText: string) {
+  return /(三分化|推拉腿|ppl|push[\s/-]*pull[\s/-]*legs|split)/i.test(goalText);
+}
+
+function canUseLeanGainThreeWaySplit(input: AssessmentInput, trainingDays: number) {
+  if (trainingDays < 4 || input.experience === "beginner") {
+    return false;
+  }
+
+  if (input.trainingEnvironment === "gym") {
+    return true;
+  }
+
+  return input.trainingEnvironment === "both" && hasGymForwardEquipment(input.equipment);
+}
+
+function canUseRecompThreeWaySplit(input: AssessmentInput, trainingDays: number) {
+  if (trainingDays < 4 || input.experience === "beginner") {
+    return false;
+  }
+
+  if (!wantsThreeWaySplitPreference(input.goalText)) {
+    return false;
+  }
+
+  if (input.trainingEnvironment === "gym") {
+    return true;
+  }
+
+  return input.trainingEnvironment === "both" && hasGymForwardEquipment(input.equipment);
+}
+
 function buildLeanGainTemplate(input: AssessmentInput): ProgramTemplate {
   const trainingDays = clampTrainingDays(input.trainingDaysPerWeek);
+  const useThreeWaySplit = canUseLeanGainThreeWaySplit(input, trainingDays);
 
   if (input.trainingEnvironment === "gym") {
     return {
-      splitStyle: trainingDays >= 5 ? "push_pull_legs" : "upper_lower",
-      weeklyStructure: trainingDays >= 5
-        ? ["push_gym", "pull_gym", "legs_gym", "cardio_recovery", "upper_accessory_gym"]
+      splitStyle: useThreeWaySplit ? "push_pull_legs" : "upper_lower",
+      weeklyStructure: useThreeWaySplit
+        ? trainingDays >= 5
+          ? ["push_gym", "pull_gym", "legs_gym", "cardio_recovery", "upper_accessory_gym"]
+          : ["push_gym", "pull_gym", "legs_gym", "upper_accessory_gym"]
         : ["upper_gym", "lower_gym", "upper_gym", "lower_gym"],
       cardioMinutesPerWeek: EVIDENCE_RULES.cardio.recoveryMinutes,
     };
@@ -29,10 +70,14 @@ function buildLeanGainTemplate(input: AssessmentInput): ProgramTemplate {
   }
 
   return {
-    splitStyle: trainingDays >= 5 ? "push_pull_legs" : "modified_split",
-    weeklyStructure: trainingDays >= 5
-      ? ["push_gym", "upper_home", "pull_gym", "cardio_home", "legs_gym"]
-      : ["upper_gym", "lower_home", "pull_gym", "cardio_home"],
+    splitStyle: "modified_split",
+    weeklyStructure: useThreeWaySplit
+      ? trainingDays >= 5
+        ? ["push_gym", "pull_gym", "legs_gym", "upper_home", "cardio_home"]
+        : ["push_gym", "pull_gym", "legs_gym", "upper_home"]
+      : trainingDays >= 5
+        ? ["push_gym", "upper_home", "pull_gym", "cardio_home", "legs_gym"]
+        : ["upper_gym", "lower_home", "pull_gym", "cardio_home"],
     cardioMinutesPerWeek: EVIDENCE_RULES.cardio.recoveryMinutes,
   };
 }
@@ -70,10 +115,17 @@ function buildFatLossTemplate(input: AssessmentInput): ProgramTemplate {
 }
 
 function buildRecompTemplate(input: AssessmentInput): ProgramTemplate {
+  const trainingDays = clampTrainingDays(input.trainingDaysPerWeek);
+  const useThreeWaySplit = canUseRecompThreeWaySplit(input, trainingDays);
+
   if (input.trainingEnvironment === "gym") {
     return {
-      splitStyle: "upper_lower",
-      weeklyStructure: ["upper_gym", "lower_gym", "cardio_recovery", "upper_gym", "lower_gym"],
+      splitStyle: useThreeWaySplit ? "push_pull_legs" : "upper_lower",
+      weeklyStructure: useThreeWaySplit
+        ? trainingDays >= 5
+          ? ["push_gym", "pull_gym", "legs_gym", "upper_accessory_gym", "cardio_recovery"]
+          : ["push_gym", "pull_gym", "legs_gym", "upper_accessory_gym"]
+        : ["upper_gym", "lower_gym", "cardio_recovery", "upper_gym", "lower_gym"],
       cardioMinutesPerWeek: 120,
     };
   }
@@ -87,8 +139,12 @@ function buildRecompTemplate(input: AssessmentInput): ProgramTemplate {
   }
 
   return {
-    splitStyle: "modified_split",
-    weeklyStructure: ["upper_gym", "lower_home", "cardio_home", "upper_home", "lower_gym"],
+    splitStyle: useThreeWaySplit ? "push_pull_legs" : "modified_split",
+    weeklyStructure: useThreeWaySplit
+      ? trainingDays >= 5
+        ? ["push_gym", "pull_gym", "legs_gym", "upper_home", "cardio_home"]
+        : ["push_gym", "pull_gym", "legs_gym", "upper_home"]
+      : ["upper_gym", "lower_home", "cardio_home", "upper_home", "lower_gym"],
     cardioMinutesPerWeek: 120,
   };
 }

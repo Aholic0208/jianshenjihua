@@ -6,7 +6,7 @@ import { adjustmentAction, checkInAction } from "@/app/dashboard/actions";
 import { buildExerciseHref } from "@/lib/dashboard-routing";
 import { getFitnessService, getSessionUser } from "@/lib/server-app";
 import { buildWorkoutWorkbench } from "@/lib/workbench";
-import type { AssessmentInput, PlanDay, WorkoutItem } from "@/lib/types";
+import type { AssessmentInput, PlanDay, PlanFaqEntry, WorkoutItem } from "@/lib/types";
 
 type SearchParamsInput = Promise<Record<string, string | string[] | undefined>>;
 
@@ -84,6 +84,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       })
     : null;
   const selectedDay = workbench?.selectedDay ?? null;
+  const faqSections = buildFaqSections(plan?.faqEntries ?? []);
+  const faqContextSummary = plan
+    ? buildFaqContextSummary({
+        assessment,
+        selectedWeekTitle: workbench?.selectedWeek.title,
+        selectedDayFocus: selectedDay?.focus,
+        faqCount: plan.faqEntries?.length ?? 0,
+      })
+    : null;
 
   return (
     <main className="screen">
@@ -536,14 +545,39 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                             <h2>常见问题</h2>
                             <p>这些说明会跟着你的计划类型一起变化，帮助你理解为什么这样安排。</p>
                           </div>
-                          <div className="list-stack">
-                            {plan.faqEntries.map((entry) => (
-                              <div className="list-row" key={entry.id}>
-                                <div>
-                                  <strong>{entry.question}</strong>
-                                  <p>{entry.answer}</p>
+                          <div className="stack-md">
+                            {faqContextSummary ? (
+                              <div className="planner-detail-card">
+                                <span className="planner-day-label">{"\u8fd9\u4efd FAQ \u6b63\u5728\u89e3\u91ca"}</span>
+                                <strong>{faqContextSummary.headline}</strong>
+                                <div className="pill-row">
+                                  {faqContextSummary.tags.map((tag) => (
+                                    <span className="info-pill" key={tag}>
+                                      {tag}
+                                    </span>
+                                  ))}
                                 </div>
                               </div>
+                            ) : null}
+
+                            {faqSections.map((section) => (
+                              <section className="stack-sm" key={section.category}>
+                                <div className="section-heading compact-heading">
+                                  <h3>{section.label}</h3>
+                                  <p>{section.description}</p>
+                                </div>
+                                <div className="list-stack">
+                                  {section.entries.map((entry) => (
+                                    <div className="list-row" key={entry.id}>
+                                      <div>
+                                        <span className="planner-day-label">{section.shortLabel}</span>
+                                        <strong>{entry.question}</strong>
+                                        <p>{entry.answer}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </section>
                             ))}
                           </div>
                         </article>
@@ -626,6 +660,125 @@ function environmentLabel(value: AssessmentInput["trainingEnvironment"]) {
   }
 
   return "居家与健身房都可";
+}
+
+type FaqSection = {
+  category: PlanFaqEntry["category"];
+  label: string;
+  shortLabel: string;
+  description: string;
+  entries: PlanFaqEntry[];
+};
+
+function buildFaqSections(entries: PlanFaqEntry[]) {
+  const order: PlanFaqEntry["category"][] = [
+    "training",
+    "equipment",
+    "nutrition",
+    "recovery",
+    "cardio",
+    "misconception",
+  ];
+  const grouped = new Map<PlanFaqEntry["category"], PlanFaqEntry[]>();
+
+  for (const entry of entries) {
+    const categoryEntries = grouped.get(entry.category) ?? [];
+    categoryEntries.push(entry);
+    grouped.set(entry.category, categoryEntries);
+  }
+
+  return order
+    .map((category) => {
+      const categoryEntries = grouped.get(category) ?? [];
+      if (categoryEntries.length === 0) {
+        return null;
+      }
+
+      return {
+        category,
+        ...faqCategoryCopy(category),
+        entries: categoryEntries,
+      };
+    })
+    .filter((section): section is FaqSection => Boolean(section));
+}
+
+function faqCategoryCopy(category: PlanFaqEntry["category"]) {
+  if (category === "training") {
+    return {
+      label: "\u8bad\u7ec3\u5b89\u6392",
+      shortLabel: "\u8bad\u7ec3",
+      description: "\u89e3\u91ca\u5f53\u524d\u5468\u7ed3\u6784\u3001\u5206\u5316\u548c\u52a8\u4f5c\u4e3a\u4ec0\u4e48\u8fd9\u6837\u642d\u914d\u3002",
+    };
+  }
+
+  if (category === "equipment") {
+    return {
+      label: "\u573a\u666f\u4e0e\u5668\u68b0",
+      shortLabel: "\u573a\u666f",
+      description: "\u7a81\u51fa\u8fd9\u4efd\u8ba1\u5212\u600e\u4e48\u5bf9\u5e94\u4f60\u73b0\u5728\u7684\u8bad\u7ec3\u5730\u70b9\u548c\u5668\u68b0\u6761\u4ef6\u3002",
+    };
+  }
+
+  if (category === "nutrition") {
+    return {
+      label: "\u996e\u98df\u4e0e\u86cb\u767d\u8d28",
+      shortLabel: "\u996e\u98df",
+      description: "\u805a\u7126\u6bcf\u5929\u7684\u70ed\u91cf\u3001\u86cb\u767d\u76ee\u6807\u548c\u66ff\u6362\u601d\u8def\u3002",
+    };
+  }
+
+  if (category === "recovery") {
+    return {
+      label: "\u6062\u590d\u4e0e\u8d1f\u8377",
+      shortLabel: "\u6062\u590d",
+      description: "\u8bf4\u660e\u4f11\u606f\u3001\u75b2\u52b3\u548c\u6062\u590d\u5728\u8fd9\u4efd\u8ba1\u5212\u91cc\u626e\u6f14\u7684\u4f5c\u7528\u3002",
+    };
+  }
+
+  if (category === "cardio") {
+    return {
+      label: "\u6709\u6c27\u5b89\u6392",
+      shortLabel: "\u6709\u6c27",
+      description: "\u5e2e\u4f60\u7406\u89e3\u6709\u6c27\u662f\u600e\u4e48\u8ddf\u4e3b\u8bad\u7ec3\u914d\u5408\u7684\u3002",
+    };
+  }
+
+  return {
+    label: "\u8bef\u533a\u4e0e\u8865\u5145\u8bf4\u660e",
+    shortLabel: "\u8bf4\u660e",
+    description: "\u628a\u5e38\u89c1\u7684\u7591\u95ee\u548c\u8bef\u533a\u89e3\u91ca\u5f97\u66f4\u76f4\u63a5\u4e00\u70b9\u3002",
+  };
+}
+
+function buildFaqContextSummary(input: {
+  assessment: AssessmentInput;
+  selectedWeekTitle?: string;
+  selectedDayFocus?: string;
+  faqCount: number;
+}) {
+  const environmentText = environmentLabel(input.assessment.trainingEnvironment);
+  const tags = [
+    environmentText,
+    `${input.assessment.trainingDaysPerWeek} \u5929\u8bad\u7ec3`,
+    `${input.assessment.sessionMinutes} \u5206\u949f / \u6b21`,
+    experienceLabel(input.assessment.experience),
+  ];
+  const introParts = [`\u8fd9\u4e9b FAQ \u662f\u6309\u4f60\u73b0\u5728\u7684${environmentText}\u573a\u666f\u6765\u7ec4\u7ec7\u7684`];
+
+  if (input.selectedWeekTitle) {
+    introParts.push(`\u4e5f\u4f1a\u7ed3\u5408\u5f53\u524d${input.selectedWeekTitle}\u7684\u5b89\u6392`);
+  }
+
+  if (input.selectedDayFocus) {
+    introParts.push(`\u7279\u522b\u662f\u4eca\u5929\u8fd9\u4e2a\u201c${input.selectedDayFocus}\u201d\u7684\u4e0a\u4e0b\u6587`);
+  }
+
+  return {
+    headline: `${input.faqCount} \u6761\u8bf4\u660e\uff0c\u56f4\u7ed5\u4f60\u7684${environmentText}\u8ba1\u5212`,
+    intro: `${introParts.join("\uff0c")}\uff0c\u5e2e\u4f60\u66f4\u5feb\u770b\u61c2\u201c\u4e3a\u4ec0\u4e48\u8fd9\u6837\u5b89\u6392\u201d\u3002`,
+    tags,
+  };
 }
 
 function experienceLabel(value: AssessmentInput["experience"]) {
