@@ -27,11 +27,14 @@ const baseAssessment: AssessmentInput = {
 describe("fitness environment split", () => {
   it("keeps mixed-environment gym upper and pull days in an upper-body movement pool when lat pulldown is unavailable", () => {
     const plan = generateFitnessPlan(baseAssessment);
-    const pullGymDay = plan.days[1];
+    const pullGymDay = plan.days
+      .slice(0, 5)
+      .find((day) => day.workoutItems.some((item) => item.exerciseId === "dumbbell-row"));
     const strengthIds = pullGymDay?.workoutItems
       .filter((item) => item.category === "strength")
       .map((item) => item.exerciseId) ?? [];
 
+    expect(pullGymDay).toBeDefined();
     expect(strengthIds).not.toContain("bodyweight-squat");
     expect(strengthIds).not.toContain("glute-bridge");
     expect(strengthIds).toContain("dumbbell-row");

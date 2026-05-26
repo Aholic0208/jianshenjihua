@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="跑步机快走 正确示范">
+  <defs>
+    <linearGradient id="treadmill-walk-proper-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="treadmill-walk-proper-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(34, 197, 94, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="treadmill-walk-proper-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(34, 197, 94, 0.18); stroke: #22c55e; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#treadmill-walk-proper-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#treadmill-walk-proper-glow-gradient)" />
+  <text class="title" x="72" y="118">跑步机快走</text>
+  <text class="subtitle" x="72" y="162">心肺 · 下肢</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">正确示范</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#treadmill-walk-proper-soft-shadow)">
+    <g class="figure-equipment">
+      
+      <rect class="machine" x="330" y="840" width="540" height="84" rx="30" />
+      <rect class="machine" x="782" y="526" width="34" height="318" rx="17" />
+      <rect class="machine-detail" x="728" y="474" width="110" height="58" rx="22" />
+    
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="600" cy="364" rx="88" ry="132" opacity="0.7" /><ellipse class="highlight" cx="666" cy="724" rx="74" ry="126" opacity="0.54" />
+    </g>
+    <g class="figure-guides">
+      <line class="guide-line good-line" x1="600" y1="208" x2="600" y2="958" opacity="0.68" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 528 324 L 672 324 L 652 520 L 548 520 Z" />
+    <line class="body-line" x1="600" y1="284" x2="600" y2="520" />
+    <line class="body-line" x1="528" y1="324" x2="486" y2="446" /><line class="body-line" x1="486" y1="446" x2="534" y2="568" /><line class="body-line" x1="672" y1="324" x2="720" y2="430" /><line class="body-line" x1="720" y1="430" x2="690" y2="540" /><line class="body-line" x1="548" y1="520" x2="558" y2="750" /><line class="body-line" x1="558" y1="750" x2="548" y2="962" /><line class="body-line" x1="652" y1="520" x2="680" y2="676" /><line class="body-line" x1="680" y1="676" x2="720" y2="920" />
+    <circle class="body-core" cx="600" cy="208" r="64" />
+    
+      <circle class="joint" cx="528" cy="324" r="19" />
+      <circle class="joint-outline" cx="528" cy="324" r="19" />
+      <circle class="joint" cx="672" cy="324" r="19" />
+      <circle class="joint-outline" cx="672" cy="324" r="19" />
+      <circle class="joint" cx="486" cy="446" r="19" />
+      <circle class="joint-outline" cx="486" cy="446" r="19" />
+      <circle class="joint" cx="720" cy="430" r="19" />
+      <circle class="joint-outline" cx="720" cy="430" r="19" />
+      <circle class="joint" cx="534" cy="568" r="19" />
+      <circle class="joint-outline" cx="534" cy="568" r="19" />
+      <circle class="joint" cx="690" cy="540" r="19" />
+      <circle class="joint-outline" cx="690" cy="540" r="19" />
+      <circle class="joint" cx="548" cy="520" r="19" />
+      <circle class="joint-outline" cx="548" cy="520" r="19" />
+      <circle class="joint" cx="652" cy="520" r="19" />
+      <circle class="joint-outline" cx="652" cy="520" r="19" />
+      <circle class="joint" cx="558" cy="750" r="19" />
+      <circle class="joint-outline" cx="558" cy="750" r="19" />
+      <circle class="joint" cx="680" cy="676" r="19" />
+      <circle class="joint-outline" cx="680" cy="676" r="19" />
+      <circle class="joint" cx="548" cy="962" r="19" />
+      <circle class="joint-outline" cx="548" cy="962" r="19" />
+      <circle class="joint" cx="720" cy="920" r="19" />
+      <circle class="joint-outline" cx="720" cy="920" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">快走时保持上身直立，不要一直扶把手。</text>
+  <text class="accent-copy" x="72" y="1136">节奏先稳，再去提高强度。</text>
+</svg>

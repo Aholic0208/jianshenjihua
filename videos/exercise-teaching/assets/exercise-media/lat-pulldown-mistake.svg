@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="高位下拉 常见错误">
+  <defs>
+    <linearGradient id="lat-pulldown-mistake-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="lat-pulldown-mistake-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(239, 68, 68, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="lat-pulldown-mistake-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(239, 68, 68, 0.18); stroke: #ef4444; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#lat-pulldown-mistake-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#lat-pulldown-mistake-glow-gradient)" />
+  <text class="title" x="72" y="118">高位下拉</text>
+  <text class="subtitle" x="72" y="162">背阔肌 · 肱二头肌 · 肩胛稳定肌</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">常见错误</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#lat-pulldown-mistake-soft-shadow)">
+    <g class="figure-equipment">
+      
+      <rect class="machine" x="400" y="214" width="400" height="30" rx="15" />
+      <rect class="machine" x="420" y="214" width="22" height="620" rx="11" />
+      <rect class="machine" x="758" y="214" width="22" height="620" rx="11" />
+      <rect class="machine" x="448" y="784" width="310" height="34" rx="17" />
+      <rect class="machine-detail" x="510" y="812" width="168" height="72" rx="26" />
+      <line class="machine" x1="462" y1="326" x2="722" y2="326" style="stroke-width: 24; stroke-linecap: round;" />
+    
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="608" cy="454" rx="158" ry="128" opacity="0.82" /><ellipse class="highlight" cx="614" cy="318" rx="124" ry="88" opacity="0.56" />
+    </g>
+    <g class="figure-guides">
+      <path class="guide-line bad-line" d="M 544 246 C 552 384, 676 462, 752 560" opacity="0.8" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 518 382 L 646 362 L 648 544 L 568 566 Z" />
+    <line class="body-line" x1="586" y1="320" x2="608" y2="556" />
+    <line class="body-line" x1="518" y1="382" x2="492" y2="454" /><line class="body-line" x1="492" y1="454" x2="474" y2="326" /><line class="body-line" x1="646" y1="362" x2="684" y2="454" /><line class="body-line" x1="684" y1="454" x2="706" y2="326" /><line class="body-line" x1="568" y1="566" x2="578" y2="750" /><line class="body-line" x1="578" y1="750" x2="528" y2="966" /><line class="body-line" x1="648" y1="544" x2="640" y2="746" /><line class="body-line" x1="640" y1="746" x2="680" y2="962" />
+    <circle class="body-core" cx="564" cy="236" r="64" />
+    
+      <circle class="joint" cx="518" cy="382" r="19" />
+      <circle class="joint-outline" cx="518" cy="382" r="19" />
+      <circle class="joint" cx="646" cy="362" r="19" />
+      <circle class="joint-outline" cx="646" cy="362" r="19" />
+      <circle class="joint" cx="492" cy="454" r="19" />
+      <circle class="joint-outline" cx="492" cy="454" r="19" />
+      <circle class="joint" cx="684" cy="454" r="19" />
+      <circle class="joint-outline" cx="684" cy="454" r="19" />
+      <circle class="joint" cx="474" cy="326" r="19" />
+      <circle class="joint-outline" cx="474" cy="326" r="19" />
+      <circle class="joint" cx="706" cy="326" r="19" />
+      <circle class="joint-outline" cx="706" cy="326" r="19" />
+      <circle class="joint" cx="568" cy="566" r="19" />
+      <circle class="joint-outline" cx="568" cy="566" r="19" />
+      <circle class="joint" cx="648" cy="544" r="19" />
+      <circle class="joint-outline" cx="648" cy="544" r="19" />
+      <circle class="joint" cx="578" cy="750" r="19" />
+      <circle class="joint-outline" cx="578" cy="750" r="19" />
+      <circle class="joint" cx="640" cy="746" r="19" />
+      <circle class="joint-outline" cx="640" cy="746" r="19" />
+      <circle class="joint" cx="528" cy="966" r="19" />
+      <circle class="joint-outline" cx="528" cy="966" r="19" />
+      <circle class="joint" cx="680" cy="962" r="19" />
+      <circle class="joint-outline" cx="680" cy="962" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">错误：身体后仰过多，还把横杆往脑后拉。</text>
+  <text class="accent-copy" x="72" y="1136">先减轻重量，恢复肩胛下沉和胸口稳定。</text>
+</svg>

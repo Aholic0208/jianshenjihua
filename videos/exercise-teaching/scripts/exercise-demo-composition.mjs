@@ -3,10 +3,24 @@ export function buildCompositionHtml({
   exercise,
   properImagePath = `assets/exercise-media/${exerciseId}-proper.svg`,
   mistakeImagePath = `assets/exercise-media/${exerciseId}-mistake.svg`,
+  properIllustration,
+  mistakeIllustration,
 }) {
   const steps = exercise.steps.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   const cues = exercise.cues.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   const mistakes = exercise.mistakes.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const properCardArt = renderPoseArt({
+    variantClassName: "proper-art",
+    fallbackImagePath: properImagePath,
+    inlineIllustration: properIllustration,
+    alt: `${exercise.name} 正确示范`,
+  });
+  const mistakeCardArt = renderPoseArt({
+    variantClassName: "mistake-art",
+    fallbackImagePath: mistakeImagePath,
+    inlineIllustration: mistakeIllustration,
+    alt: `${exercise.name} 常见错误`,
+  });
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -72,11 +86,30 @@ export function buildCompositionHtml({
         border: 2px solid rgba(255,255,255,0.08);
         box-shadow: 0 28px 80px rgba(0,0,0,0.28);
       }
-      .pose-card img {
+      .pose-card img,
+      .pose-art,
+      .pose-art svg {
         width: 100%;
         height: 100%;
-        object-fit: cover;
         display: block;
+      }
+      .pose-card img {
+        object-fit: cover;
+      }
+      .pose-art .title,
+      .pose-art .subtitle,
+      .pose-art .pill,
+      .pose-art .pill-text,
+      .pose-art .caption,
+      .pose-art .accent-copy {
+        display: none;
+      }
+      .pose-art .stage-figure {
+        transform-origin: 50% 62%;
+      }
+      .pose-art .figure-highlights .highlight {
+        transform-box: fill-box;
+        transform-origin: center;
       }
       .pose-card-proper { left: 74px; top: 314px; }
       .pose-card-mistake { left: 532px; top: 314px; }
@@ -121,11 +154,6 @@ export function buildCompositionHtml({
       .panel h2 {
         font-size: 32px;
         margin-bottom: 14px;
-      }
-      .panel p {
-        font-size: 22px;
-        line-height: 1.45;
-        color: #c4d1de;
       }
       .panel ul,
       .panel ol {
@@ -192,14 +220,14 @@ export function buildCompositionHtml({
       </div>
 
       <div id="properCard" class="clip pose-card pose-card-proper" data-start="0.3" data-duration="9.7" data-track-index="4">
-        <img src="${escapeHtml(properImagePath)}" alt="${escapeHtml(exercise.name)} 正确示范" />
-        <div class="marker green-marker">✓</div>
+        ${properCardArt}
+        <div class="marker green-marker">&#10003;</div>
         <div class="card-label label-good">正确示范</div>
       </div>
 
       <div id="mistakeCard" class="clip pose-card pose-card-mistake" data-start="0.5" data-duration="9.5" data-track-index="5">
-        <img src="${escapeHtml(mistakeImagePath)}" alt="${escapeHtml(exercise.name)} 常见错误" />
-        <div class="marker red-marker">×</div>
+        ${mistakeCardArt}
+        <div class="marker red-marker">&#10005;</div>
         <div class="card-label label-bad">常见错误</div>
       </div>
 
@@ -243,13 +271,77 @@ export function buildCompositionHtml({
         tl.to(".pose-card-mistake", { scale: 1, duration: 1.1, ease: "power1.inOut" }, 6.2);
         tl.to(".red-marker", { scale: 1.12, duration: 0.34, repeat: 1, yoyo: true, ease: "sine.inOut" }, 5.14);
 
+        addPoseMotion(tl, ".proper-art", 0.94, {
+          fromY: 24,
+          toY: -18,
+          fromRotate: -2,
+          toRotate: 2,
+        });
+        addPoseMotion(tl, ".mistake-art", 4.78, {
+          fromY: 18,
+          toY: -28,
+          fromRotate: 2,
+          toRotate: -5,
+        });
+
         tl.to("#root", { opacity: 0, duration: 0.45, ease: "power2.in" }, 9.45);
 
         window.__timelines["main"] = tl;
+
+        function addPoseMotion(timeline, scope, startAt, motion) {
+          timeline.fromTo(\`\${scope} .figure-guides .guide-line, \${scope} .figure-guides .guide-dash\`, {
+            strokeDasharray: 420,
+            strokeDashoffset: 420,
+            opacity: 0.12,
+          }, {
+            strokeDashoffset: 0,
+            opacity: 0.88,
+            duration: 1,
+            stagger: 0.08,
+            ease: "power1.inOut",
+          }, startAt);
+          timeline.fromTo(\`\${scope} .figure-highlights .highlight\`, {
+            opacity: 0.22,
+            scale: 0.92,
+            transformOrigin: "center center",
+          }, {
+            opacity: 0.92,
+            scale: 1.05,
+            duration: 0.7,
+            stagger: 0.08,
+            repeat: 1,
+            yoyo: true,
+            ease: "sine.inOut",
+          }, startAt + 0.16);
+          timeline.fromTo(\`\${scope} .stage-figure\`, {
+            y: motion.fromY,
+            rotate: motion.fromRotate,
+            transformOrigin: "50% 62%",
+          }, {
+            y: motion.toY,
+            rotate: motion.toRotate,
+            duration: 1.5,
+            repeat: 1,
+            yoyo: true,
+            ease: "sine.inOut",
+          }, startAt + 0.12);
+        }
       </script>
     </div>
   </body>
 </html>`;
+}
+
+function renderPoseArt({ variantClassName, fallbackImagePath, inlineIllustration, alt }) {
+  if (inlineIllustration) {
+    return `<div class="pose-art ${variantClassName}">${stripXmlDeclaration(inlineIllustration)}</div>`;
+  }
+
+  return `<img class="${variantClassName}" src="${escapeHtml(fallbackImagePath)}" alt="${escapeHtml(alt)}" />`;
+}
+
+function stripXmlDeclaration(value) {
+  return value.replace(/^\s*<\?xml[^>]*>\s*/u, "");
 }
 
 function escapeHtml(value) {

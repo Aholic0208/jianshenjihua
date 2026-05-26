@@ -52,8 +52,8 @@ function buildLeanGainTemplate(input: AssessmentInput): ProgramTemplate {
       splitStyle: useThreeWaySplit ? "push_pull_legs" : "upper_lower",
       weeklyStructure: useThreeWaySplit
         ? trainingDays >= 5
-          ? ["push_gym", "pull_gym", "legs_gym", "cardio_recovery", "upper_accessory_gym"]
-          : ["push_gym", "pull_gym", "legs_gym", "upper_accessory_gym"]
+          ? ["push_gym", "pull_gym", "quad_focus_gym", "upper_accessory_gym", "posterior_chain_gym"]
+          : ["push_gym", "pull_gym", "quad_focus_gym", "posterior_chain_gym"]
         : ["upper_gym", "lower_gym", "upper_gym", "lower_gym"],
       cardioMinutesPerWeek: EVIDENCE_RULES.cardio.recoveryMinutes,
     };
@@ -73,8 +73,8 @@ function buildLeanGainTemplate(input: AssessmentInput): ProgramTemplate {
     splitStyle: "modified_split",
     weeklyStructure: useThreeWaySplit
       ? trainingDays >= 5
-        ? ["push_gym", "pull_gym", "legs_gym", "upper_home", "cardio_home"]
-        : ["push_gym", "pull_gym", "legs_gym", "upper_home"]
+        ? ["push_gym", "lower_home", "pull_gym", "upper_home", "posterior_chain_gym"]
+        : ["push_gym", "lower_home", "pull_gym", "upper_home"]
       : trainingDays >= 5
         ? ["push_gym", "upper_home", "pull_gym", "cardio_home", "legs_gym"]
         : ["upper_gym", "lower_home", "pull_gym", "cardio_home"],
@@ -144,7 +144,9 @@ function buildRecompTemplate(input: AssessmentInput): ProgramTemplate {
       ? trainingDays >= 5
         ? ["push_gym", "pull_gym", "legs_gym", "upper_home", "cardio_home"]
         : ["push_gym", "pull_gym", "legs_gym", "upper_home"]
-      : ["upper_gym", "lower_home", "cardio_home", "upper_home", "lower_gym"],
+      : trainingDays >= 5
+        ? ["upper_gym", "lower_home", "cardio_home", "pull_gym", "upper_home"]
+        : ["upper_gym", "lower_home", "cardio_home", "upper_home"],
     cardioMinutesPerWeek: 120,
   };
 }

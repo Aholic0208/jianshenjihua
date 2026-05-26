@@ -101,7 +101,7 @@ describe("fitness plan generation", () => {
     expect(restrictionNotes).toContain("peanut");
   });
 
-  it("creates a lean-gain gym plan with split-oriented structure and moderate cardio", () => {
+  it("creates a lean-gain gym plan with a distinct gym-only hypertrophy split", () => {
     const plan = generateFitnessPlan({
       ...baseAssessment,
       weightKg: 64,
@@ -115,15 +115,32 @@ describe("fitness plan generation", () => {
     });
 
     const firstWeek = plan.days.slice(0, 7);
-    const cardioCount = firstWeek.flatMap((day) => day.workoutItems).filter((item) => item.category === "cardio").length;
+    const pushDay = firstWeek[0];
+    const pullDay = firstWeek[1];
+    const quadDay = firstWeek[2];
+    const accessoryDay = firstWeek[3];
+    const posteriorDay = firstWeek[4];
 
-    expect(firstWeek.some((day) => hasUpperBias(day))).toBe(true);
-    expect(firstWeek.some((day) => hasLowerBias(day))).toBe(true);
-    expect(cardioCount).toBeGreaterThan(0);
+    expect(pushDay?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["machine-chest-press", "incline-push-up"]),
+    );
+    expect(pullDay?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["lat-pulldown", "seated-cable-row"]),
+    );
+    expect(quadDay?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["leg-press", "goblet-squat"]),
+    );
+    expect(accessoryDay?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["machine-chest-press", "seated-cable-row"]),
+    );
+    expect(posteriorDay?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["glute-bridge", "leg-press"]),
+    );
+    expect(firstWeek.flatMap((day) => day.workoutItems).every((item) => item.environment !== "home")).toBe(true);
     expect(plan.days[0]?.nutrition.indulgenceGuidance.length).toBeGreaterThan(0);
   });
 
-  it("keeps four-day lean-gain gym plans on upper and lower focused days instead of full-body fallbacks", () => {
+  it("keeps four-day lean-gain gym plans on gym-only body-part days instead of full-body fallbacks", () => {
     const plan = generateFitnessPlan({
       ...baseAssessment,
       weightKg: 64,
@@ -138,12 +155,22 @@ describe("fitness plan generation", () => {
 
     const firstFourDays = plan.days.slice(0, 4);
 
-    expect(firstFourDays.some((day) => hasUpperBias(day))).toBe(true);
-    expect(firstFourDays.some((day) => hasLowerBias(day))).toBe(true);
+    expect(firstFourDays[0]?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["machine-chest-press", "incline-push-up"]),
+    );
+    expect(firstFourDays[1]?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["lat-pulldown", "seated-cable-row"]),
+    );
+    expect(firstFourDays[2]?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["leg-press", "goblet-squat"]),
+    );
+    expect(firstFourDays[3]?.workoutItems.map((item) => item.exerciseId)).toEqual(
+      expect.arrayContaining(["glute-bridge", "leg-press"]),
+    );
     expect(firstFourDays.every((day) => !isFullBodyFallback(day))).toBe(true);
   });
 
-  it("uses gym-specific movements on gym-tagged days for mixed-environment recomposition plans", () => {
+  it("splits mixed-environment recomposition plans into explicit gym and home days across the week", () => {
     const plan = generateFitnessPlan({
       ...baseAssessment,
       weightKg: 72,
@@ -155,16 +182,18 @@ describe("fitness plan generation", () => {
       equipment: ["mat", "band", "dumbbell", "lat pulldown machine", "treadmill"],
     });
 
-    const gymStrengthDay = plan.days.find((day) =>
-      day.workoutItems.some((item) => item.exerciseId === "lat-pulldown"),
+    const firstFiveDays = plan.days.slice(0, 5);
+    const gymDays = firstFiveDays.filter((day) =>
+      day.workoutItems.some((item) => item.environment === "gym"),
     );
-    const homeStrengthDay = plan.days.find((day) =>
-      day.workoutItems.some((item) => item.exerciseId === "band-row")
-      && !day.workoutItems.some((item) => item.exerciseId === "lat-pulldown"),
+    const homeDays = firstFiveDays.filter((day) =>
+      day.workoutItems.every((item) => item.environment !== "gym"),
     );
 
-    expect(gymStrengthDay).toBeDefined();
-    expect(homeStrengthDay).toBeDefined();
+    expect(gymDays).toHaveLength(2);
+    expect(homeDays).toHaveLength(3);
+    expect(gymDays.some((day) => day.workoutItems.some((item) => item.exerciseId === "lat-pulldown"))).toBe(true);
+    expect(homeDays.some((day) => day.workoutItems.some((item) => item.exerciseId === "band-row"))).toBe(true);
   });
 
   it("creates a higher-cardio fat-loss plan without dropping resistance work", () => {
@@ -187,6 +216,53 @@ describe("fitness plan generation", () => {
 
     expect(strengthCount).toBeGreaterThan(0);
     expect(cardioCount).toBeGreaterThan(0);
+  });
+
+  it("changes weekly volume and cardio by goal and training base", () => {
+    const leanGainPlan = generateFitnessPlan({
+      ...baseAssessment,
+      weightKg: 68,
+      targetWeightKg: 73,
+      goalText: "gain muscle",
+      experience: "intermediate",
+      trainingEnvironment: "gym",
+      trainingDaysPerWeek: 5,
+      sessionMinutes: 60,
+      equipment: ["dumbbell", "lat pulldown machine", "treadmill"],
+    });
+    const recompPlan = generateFitnessPlan({
+      ...baseAssessment,
+      weightKg: 72,
+      targetWeightKg: 72,
+      goalText: "body recomposition",
+      experience: "intermediate",
+      trainingEnvironment: "both",
+      trainingDaysPerWeek: 5,
+      equipment: ["mat", "band", "dumbbell", "lat pulldown machine", "treadmill"],
+    });
+    const fatLossPlan = generateFitnessPlan({
+      ...baseAssessment,
+      weightKg: 96,
+      targetWeightKg: 84,
+      goalText: "lose fat",
+      experience: "beginner",
+      trainingEnvironment: "home",
+      trainingDaysPerWeek: 4,
+      sessionMinutes: 45,
+      equipment: ["mat", "band"],
+    });
+
+    const leanGainStrengthSets = totalStrengthSets(leanGainPlan.days.slice(0, 7));
+    const recompStrengthSets = totalStrengthSets(recompPlan.days.slice(0, 7));
+    const fatLossStrengthSets = totalStrengthSets(fatLossPlan.days.slice(0, 7));
+    const leanGainCardioMinutes = totalCardioMinutes(leanGainPlan.days.slice(0, 7));
+    const recompCardioMinutes = totalCardioMinutes(recompPlan.days.slice(0, 7));
+    const fatLossCardioMinutes = totalCardioMinutes(fatLossPlan.days.slice(0, 7));
+
+    expect(leanGainStrengthSets).toBeGreaterThan(recompStrengthSets);
+    expect(recompStrengthSets).toBeGreaterThan(fatLossStrengthSets);
+    expect(fatLossCardioMinutes).toBeGreaterThan(recompCardioMinutes);
+    expect(recompCardioMinutes).toBeGreaterThan(leanGainCardioMinutes);
   });
 });
 
@@ -253,4 +329,18 @@ function isFullBodyFallback(day: PlanDay) {
     && exerciseIds.includes("incline-push-up")
     && (exerciseIds.includes("lat-pulldown") || exerciseIds.includes("band-row") || exerciseIds.includes("dumbbell-row"))
   );
+}
+
+function totalStrengthSets(days: PlanDay[]) {
+  return days
+    .flatMap((day) => day.workoutItems)
+    .filter((item) => item.category === "strength")
+    .reduce((sum, item) => sum + (item.sets ?? 0), 0);
+}
+
+function totalCardioMinutes(days: PlanDay[]) {
+  return days
+    .flatMap((day) => day.workoutItems)
+    .filter((item) => item.category === "cardio")
+    .reduce((sum, item) => sum + (item.durationMinutes ?? 0), 0);
 }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="腿举机推腿 常见错误">
+  <defs>
+    <linearGradient id="leg-press-mistake-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="leg-press-mistake-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(239, 68, 68, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="leg-press-mistake-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(239, 68, 68, 0.18); stroke: #ef4444; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#leg-press-mistake-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#leg-press-mistake-glow-gradient)" />
+  <text class="title" x="72" y="118">腿举机推腿</text>
+  <text class="subtitle" x="72" y="162">股四头肌 · 臀部 · 腿后侧</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">常见错误</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#leg-press-mistake-soft-shadow)">
+    <g class="figure-equipment">
+      
+      <path class="machine" d="M 360 864 L 860 664 L 920 742 L 432 962 Z" />
+      <rect class="machine" x="314" y="702" width="160" height="220" rx="46" transform="rotate(-20 394 812)" />
+      <rect class="machine-detail" x="748" y="570" width="136" height="176" rx="28" transform="rotate(-20 816 658)" />
+    
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="770" cy="724" rx="118" ry="144" opacity="0.82" /><ellipse class="highlight" cx="608" cy="664" rx="98" ry="86" opacity="0.46" />
+    </g>
+    <g class="figure-guides">
+      <line class="guide-line bad-line" x1="506" y1="744" x2="922" y2="628" opacity="0.78" /><path class="guide-line bad-line" d="M 654 708 C 690 684, 726 670, 792 662" opacity="0.72" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 550 586 L 578 642 L 658 734 L 628 676 Z" />
+    <line class="body-line" x1="506" y1="534" x2="642" y2="706" />
+    <line class="body-line" x1="550" y1="586" x2="498" y2="670" /><line class="body-line" x1="498" y1="670" x2="432" y2="748" /><line class="body-line" x1="578" y1="642" x2="542" y2="726" /><line class="body-line" x1="542" y1="726" x2="470" y2="808" /><line class="body-line" x1="628" y1="676" x2="808" y2="688" /><line class="body-line" x1="808" y1="688" x2="944" y2="618" /><line class="body-line" x1="658" y1="734" x2="842" y2="742" /><line class="body-line" x1="842" y1="742" x2="970" y2="674" />
+    <circle class="body-core" cx="458" cy="488" r="64" />
+    
+      <circle class="joint" cx="550" cy="586" r="19" />
+      <circle class="joint-outline" cx="550" cy="586" r="19" />
+      <circle class="joint" cx="578" cy="642" r="19" />
+      <circle class="joint-outline" cx="578" cy="642" r="19" />
+      <circle class="joint" cx="498" cy="670" r="19" />
+      <circle class="joint-outline" cx="498" cy="670" r="19" />
+      <circle class="joint" cx="542" cy="726" r="19" />
+      <circle class="joint-outline" cx="542" cy="726" r="19" />
+      <circle class="joint" cx="432" cy="748" r="19" />
+      <circle class="joint-outline" cx="432" cy="748" r="19" />
+      <circle class="joint" cx="470" cy="808" r="19" />
+      <circle class="joint-outline" cx="470" cy="808" r="19" />
+      <circle class="joint" cx="628" cy="676" r="19" />
+      <circle class="joint-outline" cx="628" cy="676" r="19" />
+      <circle class="joint" cx="658" cy="734" r="19" />
+      <circle class="joint-outline" cx="658" cy="734" r="19" />
+      <circle class="joint" cx="808" cy="688" r="19" />
+      <circle class="joint-outline" cx="808" cy="688" r="19" />
+      <circle class="joint" cx="842" cy="742" r="19" />
+      <circle class="joint-outline" cx="842" cy="742" r="19" />
+      <circle class="joint" cx="944" cy="618" r="19" />
+      <circle class="joint-outline" cx="944" cy="618" r="19" />
+      <circle class="joint" cx="970" cy="674" r="19" />
+      <circle class="joint-outline" cx="970" cy="674" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">错误：膝盖锁死、臀部离座，压力顶到关节上。</text>
+  <text class="accent-copy" x="72" y="1136">先缩小活动范围，把贴背和膝盖轨迹守住。</text>
+</svg>

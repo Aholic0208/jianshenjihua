@@ -47,13 +47,17 @@ const baseAssessment: AssessmentInput = {
 };
 
 describe("buildProgramTemplate", () => {
-  it("builds a split-oriented gym template for lean gain users", () => {
+  it("builds a body-part-forward gym template for lean gain users", () => {
     const program = buildProgramTemplate(baseAssessment, profileMap.gain);
 
     expect(program.splitStyle).toBe("push_pull_legs");
-    expect(program.weeklyStructure).toContain("push_gym");
-    expect(program.weeklyStructure).toContain("pull_gym");
-    expect(program.weeklyStructure).toContain("legs_gym");
+    expect(program.weeklyStructure).toEqual([
+      "push_gym",
+      "pull_gym",
+      "quad_focus_gym",
+      "upper_accessory_gym",
+      "posterior_chain_gym",
+    ]);
   });
 
   it("builds a full-body plus cardio home template for fat-loss users", () => {
@@ -69,7 +73,7 @@ describe("buildProgramTemplate", () => {
 
     expect(program.splitStyle).toBe("full_body");
     expect(program.weeklyStructure.some((day) => day.includes("cardio"))).toBe(true);
-    expect(program.weeklyStructure.filter((day) => day.includes("full_body")).length).toBeGreaterThan(1);
+    expect(program.weeklyStructure.filter((day) => day.includes("full_body"))).toHaveLength(3);
   });
 
   it("builds a mixed-location template for recomposition users", () => {
@@ -87,7 +91,7 @@ describe("buildProgramTemplate", () => {
     expect(program.weeklyStructure.some((day) => day.includes("home"))).toBe(true);
   });
 
-  it("routes four-day gym lean-gain users into a three-way split structure", () => {
+  it("routes four-day gym lean-gain users into a gym-only split", () => {
     const program = buildProgramTemplate(
       {
         ...baseAssessment,
@@ -98,13 +102,15 @@ describe("buildProgramTemplate", () => {
     );
 
     expect(program.splitStyle).toBe("push_pull_legs");
-    expect(program.weeklyStructure).toContain("push_gym");
-    expect(program.weeklyStructure).toContain("pull_gym");
-    expect(program.weeklyStructure).toContain("legs_gym");
-    expect(program.weeklyStructure.every((day) => !day.includes("_home"))).toBe(true);
+    expect(program.weeklyStructure).toEqual([
+      "push_gym",
+      "pull_gym",
+      "quad_focus_gym",
+      "posterior_chain_gym",
+    ]);
   });
 
-  it("keeps four-day mixed lean-gain templates gym-forward with a home top-up day", () => {
+  it("splits four-day mixed lean-gain templates into clear gym and home days", () => {
     const program = buildProgramTemplate(
       {
         ...baseAssessment,
@@ -115,18 +121,21 @@ describe("buildProgramTemplate", () => {
       profileMap.gain,
     );
 
-    expect(program.weeklyStructure).toContain("push_gym");
-    expect(program.weeklyStructure).toContain("pull_gym");
-    expect(program.weeklyStructure).toContain("legs_gym");
-    expect(program.weeklyStructure.filter((day) => day.includes("_gym")).length).toBe(3);
-    expect(program.weeklyStructure.filter((day) => day.includes("_home")).length).toBe(1);
+    expect(program.weeklyStructure).toEqual([
+      "push_gym",
+      "lower_home",
+      "pull_gym",
+      "upper_home",
+    ]);
+    expect(program.weeklyStructure.filter((day) => day.includes("_gym"))).toHaveLength(2);
+    expect(program.weeklyStructure.filter((day) => day.includes("_home"))).toHaveLength(2);
   });
 
-  it("lets intermediate gym recomposition users who explicitly ask for 三分化 use a gym split", () => {
+  it("lets intermediate gym recomposition users who explicitly ask for a split use a gym split", () => {
     const program = buildProgramTemplate(
       {
         ...baseAssessment,
-        goalText: "体脂高一些，但我想在减脂同时练出薄肌，要三分化训练",
+        goalText: "I want to recomp and use a push pull legs split",
         trainingEnvironment: "gym",
         trainingDaysPerWeek: 5,
       },
@@ -139,7 +148,7 @@ describe("buildProgramTemplate", () => {
     expect(program.weeklyStructure).toContain("legs_gym");
   });
 
-  it("recognizes Chinese gym equipment wording when mixed recomposition users ask for 三分化", () => {
+  it("recognizes Chinese gym equipment wording when mixed recomposition users ask for a split", () => {
     const program = buildProgramTemplate(
       {
         ...baseAssessment,
@@ -155,5 +164,26 @@ describe("buildProgramTemplate", () => {
     expect(program.weeklyStructure).toContain("pull_gym");
     expect(program.weeklyStructure).toContain("legs_gym");
     expect(program.weeklyStructure.some((day) => day.includes("_home"))).toBe(true);
+  });
+
+  it("keeps mixed fat-loss templates cardio-forward while splitting gym and home days", () => {
+    const program = buildProgramTemplate(
+      {
+        ...baseAssessment,
+        goalText: "lose fat and keep muscle",
+        trainingEnvironment: "both",
+        trainingDaysPerWeek: 5,
+        equipment: ["mat", "band", "dumbbell", "treadmill"],
+      },
+      profileMap.fatLoss,
+    );
+
+    expect(program.weeklyStructure).toEqual([
+      "full_body_gym",
+      "cardio_home",
+      "full_body_home",
+      "full_body_gym",
+      "cardio_home",
+    ]);
   });
 });

@@ -192,6 +192,8 @@ for (const exerciseId of exerciseIds) {
       exercise,
       properImagePath: `assets/exercise-media/${exerciseId}-proper.svg`,
       mistakeImagePath: `assets/exercise-media/${exerciseId}-mistake.svg`,
+      properIllustration: properSvg,
+      mistakeIllustration: mistakeSvg,
     }),
   );
 

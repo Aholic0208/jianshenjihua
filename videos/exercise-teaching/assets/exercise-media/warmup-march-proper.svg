@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="原地高抬腿热身 正确示范">
+  <defs>
+    <linearGradient id="warmup-march-proper-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="warmup-march-proper-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(34, 197, 94, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="warmup-march-proper-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(34, 197, 94, 0.18); stroke: #22c55e; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#warmup-march-proper-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#warmup-march-proper-glow-gradient)" />
+  <text class="title" x="72" y="118">原地高抬腿热身</text>
+  <text class="subtitle" x="72" y="162">髋前侧 · 核心 · 心肺</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">正确示范</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#warmup-march-proper-soft-shadow)">
+    <g class="figure-equipment">
+      
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="600" cy="364" rx="86" ry="132" opacity="0.75" /><ellipse class="highlight" cx="664" cy="686" rx="70" ry="126" opacity="0.54" />
+    </g>
+    <g class="figure-guides">
+      <line class="guide-line good-line" x1="600" y1="208" x2="600" y2="958" opacity="0.66" /><path class="guide-line good-line" d="M 686 632 C 742 602, 772 548, 764 488" opacity="0.72" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 528 324 L 672 324 L 652 520 L 548 520 Z" />
+    <line class="body-line" x1="600" y1="284" x2="600" y2="520" />
+    <line class="body-line" x1="528" y1="324" x2="484" y2="444" /><line class="body-line" x1="484" y1="444" x2="528" y2="566" /><line class="body-line" x1="672" y1="324" x2="724" y2="434" /><line class="body-line" x1="724" y1="434" x2="676" y2="562" /><line class="body-line" x1="548" y1="520" x2="558" y2="746" /><line class="body-line" x1="558" y1="746" x2="548" y2="958" /><line class="body-line" x1="652" y1="520" x2="676" y2="632" /><line class="body-line" x1="676" y1="632" x2="714" y2="860" />
+    <circle class="body-core" cx="600" cy="208" r="64" />
+    
+      <circle class="joint" cx="528" cy="324" r="19" />
+      <circle class="joint-outline" cx="528" cy="324" r="19" />
+      <circle class="joint" cx="672" cy="324" r="19" />
+      <circle class="joint-outline" cx="672" cy="324" r="19" />
+      <circle class="joint" cx="484" cy="444" r="19" />
+      <circle class="joint-outline" cx="484" cy="444" r="19" />
+      <circle class="joint" cx="724" cy="434" r="19" />
+      <circle class="joint-outline" cx="724" cy="434" r="19" />
+      <circle class="joint" cx="528" cy="566" r="19" />
+      <circle class="joint-outline" cx="528" cy="566" r="19" />
+      <circle class="joint" cx="676" cy="562" r="19" />
+      <circle class="joint-outline" cx="676" cy="562" r="19" />
+      <circle class="joint" cx="548" cy="520" r="19" />
+      <circle class="joint-outline" cx="548" cy="520" r="19" />
+      <circle class="joint" cx="652" cy="520" r="19" />
+      <circle class="joint-outline" cx="652" cy="520" r="19" />
+      <circle class="joint" cx="558" cy="746" r="19" />
+      <circle class="joint-outline" cx="558" cy="746" r="19" />
+      <circle class="joint" cx="676" cy="632" r="19" />
+      <circle class="joint-outline" cx="676" cy="632" r="19" />
+      <circle class="joint" cx="548" cy="958" r="19" />
+      <circle class="joint-outline" cx="548" cy="958" r="19" />
+      <circle class="joint" cx="714" cy="860" r="19" />
+      <circle class="joint-outline" cx="714" cy="860" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">抬膝靠髋前侧发力，躯干保持直立。</text>
+  <text class="accent-copy" x="72" y="1136">保持脚步轻，先把节奏和稳定性做出来。</text>
+</svg>

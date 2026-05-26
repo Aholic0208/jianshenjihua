@@ -10,260 +10,140 @@
         width: 1920px;
         height: 1080px;
         overflow: hidden;
-        background: #f2f6f4;
+        background: #0e131a;
         font-family: "Segoe UI", "Inter", "Microsoft YaHei", sans-serif;
-        color: #17231d;
+        color: #f5f7fb;
       }
       #root {
         position: relative;
         width: 100%;
         height: 100%;
         background:
-          radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 28%),
-          radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 32%),
-          linear-gradient(180deg, #f6f8f7 0%, #edf3f0 100%);
+          radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 24%),
+          radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.12), transparent 28%),
+          linear-gradient(180deg, #111720 0%, #151d29 100%);
       }
       .clip { position: absolute; }
       .eyebrow {
-        top: 56px;
+        top: 48px;
         left: 72px;
         display: inline-flex;
         align-items: center;
-        gap: 14px;
-        padding: 12px 22px;
+        gap: 12px;
+        padding: 12px 20px;
         border-radius: 999px;
-        background: rgba(20, 152, 106, 0.14);
-        color: #156a4a;
+        background: rgba(255,255,255,0.08);
+        color: #dce7f4;
         font-size: 22px;
         font-weight: 700;
       }
       .title-block {
-        top: 122px;
+        top: 110px;
         left: 72px;
-        width: 760px;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
+        width: 720px;
       }
       .title-block h1 {
-        font-size: 76px;
-        line-height: 1.02;
+        font-size: 74px;
+        line-height: 1.04;
         font-weight: 800;
       }
       .title-block p {
-        font-size: 28px;
-        line-height: 1.46;
-        color: #42544a;
+        margin-top: 20px;
+        font-size: 29px;
+        line-height: 1.5;
+        color: #c4d1de;
       }
-      .legend-chip {
-        top: 254px;
-        left: 72px;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        padding: 14px 20px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.86);
-        box-shadow: 0 18px 40px rgba(22, 33, 29, 0.08);
-        font-size: 21px;
-        color: #4f5d57;
+      .pose-card {
+        width: 420px;
+        height: 720px;
+        border-radius: 30px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.06);
+        border: 2px solid rgba(255,255,255,0.08);
+        box-shadow: 0 28px 80px rgba(0,0,0,0.28);
       }
-      .legend-dot {
-        width: 14px;
-        height: 14px;
-        border-radius: 999px;
-        background: #ff5858;
-        box-shadow: 0 0 18px rgba(255, 88, 88, 0.65);
-      }
-      .robot-stage-shell {
-        top: 328px;
-        left: 72px;
-        width: 856px;
-        height: 664px;
-        border-radius: 34px;
-        padding: 24px;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 28px 80px rgba(22, 33, 29, 0.12);
-      }
-      .robot-stage {
-        position: relative;
+      .pose-card img,
+      .pose-art,
+      .pose-art svg {
         width: 100%;
         height: 100%;
-        overflow: hidden;
-        border-radius: 28px;
-        background:
-          linear-gradient(180deg, rgba(14, 116, 144, 0.12), rgba(14, 116, 144, 0.02)),
-          linear-gradient(180deg, rgba(11, 18, 32, 0.96), rgba(22, 34, 48, 0.98));
+        display: block;
       }
-      .robot-stage::before {
-        content: "";
-        position: absolute;
-        inset: 28px;
-        border-radius: 24px;
-        border: 1px solid rgba(148, 163, 184, 0.2);
+      .pose-card img {
+        object-fit: cover;
       }
-      .robot-stage::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 116px;
-        background: linear-gradient(180deg, rgba(4, 12, 25, 0), rgba(4, 12, 25, 0.62));
+      .pose-art .title,
+      .pose-art .subtitle,
+      .pose-art .pill,
+      .pose-art .pill-text,
+      .pose-art .caption,
+      .pose-art .accent-copy {
+        display: none;
       }
-      .stage-grid {
-        position: absolute;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-        background-size: 56px 56px;
-        mask-image: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.18));
+      .pose-art .stage-figure {
+        transform-origin: 50% 62%;
       }
-      .robot-label {
+      .pose-art .figure-highlights .highlight {
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+      .pose-card-proper { left: 74px; top: 314px; }
+      .pose-card-mistake { left: 532px; top: 314px; }
+      .marker {
         position: absolute;
         top: 24px;
-        left: 26px;
-        display: inline-flex;
+        right: 24px;
+        width: 84px;
+        height: 84px;
+        border-radius: 999px;
+        display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 16px;
-        border-radius: 16px;
-        background: rgba(9, 14, 24, 0.82);
-        color: #f3f7fa;
-        font-size: 20px;
+        justify-content: center;
+        font-size: 46px;
+        font-weight: 800;
+        color: white;
+        box-shadow: 0 0 24px rgba(0,0,0,0.22);
       }
-      .robot-stage svg {
+      .green-marker { background: rgba(34, 197, 94, 0.9); }
+      .red-marker { background: rgba(239, 68, 68, 0.92); }
+      .card-label {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        overflow: visible;
+        left: 24px;
+        bottom: 24px;
+        padding: 12px 20px;
+        border-radius: 999px;
+        font-size: 24px;
+        font-weight: 700;
+        backdrop-filter: blur(12px);
       }
-      .robot-figure {
-        filter: drop-shadow(0 24px 44px rgba(12, 18, 32, 0.32));
-      }
-      .robot-shell {
-        fill: rgba(218, 236, 248, 0.96);
-        stroke: rgba(175, 225, 255, 0.65);
-        stroke-width: 4;
-      }
-      .robot-core {
-        fill: rgba(123, 216, 255, 0.14);
-        stroke: rgba(125, 219, 255, 0.9);
-        stroke-width: 3;
-      }
-      .robot-joint {
-        fill: rgba(231, 245, 255, 0.95);
-        stroke: rgba(140, 216, 255, 0.72);
-        stroke-width: 3;
-      }
-      .joint-glow {
-        fill: rgba(107, 204, 255, 0.2);
-      }
-      .hotspot {
-        fill: rgba(255, 78, 78, 0.78);
-        stroke: rgba(255, 205, 205, 0.55);
-        stroke-width: 2;
-        filter: blur(10px);
-        opacity: 0.42;
-      }
-      .hotspot-secondary {
-        fill: rgba(255, 102, 102, 0.54);
-      }
-      .hotspot-tertiary {
-        fill: rgba(255, 132, 132, 0.38);
-      }
-      .highlight-shell,
-      .motion-path {
-        fill: none;
-        opacity: 0.18;
-        transform-origin: center center;
-      }
-      .highlight-shell {
-        stroke-width: 4;
-        stroke-linecap: round;
-        filter: drop-shadow(0 0 18px rgba(255, 132, 132, 0.24));
-      }
-      .highlight-shell-primary {
-        stroke: rgba(255, 196, 196, 0.92);
-      }
-      .highlight-shell-secondary {
-        stroke: rgba(255, 176, 176, 0.82);
-        stroke-dasharray: 10 12;
-      }
-      .highlight-shell-tertiary {
-        stroke: rgba(255, 160, 160, 0.72);
-        stroke-dasharray: 12 14;
-      }
-      .motion-path {
-        stroke-width: 7;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        stroke-dasharray: 26 18;
-        filter: drop-shadow(0 0 14px rgba(123, 216, 255, 0.24));
-      }
-      .motion-path-primary {
-        stroke: rgba(123, 216, 255, 0.9);
-      }
-      .motion-path-secondary {
-        stroke: rgba(255, 202, 114, 0.78);
-      }
-      #pose-arms,
-      #pose-body,
-      #pose-torso-shell,
-      #pose-arm-left,
-      #pose-arm-right,
-      #pose-leg-left,
-      #pose-leg-right,
-      #pose-forearm-left,
-      #pose-forearm-right,
-      #pose-shin-left,
-      #pose-shin-right {
-        transform-box: fill-box;
-      }
-      #pose-body,
-      #pose-torso-shell {
-        transform-origin: center center;
-      }
-      #pose-arms {
-        transform-origin: center top;
-      }
-      #pose-arm-left,
-      #pose-arm-right,
-      #pose-leg-left,
-      #pose-leg-right,
-      #pose-forearm-left,
-      #pose-forearm-right,
-      #pose-shin-left,
-      #pose-shin-right {
-        transform-origin: center top;
-      }
+      .label-good { background: rgba(34, 197, 94, 0.18); color: #9ae6b4; }
+      .label-bad { background: rgba(239, 68, 68, 0.18); color: #fecaca; }
       .panel {
         right: 72px;
-        width: 856px;
-        padding: 30px 34px;
+        width: 814px;
+        padding: 28px 32px;
         border-radius: 26px;
-        background: rgba(255, 255, 255, 0.94);
-        box-shadow: 0 22px 64px rgba(22, 33, 29, 0.1);
+        background: rgba(255,255,255,0.06);
+        border: 2px solid rgba(255,255,255,0.08);
+        box-shadow: 0 24px 64px rgba(0,0,0,0.24);
       }
       .panel h2 {
         font-size: 32px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
       }
-      .panel ol,
-      .panel ul {
+      .panel ul,
+      .panel ol {
         padding-left: 28px;
         display: flex;
         flex-direction: column;
         gap: 12px;
         font-size: 24px;
-        line-height: 1.45;
-        color: #35453d;
+        line-height: 1.46;
+        color: #eef4fa;
       }
-      .panel-top { top: 104px; min-height: 274px; }
-      .panel-mid { top: 410px; min-height: 234px; border: 2px solid rgba(15, 118, 110, 0.14); }
-      .panel-bottom { top: 676px; min-height: 316px; border: 2px solid rgba(239, 68, 68, 0.14); }
+      .panel-top { top: 108px; min-height: 250px; }
+      .panel-mid { top: 390px; min-height: 258px; }
+      .panel-bottom { top: 686px; min-height: 256px; }
       .panel-tag {
         display: inline-flex;
         align-items: center;
@@ -271,232 +151,337 @@
         margin-bottom: 14px;
         padding: 10px 16px;
         border-radius: 999px;
-        background: #fff4f4;
-        color: #b42318;
         font-size: 20px;
         font-weight: 700;
+      }
+      .panel-tag-good {
+        background: rgba(34, 197, 94, 0.16);
+        color: #9ae6b4;
+      }
+      .panel-tag-bad {
+        background: rgba(239, 68, 68, 0.16);
+        color: #fecaca;
       }
       .footer-note {
-        position: absolute;
-        left: 34px;
-        right: 34px;
-        bottom: 26px;
-        padding: 16px 20px;
+        margin-top: 18px;
+        padding: 16px 18px;
         border-radius: 18px;
-        background: rgba(12, 18, 32, 0.88);
-        color: #f4f8fb;
-        font-size: 20px;
+        background: rgba(0,0,0,0.18);
+        color: #e4edf7;
+        font-size: 21px;
         line-height: 1.5;
       }
-      .reference-card {
-        position: absolute;
-        right: 28px;
-        bottom: 28px;
-        width: 148px;
-        padding: 10px;
-        border-radius: 18px;
-        background: rgba(255,255,255,0.88);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255,255,255,0.18);
-      }
-      .reference-copy {
-        margin-bottom: 8px;
-        color: #23333d;
-        font-size: 16px;
+      .divider-copy {
+        top: 282px;
+        left: 74px;
+        width: 878px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 24px;
         font-weight: 700;
-      }
-      .reference-card img {
-        width: 100%;
-        height: 118px;
-        object-fit: contain;
-        border-radius: 12px;
-        background: rgba(255,255,255,0.92);
+        color: #eaf2fb;
       }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080" data-explainer-scene="true" data-exercise-id="stretch-full-body">
       <div id="eyebrow" class="clip eyebrow" data-start="0" data-duration="10" data-track-index="1">站内动作讲解 · 全身拉伸放松</div>
       <div id="title" class="clip title-block" data-start="0" data-duration="10" data-track-index="2">
         <h1>全身拉伸放松</h1>
         <p>用缓慢呼吸把身体放松下来，不要追求疼痛感。</p>
       </div>
-      <div id="legend" class="clip legend-chip" data-start="0.2" data-duration="9.8" data-track-index="3">
-        <span class="legend-dot"></span>
-        <span>红色高亮 = 当前重点拉伸或发力区域</span>
+      <div id="dividerCopy" class="clip divider-copy" data-start="0.2" data-duration="9.8" data-track-index="3">
+        <span>先看正确示范</span>
+        <span>再看常见错误</span>
       </div>
 
-      <div id="stageShell" class="clip robot-stage-shell" data-start="0.3" data-duration="9.7" data-track-index="4">
-        <div class="robot-stage" data-robot-stage="true" data-motion-profile="mobility-flow">
-          <div class="stage-grid"></div>
-          <div class="robot-label">放松路径示范</div>
-          <svg class="robot-figure" viewBox="0 0 720 720" aria-label="全身拉伸放松 动作路径机器人演示" role="img">
-            <defs>
-              <radialGradient id="platformGlow" cx="50%" cy="50%" r="56%">
-                <stop offset="0%" stop-color="rgba(107, 204, 255, 0.52)" />
-                <stop offset="100%" stop-color="rgba(107, 204, 255, 0)" />
-              </radialGradient>
-            </defs>
-
-            <ellipse cx="360" cy="644" rx="154" ry="34" fill="url(#platformGlow)" opacity="0.65"></ellipse>
-            <path id="motion-arc-left" class="motion-path motion-path-primary" d="M 292 258 C 246 220, 224 158, 236 102"></path><path id="motion-arc-right" class="motion-path motion-path-primary" d="M 428 258 C 474 220, 496 158, 484 102"></path><path id="motion-sway" class="motion-path motion-path-secondary" d="M 278 334 C 324 294, 396 294, 442 334"></path>
-            <ellipse id="hotspot-primary" class="hotspot hotspot-primary" cx="360" cy="246" rx="128" ry="98"></ellipse><ellipse id="hotspot-secondary" class="hotspot hotspot-secondary" cx="360" cy="406" rx="82" ry="100"></ellipse><ellipse id="hotspot-tertiary" class="hotspot hotspot-tertiary" cx="360" cy="548" rx="108" ry="126"></ellipse>
-            <ellipse id="highlight-shoulders" class="highlight-shell highlight-shell-primary" cx="360" cy="226" rx="140" ry="54"></ellipse><ellipse id="highlight-core" class="highlight-shell highlight-shell-secondary" cx="360" cy="368" rx="96" ry="134"></ellipse><ellipse id="highlight-lower" class="highlight-shell highlight-shell-tertiary" cx="360" cy="546" rx="118" ry="138"></ellipse>
-
-            <g id="pose-body">
-              <g id="pose-arms">
-                <g id="pose-arm-left" transform="translate(274 220)">
-                  <ellipse class="joint-glow" cx="0" cy="0" rx="24" ry="24"></ellipse>
-                  <circle class="robot-joint" cx="0" cy="0" r="14"></circle>
-                  <rect class="robot-shell" x="-15" y="0" width="30" height="126" rx="15"></rect>
-                  <g id="pose-forearm-left" transform="translate(0 112)">
-                    <ellipse class="joint-glow" cx="0" cy="0" rx="22" ry="22"></ellipse>
-                    <circle class="robot-joint" cx="0" cy="0" r="13"></circle>
-                    <rect class="robot-shell" x="-13" y="0" width="26" height="118" rx="13"></rect>
-                  </g>
-                </g>
-                <g id="pose-arm-right" transform="translate(446 220)">
-                  <ellipse class="joint-glow" cx="0" cy="0" rx="24" ry="24"></ellipse>
-                  <circle class="robot-joint" cx="0" cy="0" r="14"></circle>
-                  <rect class="robot-shell" x="-15" y="0" width="30" height="126" rx="15"></rect>
-                  <g id="pose-forearm-right" transform="translate(0 112)">
-                    <ellipse class="joint-glow" cx="0" cy="0" rx="22" ry="22"></ellipse>
-                    <circle class="robot-joint" cx="0" cy="0" r="13"></circle>
-                    <rect class="robot-shell" x="-13" y="0" width="26" height="118" rx="13"></rect>
-                  </g>
-                </g>
-              </g>
-
-              <circle id="pose-head" class="robot-shell" cx="360" cy="136" r="48"></circle>
-              <rect id="pose-neck" class="robot-core" x="340" y="178" width="40" height="34" rx="20"></rect>
-              <ellipse id="pose-shoulder-band" class="robot-core" cx="360" cy="222" rx="102" ry="30"></ellipse>
-              <rect id="pose-torso-shell" class="robot-shell" x="292" y="222" width="136" height="212" rx="54"></rect>
-              <rect id="pose-torso-core" class="robot-core" x="328" y="266" width="64" height="132" rx="32"></rect>
-              <ellipse id="pose-pelvis" class="robot-shell" cx="360" cy="446" rx="86" ry="38"></ellipse>
-
-              <g id="pose-leg-left" transform="translate(328 452)">
-                <ellipse class="joint-glow" cx="0" cy="0" rx="24" ry="24"></ellipse>
-                <circle class="robot-joint" cx="0" cy="0" r="14"></circle>
-                <rect class="robot-shell" x="-17" y="0" width="34" height="156" rx="17"></rect>
-                <g id="pose-shin-left" transform="translate(0 138)">
-                  <ellipse class="joint-glow" cx="0" cy="0" rx="22" ry="22"></ellipse>
-                  <circle class="robot-joint" cx="0" cy="0" r="13"></circle>
-                  <rect class="robot-shell" x="-15" y="0" width="30" height="130" rx="15"></rect>
-                  <ellipse class="robot-core" cx="0" cy="138" rx="34" ry="12"></ellipse>
-                </g>
-              </g>
-
-              <g id="pose-leg-right" transform="translate(392 452)">
-                <ellipse class="joint-glow" cx="0" cy="0" rx="24" ry="24"></ellipse>
-                <circle class="robot-joint" cx="0" cy="0" r="14"></circle>
-                <rect class="robot-shell" x="-17" y="0" width="34" height="156" rx="17"></rect>
-                <g id="pose-shin-right" transform="translate(0 138)">
-                  <ellipse class="joint-glow" cx="0" cy="0" rx="22" ry="22"></ellipse>
-                  <circle class="robot-joint" cx="0" cy="0" r="13"></circle>
-                  <rect class="robot-shell" x="-15" y="0" width="30" height="130" rx="15"></rect>
-                  <ellipse class="robot-core" cx="0" cy="138" rx="34" ry="12"></ellipse>
-                </g>
-              </g>
-            </g>
-          </svg>
-          <div class="reference-card">
-        <div class="reference-copy">姿势参考</div>
-        <img src="assets/exercise-media/stretch-full-body-proper.png" alt="全身拉伸放松 静态姿势参考" crossorigin="anonymous" />
+      <div id="properCard" class="clip pose-card pose-card-proper" data-start="0.3" data-duration="9.7" data-track-index="4">
+        <div class="pose-art proper-art"><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="全身拉伸放松 正确示范">
+  <defs>
+    <linearGradient id="stretch-full-body-proper-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="stretch-full-body-proper-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(34, 197, 94, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="stretch-full-body-proper-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(34, 197, 94, 0.18); stroke: #22c55e; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#stretch-full-body-proper-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#stretch-full-body-proper-glow-gradient)" />
+  <text class="title" x="72" y="118">全身拉伸放松</text>
+  <text class="subtitle" x="72" y="162">髋部 · 胸椎 · 肩颈 · 小腿</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">正确示范</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#stretch-full-body-proper-soft-shadow)">
+    <g class="figure-equipment">
+      
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="612" cy="286" rx="146" ry="96" opacity="0.62" /><ellipse class="highlight" cx="646" cy="496" rx="112" ry="168" opacity="0.58" /><ellipse class="highlight" cx="612" cy="812" rx="116" ry="148" opacity="0.34" />
+    </g>
+    <g class="figure-guides">
+      <path class="guide-line good-line" d="M 748 310 C 794 268, 822 212, 816 148" opacity="0.74" /><path class="guide-line good-line" d="M 688 460 C 712 504, 720 558, 700 616" opacity="0.72" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 542 324 L 670 316 L 658 518 L 564 528 Z" />
+    <line class="body-line" x1="608" y1="280" x2="610" y2="524" />
+    <line class="body-line" x1="542" y1="324" x2="520" y2="196" /><line class="body-line" x1="520" y1="196" x2="492" y2="100" /><line class="body-line" x1="670" y1="316" x2="726" y2="184" /><line class="body-line" x1="726" y1="184" x2="792" y2="96" /><line class="body-line" x1="564" y1="528" x2="558" y2="746" /><line class="body-line" x1="558" y1="746" x2="544" y2="958" /><line class="body-line" x1="658" y1="518" x2="644" y2="742" /><line class="body-line" x1="644" y1="742" x2="664" y2="956" />
+    <circle class="body-core" cx="608" cy="200" r="64" />
+    
+      <circle class="joint" cx="542" cy="324" r="19" />
+      <circle class="joint-outline" cx="542" cy="324" r="19" />
+      <circle class="joint" cx="670" cy="316" r="19" />
+      <circle class="joint-outline" cx="670" cy="316" r="19" />
+      <circle class="joint" cx="520" cy="196" r="19" />
+      <circle class="joint-outline" cx="520" cy="196" r="19" />
+      <circle class="joint" cx="726" cy="184" r="19" />
+      <circle class="joint-outline" cx="726" cy="184" r="19" />
+      <circle class="joint" cx="492" cy="100" r="19" />
+      <circle class="joint-outline" cx="492" cy="100" r="19" />
+      <circle class="joint" cx="792" cy="96" r="19" />
+      <circle class="joint-outline" cx="792" cy="96" r="19" />
+      <circle class="joint" cx="564" cy="528" r="19" />
+      <circle class="joint-outline" cx="564" cy="528" r="19" />
+      <circle class="joint" cx="658" cy="518" r="19" />
+      <circle class="joint-outline" cx="658" cy="518" r="19" />
+      <circle class="joint" cx="558" cy="746" r="19" />
+      <circle class="joint-outline" cx="558" cy="746" r="19" />
+      <circle class="joint" cx="644" cy="742" r="19" />
+      <circle class="joint-outline" cx="644" cy="742" r="19" />
+      <circle class="joint" cx="544" cy="958" r="19" />
+      <circle class="joint-outline" cx="544" cy="958" r="19" />
+      <circle class="joint" cx="664" cy="956" r="19" />
+      <circle class="joint-outline" cx="664" cy="956" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">上举延展后做轻柔侧屈，拉伸感觉停在可控范围内。</text>
+  <text class="accent-copy" x="72" y="1136">呼气时慢一点，不要弹震式猛拉。</text>
+</svg></div>
+        <div class="marker green-marker">&#10003;</div>
+        <div class="card-label label-good">正确示范</div>
       </div>
-        </div>
+
+      <div id="mistakeCard" class="clip pose-card pose-card-mistake" data-start="0.5" data-duration="9.5" data-track-index="5">
+        <div class="pose-art mistake-art"><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="全身拉伸放松 常见错误">
+  <defs>
+    <linearGradient id="stretch-full-body-mistake-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="stretch-full-body-mistake-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(239, 68, 68, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="stretch-full-body-mistake-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(239, 68, 68, 0.18); stroke: #ef4444; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#stretch-full-body-mistake-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#stretch-full-body-mistake-glow-gradient)" />
+  <text class="title" x="72" y="118">全身拉伸放松</text>
+  <text class="subtitle" x="72" y="162">髋部 · 胸椎 · 肩颈 · 小腿</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">常见错误</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#stretch-full-body-mistake-soft-shadow)">
+    <g class="figure-equipment">
+      
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="624" cy="454" rx="146" ry="184" opacity="0.78" /><ellipse class="highlight" cx="646" cy="312" rx="126" ry="92" opacity="0.56" />
+    </g>
+    <g class="figure-guides">
+      <path class="guide-line bad-line" d="M 560 334 C 620 390, 664 458, 700 628" opacity="0.84" /><path class="guide-line bad-line" d="M 650 352 C 694 324, 724 300, 742 248" opacity="0.72" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 556 378 L 676 370 L 654 562 L 590 570 Z" />
+    <line class="body-line" x1="612" y1="334" x2="622" y2="568" />
+    <line class="body-line" x1="556" y1="378" x2="558" y2="286" /><line class="body-line" x1="558" y1="286" x2="542" y2="208" /><line class="body-line" x1="676" y1="370" x2="720" y2="276" /><line class="body-line" x1="720" y1="276" x2="744" y2="224" /><line class="body-line" x1="590" y1="570" x2="592" y2="776" /><line class="body-line" x1="592" y1="776" x2="572" y2="960" /><line class="body-line" x1="654" y1="562" x2="652" y2="766" /><line class="body-line" x1="652" y1="766" x2="682" y2="958" />
+    <circle class="body-core" cx="598" cy="246" r="64" />
+    
+      <circle class="joint" cx="556" cy="378" r="19" />
+      <circle class="joint-outline" cx="556" cy="378" r="19" />
+      <circle class="joint" cx="676" cy="370" r="19" />
+      <circle class="joint-outline" cx="676" cy="370" r="19" />
+      <circle class="joint" cx="558" cy="286" r="19" />
+      <circle class="joint-outline" cx="558" cy="286" r="19" />
+      <circle class="joint" cx="720" cy="276" r="19" />
+      <circle class="joint-outline" cx="720" cy="276" r="19" />
+      <circle class="joint" cx="542" cy="208" r="19" />
+      <circle class="joint-outline" cx="542" cy="208" r="19" />
+      <circle class="joint" cx="744" cy="224" r="19" />
+      <circle class="joint-outline" cx="744" cy="224" r="19" />
+      <circle class="joint" cx="590" cy="570" r="19" />
+      <circle class="joint-outline" cx="590" cy="570" r="19" />
+      <circle class="joint" cx="654" cy="562" r="19" />
+      <circle class="joint-outline" cx="654" cy="562" r="19" />
+      <circle class="joint" cx="592" cy="776" r="19" />
+      <circle class="joint-outline" cx="592" cy="776" r="19" />
+      <circle class="joint" cx="652" cy="766" r="19" />
+      <circle class="joint-outline" cx="652" cy="766" r="19" />
+      <circle class="joint" cx="572" cy="960" r="19" />
+      <circle class="joint-outline" cx="572" cy="960" r="19" />
+      <circle class="joint" cx="682" cy="958" r="19" />
+      <circle class="joint-outline" cx="682" cy="958" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">错误：塌腰耸肩，为了幅度把动作做成硬掰。</text>
+  <text class="accent-copy" x="72" y="1136">拉伸不是比赛，刺痛一出现就应该退回来。</text>
+</svg></div>
+        <div class="marker red-marker">&#10005;</div>
+        <div class="card-label label-bad">常见错误</div>
       </div>
 
-      <div id="panelTop" class="clip panel panel-top" data-start="0.4" data-duration="9.6" data-track-index="5">
+      <div id="panelTop" class="clip panel panel-top" data-start="0.35" data-duration="9.65" data-track-index="6">
+        <div class="panel-tag panel-tag-good">正确示范</div>
         <h2>动作要领</h2>
-        <ol><li>按小腿、大腿前侧、臀部、胸部和肩颈的顺序依次放松。</li><li>每个位置停留 20 到 30 秒，以轻微拉伸感为准。</li><li>保持自然呼吸，慢慢让肌肉放松下来。</li></ol>
+        <ol><li>先上举延展</li><li>再做轻柔侧屈</li><li>每个位置停留并自然呼吸</li></ol>
       </div>
-      <div id="panelMid" class="clip panel panel-mid" data-start="1.8" data-duration="8.2" data-track-index="6">
-        <h2>发力提醒</h2>
-        <ul><li>呼气时放松一点点，不要突然弹震。</li><li>动作越慢越好，别急着切换下一个部位。</li><li>只要有刺痛，就立刻缩小幅度或停下。</li></ul>
+
+      <div id="panelMid" class="clip panel panel-mid" data-start="2.5" data-duration="7.5" data-track-index="7">
+        <div class="panel-tag panel-tag-good">发力与节奏</div>
+        <h2>关键提示</h2>
+        <ul><li>动作越慢越好</li><li>呼气时再放松一点</li><li>有刺痛立刻缩小幅度</li></ul>
       </div>
-      <div id="panelBottom" class="clip panel panel-bottom" data-start="4.2" data-duration="5.8" data-track-index="7">
-        <div class="panel-tag">新手最容易错的地方</div>
-        <ul><li>拉到疼痛</li><li>弹震式拉伸</li><li>憋气</li></ul>
-        <div class="footer-note">急性拉伤或关节肿胀时，不要强行拉伸。</div>
+
+      <div id="panelBottom" class="clip panel panel-bottom" data-start="5.2" data-duration="4.8" data-track-index="8">
+        <div class="panel-tag panel-tag-bad">常见错误</div>
+        <h2>先避开这些问题</h2>
+        <ul><li>拉到疼痛</li><li>弹震式拉伸</li><li>塌腰耸肩</li></ul>
+        <div class="footer-note">关节明显肿胀或急性拉伤时先休息评估。</div>
       </div>
 
       <script>
         window.__timelines = window.__timelines || {};
         const tl = gsap.timeline({ paused: true });
-        tl.from("#eyebrow", { y: 20, opacity: 0, duration: 0.45, ease: "power2.out" }, 0.12);
-        tl.from("#title", { y: 28, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.22);
-        tl.from("#legend", { y: 16, opacity: 0, duration: 0.42, ease: "power2.out" }, 0.36);
-        tl.from("#stageShell", { x: -34, opacity: 0, duration: 0.72, ease: "expo.out" }, 0.32);
-        tl.from("#panelTop", { x: 44, opacity: 0, duration: 0.62, ease: "power2.out" }, 0.48);
-        tl.from("#panelMid", { x: 40, opacity: 0, duration: 0.58, ease: "power2.out" }, 1.86);
-        tl.from("#panelBottom", { x: 40, opacity: 0, duration: 0.58, ease: "power2.out" }, 4.26);
 
-        
-        tl.to(["#motion-arc-left", "#motion-arc-right"], { opacity: 0.72, duration: 0.34, ease: "sine.out" }, 0.82);
-        tl.to(["#motion-arc-left", "#motion-arc-right"], { strokeDashoffset: -44, duration: 1.08, ease: "none" }, 0.84);
-        tl.to("#pose-arms", { y: -30, duration: 0.34, ease: "sine.out" }, 0.88);
-        tl.to("#pose-arm-left", { rotation: -94, duration: 1.02, ease: "power2.out" }, 0.88);
-        tl.to("#pose-arm-right", { rotation: 94, duration: 1.02, ease: "power2.out" }, 0.88);
-        tl.to("#pose-forearm-left", { rotation: -24, duration: 0.94, ease: "power2.out" }, 0.94);
-        tl.to("#pose-forearm-right", { rotation: 24, duration: 0.94, ease: "power2.out" }, 0.94);
-        tl.to("#pose-body", { y: -20, scaleY: 1.04, duration: 0.9, ease: "sine.out" }, 0.92);
-        tl.to("#pose-torso-shell", { scaleY: 1.06, duration: 0.9, ease: "sine.out" }, 0.92);
-        tl.to("#pose-head", { y: -8, duration: 0.9, ease: "sine.out" }, 0.92);
-        tl.to("#hotspot-primary", { opacity: 0.96, scale: 1.18, duration: 0.58, repeat: 2, yoyo: true, ease: "sine.inOut" }, 1.02);
-        tl.to("#highlight-shoulders", { opacity: 0.82, scale: 1.04, duration: 0.58, repeat: 2, yoyo: true, ease: "sine.inOut" }, 1.02);
-        tl.to("#hotspot-primary", { attr: { cx: 360, cy: 246, rx: 132, ry: 102 }, duration: 0.46, ease: "sine.out" }, 1.06);
-        tl.to("#hotspot-secondary", { opacity: 0.7, scale: 1.08, duration: 0.64, repeat: 1, yoyo: true, ease: "sine.inOut" }, 1.56);
-        tl.to("#highlight-core", { opacity: 0.62, scale: 1.02, duration: 0.64, repeat: 1, yoyo: true, ease: "sine.inOut" }, 1.56);
-        tl.to("#motion-sway", { opacity: 0.44, duration: 0.34, ease: "sine.out" }, 2.08);
-        tl.to("#motion-sway", { strokeDashoffset: -36, duration: 1.04, ease: "none" }, 2.1);
-        tl.to("#pose-body", { rotation: -13, x: -34, duration: 0.86, ease: "power1.inOut" }, 2.18);
-        tl.to("#pose-torso-shell", { rotation: -6, duration: 0.86, ease: "power1.inOut" }, 2.18);
-        tl.to("#pose-leg-left", { x: -12, duration: 0.86, ease: "power1.inOut" }, 2.18);
-        tl.to("#pose-leg-right", { x: -4, duration: 0.86, ease: "power1.inOut" }, 2.18);
-        tl.to("#hotspot-primary", { attr: { cx: 300, cy: 314, rx: 100, ry: 88 }, duration: 0.74, ease: "power1.inOut" }, 2.22);
-        tl.to("#highlight-shoulders", { attr: { cx: 312, cy: 248, rx: 126, ry: 52 }, duration: 0.74, ease: "power1.inOut" }, 2.22);
-        tl.to("#pose-body", { rotation: 0, x: 0, duration: 0.58, ease: "power1.inOut" }, 3.14);
-        tl.to("#pose-torso-shell", { rotation: 0, duration: 0.58, ease: "power1.inOut" }, 3.14);
-        tl.to("#pose-leg-left", { x: 0, duration: 0.58, ease: "power1.inOut" }, 3.14);
-        tl.to("#pose-leg-right", { x: 0, duration: 0.58, ease: "power1.inOut" }, 3.14);
-        tl.to("#hotspot-primary", { attr: { cx: 360, cy: 252, rx: 124, ry: 98 }, duration: 0.58, ease: "power1.inOut" }, 3.14);
-        tl.to("#highlight-shoulders", { attr: { cx: 360, cy: 228, rx: 140, ry: 54 }, duration: 0.58, ease: "power1.inOut" }, 3.14);
-        tl.to("#pose-body", { rotation: 13, x: 34, duration: 0.86, ease: "power1.inOut" }, 3.84);
-        tl.to("#pose-torso-shell", { rotation: 6, duration: 0.86, ease: "power1.inOut" }, 3.84);
-        tl.to("#pose-leg-left", { x: 4, duration: 0.86, ease: "power1.inOut" }, 3.84);
-        tl.to("#pose-leg-right", { x: 12, duration: 0.86, ease: "power1.inOut" }, 3.84);
-        tl.to("#hotspot-primary", { attr: { cx: 420, cy: 314, rx: 100, ry: 88 }, duration: 0.74, ease: "power1.inOut" }, 3.88);
-        tl.to("#highlight-shoulders", { attr: { cx: 408, cy: 248, rx: 126, ry: 52 }, duration: 0.74, ease: "power1.inOut" }, 3.88);
-        tl.to("#pose-body", { rotation: 0, x: 0, duration: 0.58, ease: "power1.inOut" }, 4.78);
-        tl.to("#pose-torso-shell", { rotation: 0, duration: 0.58, ease: "power1.inOut" }, 4.78);
-        tl.to("#pose-leg-left", { x: 0, duration: 0.58, ease: "power1.inOut" }, 4.78);
-        tl.to("#pose-leg-right", { x: 0, duration: 0.58, ease: "power1.inOut" }, 4.78);
-        tl.to("#hotspot-primary", { attr: { cx: 360, cy: 252, rx: 124, ry: 98 }, duration: 0.58, ease: "power1.inOut" }, 4.78);
-        tl.to("#highlight-shoulders", { attr: { cx: 360, cy: 228, rx: 140, ry: 54 }, duration: 0.58, ease: "power1.inOut" }, 4.78);
-        tl.to("#hotspot-secondary", { opacity: 0.82, scale: 1.1, duration: 0.56, repeat: 1, yoyo: true, ease: "sine.inOut" }, 5.32);
-        tl.to("#highlight-core", { opacity: 0.72, scale: 1.04, duration: 0.56, repeat: 1, yoyo: true, ease: "sine.inOut" }, 5.32);
-        tl.to("#pose-torso-shell", { scaleY: 1.08, y: -14, duration: 0.58, ease: "sine.inOut" }, 5.36);
-        tl.to("#pose-body", { y: -26, duration: 0.58, ease: "sine.inOut" }, 5.36);
-        tl.to("#hotspot-secondary", { attr: { cx: 360, cy: 382, rx: 90, ry: 112 }, duration: 0.56, ease: "sine.inOut" }, 5.4);
-        tl.to("#pose-torso-shell", { scaleY: 1.02, y: -6, duration: 0.64, ease: "sine.inOut" }, 6.04);
-        tl.to("#pose-body", { y: -10, duration: 0.64, ease: "sine.inOut" }, 6.04);
-        tl.to("#hotspot-tertiary", { opacity: 0.68, scale: 1.08, duration: 0.62, repeat: 1, yoyo: true, ease: "sine.inOut" }, 6.72);
-        tl.to("#highlight-lower", { opacity: 0.56, scale: 1.03, duration: 0.62, repeat: 1, yoyo: true, ease: "sine.inOut" }, 6.72);
-        tl.to("#hotspot-tertiary", { attr: { cx: 360, cy: 560, rx: 118, ry: 138 }, duration: 0.62, ease: "sine.inOut" }, 6.76);
-        tl.to(["#motion-arc-left", "#motion-arc-right", "#motion-sway"], { opacity: 0.14, duration: 0.5, ease: "power1.out" }, 7.18);
-        tl.to("#pose-arms", { y: 0, duration: 0.72, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-arm-left", { rotation: 0, duration: 0.8, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-arm-right", { rotation: 0, duration: 0.8, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-forearm-left", { rotation: 0, duration: 0.72, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-forearm-right", { rotation: 0, duration: 0.72, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-body", { rotation: 0, x: 0, y: 0, scaleY: 1, duration: 0.82, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-torso-shell", { rotation: 0, y: 0, scaleY: 1, duration: 0.82, ease: "power2.inOut" }, 7.72);
-        tl.to("#pose-head", { y: 0, duration: 0.72, ease: "power2.inOut" }, 7.72);
-        tl.to(["#highlight-shoulders", "#highlight-core", "#highlight-lower"], { opacity: 0.18, scale: 1, duration: 0.72, ease: "power2.out" }, 7.82);
-      
+        tl.from("#eyebrow", { y: 18, opacity: 0, duration: 0.35, ease: "power2.out" }, 0.08);
+        tl.from("#title", { y: 26, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.18);
+        tl.from("#dividerCopy", { y: 10, opacity: 0, duration: 0.3, ease: "power2.out" }, 0.28);
+        tl.from(".pose-card-proper", { x: -30, opacity: 0, duration: 0.62, ease: "expo.out" }, 0.34);
+        tl.from(".pose-card-mistake", { x: -24, opacity: 0, duration: 0.62, ease: "expo.out" }, 0.56);
+        tl.from("#panelTop", { x: 44, opacity: 0, duration: 0.56, ease: "power2.out" }, 0.46);
+        tl.from("#panelMid", { x: 40, opacity: 0, duration: 0.52, ease: "power2.out" }, 2.58);
+        tl.from("#panelBottom", { x: 40, opacity: 0, duration: 0.52, ease: "power2.out" }, 5.24);
 
-        tl.to("#root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 9.45);
+        tl.to(".pose-card-proper", { scale: 1.03, duration: 1.1, ease: "power1.inOut" }, 1.1);
+        tl.to(".pose-card-proper", { scale: 1, duration: 1.1, ease: "power1.inOut" }, 2.4);
+        tl.to(".green-marker", { scale: 1.12, duration: 0.34, repeat: 1, yoyo: true, ease: "sine.inOut" }, 1.34);
+
+        tl.to(".pose-card-mistake", { scale: 1.03, duration: 1.1, ease: "power1.inOut" }, 4.9);
+        tl.to(".pose-card-mistake", { scale: 1, duration: 1.1, ease: "power1.inOut" }, 6.2);
+        tl.to(".red-marker", { scale: 1.12, duration: 0.34, repeat: 1, yoyo: true, ease: "sine.inOut" }, 5.14);
+
+        addPoseMotion(tl, ".proper-art", 0.94, {
+          fromY: 24,
+          toY: -18,
+          fromRotate: -2,
+          toRotate: 2,
+        });
+        addPoseMotion(tl, ".mistake-art", 4.78, {
+          fromY: 18,
+          toY: -28,
+          fromRotate: 2,
+          toRotate: -5,
+        });
+
+        tl.to("#root", { opacity: 0, duration: 0.45, ease: "power2.in" }, 9.45);
+
         window.__timelines["main"] = tl;
+
+        function addPoseMotion(timeline, scope, startAt, motion) {
+          timeline.fromTo(`${scope} .figure-guides .guide-line, ${scope} .figure-guides .guide-dash`, {
+            strokeDasharray: 420,
+            strokeDashoffset: 420,
+            opacity: 0.12,
+          }, {
+            strokeDashoffset: 0,
+            opacity: 0.88,
+            duration: 1,
+            stagger: 0.08,
+            ease: "power1.inOut",
+          }, startAt);
+          timeline.fromTo(`${scope} .figure-highlights .highlight`, {
+            opacity: 0.22,
+            scale: 0.92,
+            transformOrigin: "center center",
+          }, {
+            opacity: 0.92,
+            scale: 1.05,
+            duration: 0.7,
+            stagger: 0.08,
+            repeat: 1,
+            yoyo: true,
+            ease: "sine.inOut",
+          }, startAt + 0.16);
+          timeline.fromTo(`${scope} .stage-figure`, {
+            y: motion.fromY,
+            rotate: motion.fromRotate,
+            transformOrigin: "50% 62%",
+          }, {
+            y: motion.toY,
+            rotate: motion.toRotate,
+            duration: 1.5,
+            repeat: 1,
+            yoyo: true,
+            ease: "sine.inOut",
+          }, startAt + 0.12);
+        }
       </script>
     </div>
   </body>

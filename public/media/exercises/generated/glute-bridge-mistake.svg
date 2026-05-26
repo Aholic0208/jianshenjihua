@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="臀桥 常见错误">
+  <defs>
+    <linearGradient id="glute-bridge-mistake-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="glute-bridge-mistake-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(239, 68, 68, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="glute-bridge-mistake-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(239, 68, 68, 0.18); stroke: #ef4444; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #ef4444; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#glute-bridge-mistake-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#glute-bridge-mistake-glow-gradient)" />
+  <text class="title" x="72" y="118">臀桥</text>
+  <text class="subtitle" x="72" y="162">臀大肌 · 腿后侧 · 核心</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">常见错误</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#glute-bridge-mistake-soft-shadow)">
+    <g class="figure-equipment">
+      <path class="machine" d="M 244 962 L 956 962" />
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="554" cy="600" rx="102" ry="82" opacity="0.8" /><ellipse class="highlight" cx="640" cy="540" rx="82" ry="66" opacity="0.44" />
+    </g>
+    <g class="figure-guides">
+      <path class="guide-line bad-line" d="M 420 664 C 548 592, 612 536, 726 526" opacity="0.8" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 420 640 L 436 700 L 626 620 L 588 548 Z" />
+    <line class="body-line" x1="384" y1="664" x2="608" y2="584" />
+    <line class="body-line" x1="420" y1="640" x2="350" y2="730" /><line class="body-line" x1="350" y1="730" x2="292" y2="812" /><line class="body-line" x1="436" y1="700" x2="404" y2="776" /><line class="body-line" x1="404" y1="776" x2="344" y2="844" /><line class="body-line" x1="588" y1="548" x2="804" y2="694" /><line class="body-line" x1="804" y1="694" x2="896" y2="894" /><line class="body-line" x1="626" y1="620" x2="780" y2="746" /><line class="body-line" x1="780" y1="746" x2="838" y2="918" />
+    <circle class="body-core" cx="320" cy="684" r="64" />
+    
+      <circle class="joint" cx="420" cy="640" r="19" />
+      <circle class="joint-outline" cx="420" cy="640" r="19" />
+      <circle class="joint" cx="436" cy="700" r="19" />
+      <circle class="joint-outline" cx="436" cy="700" r="19" />
+      <circle class="joint" cx="350" cy="730" r="19" />
+      <circle class="joint-outline" cx="350" cy="730" r="19" />
+      <circle class="joint" cx="404" cy="776" r="19" />
+      <circle class="joint-outline" cx="404" cy="776" r="19" />
+      <circle class="joint" cx="292" cy="812" r="19" />
+      <circle class="joint-outline" cx="292" cy="812" r="19" />
+      <circle class="joint" cx="344" cy="844" r="19" />
+      <circle class="joint-outline" cx="344" cy="844" r="19" />
+      <circle class="joint" cx="588" cy="548" r="19" />
+      <circle class="joint-outline" cx="588" cy="548" r="19" />
+      <circle class="joint" cx="626" cy="620" r="19" />
+      <circle class="joint-outline" cx="626" cy="620" r="19" />
+      <circle class="joint" cx="804" cy="694" r="19" />
+      <circle class="joint-outline" cx="804" cy="694" r="19" />
+      <circle class="joint" cx="780" cy="746" r="19" />
+      <circle class="joint-outline" cx="780" cy="746" r="19" />
+      <circle class="joint" cx="896" cy="894" r="19" />
+      <circle class="joint-outline" cx="896" cy="894" r="19" />
+      <circle class="joint" cx="838" cy="918" r="19" />
+      <circle class="joint-outline" cx="838" cy="918" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">错误：腰椎过度后仰，臀部没有真正发力。</text>
+  <text class="accent-copy" x="72" y="1136">别为了抬更高去把动作做成顶腰。</text>
+</svg>

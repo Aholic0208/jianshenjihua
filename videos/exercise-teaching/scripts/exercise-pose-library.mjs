@@ -2,6 +2,10 @@ const CANVAS = { width: 1200, height: 1200 };
 
 export function buildExerciseTeachingIllustration({ exerciseId, exercise, variant }) {
   const pose = getPoseDefinition(exerciseId, variant);
+  const idPrefix = `${exerciseId}-${variant}`;
+  const backgroundGradientId = `${idPrefix}-bg-gradient`;
+  const glowGradientId = `${idPrefix}-glow-gradient`;
+  const softShadowId = `${idPrefix}-soft-shadow`;
   const theme = variant === "proper"
     ? {
         label: "正确示范",
@@ -19,15 +23,15 @@ export function buildExerciseTeachingIllustration({ exerciseId, exercise, varian
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS.width}" height="${CANVAS.height}" viewBox="0 0 ${CANVAS.width} ${CANVAS.height}" role="img" aria-label="${escapeHtml(exercise.name)} ${theme.label}">
   <defs>
-    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="${backgroundGradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#10141b" />
       <stop offset="100%" stop-color="#1b2330" />
     </linearGradient>
-    <radialGradient id="glow-gradient" cx="50%" cy="42%" r="62%">
+    <radialGradient id="${glowGradientId}" cx="50%" cy="42%" r="62%">
       <stop offset="0%" stop-color="${theme.accentSoft}" />
       <stop offset="100%" stop-color="rgba(255,255,255,0)" />
     </radialGradient>
-    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <filter id="${softShadowId}" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
     </filter>
   </defs>
@@ -51,9 +55,9 @@ export function buildExerciseTeachingIllustration({ exerciseId, exercise, varian
     .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
     .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: ${theme.accent}; }
   </style>
-  <rect width="${CANVAS.width}" height="${CANVAS.height}" fill="url(#bg-gradient)" />
+  <rect width="${CANVAS.width}" height="${CANVAS.height}" fill="url(#${backgroundGradientId})" />
   <rect x="36" y="36" width="${CANVAS.width - 72}" height="${CANVAS.height - 72}" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
-  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#glow-gradient)" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#${glowGradientId})" />
   <text class="title" x="72" y="118">${escapeHtml(exercise.name)}</text>
   <text class="subtitle" x="72" y="162">${escapeHtml(exercise.muscles.join(" · "))}</text>
   <g transform="translate(72 204)">
@@ -61,11 +65,19 @@ export function buildExerciseTeachingIllustration({ exerciseId, exercise, varian
     <text class="pill-text" x="34" y="39">${theme.label}</text>
   </g>
   <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
-  <g filter="url(#soft-shadow)">
-    ${renderEquipment(pose.equipment)}
-    ${renderHighlights(pose.highlights)}
-    ${renderGuideLines(pose.guideLines, theme.markerClass)}
-    ${renderBody(pose.points)}
+  <g class="stage-figure" filter="url(#${softShadowId})">
+    <g class="figure-equipment">
+      ${renderEquipment(pose.equipment)}
+    </g>
+    <g class="figure-highlights">
+      ${renderHighlights(pose.highlights)}
+    </g>
+    <g class="figure-guides">
+      ${renderGuideLines(pose.guideLines, theme.markerClass)}
+    </g>
+    <g class="figure-body">
+      ${renderBody(pose.points)}
+    </g>
   </g>
   <text class="caption" x="72" y="1092">${escapeHtml(pose.caption)}</text>
   <text class="accent-copy" x="72" y="1136">${escapeHtml(pose.footer)}</text>
@@ -315,29 +327,29 @@ function standingMarchPose(variant) {
     footer: "抬膝不是甩腿，别用后仰去凑幅度。",
     equipment: { type: "none" },
     highlights: [
-      { cx: 600, cy: 426, rx: 116, ry: 154, opacity: 0.82 },
-      { cx: 712, cy: 604, rx: 80, ry: 118, opacity: 0.54 },
+      { cx: 602, cy: 440, rx: 128, ry: 166, opacity: 0.82 },
+      { cx: 744, cy: 570, rx: 92, ry: 128, opacity: 0.54 },
     ],
     guideLines: [
-      { type: "line", x1: 520, y1: 244, x2: 640, y2: 958, opacity: 0.72 },
-      { type: "curve", d: "M 698 606 C 768 564, 806 496, 796 412", opacity: 0.76 },
+      { type: "line", x1: 500, y1: 244, x2: 650, y2: 958, opacity: 0.76 },
+      { type: "curve", d: "M 726 580 C 806 536, 848 470, 836 388", opacity: 0.8 },
     ],
     points: {
-      head: pt(560, 218),
-      neck: pt(588, 298),
-      leftShoulder: pt(506, 348),
-      rightShoulder: pt(648, 332),
-      leftElbow: pt(470, 470),
-      rightElbow: pt(692, 446),
-      leftHand: pt(516, 588),
-      rightHand: pt(640, 578),
-      leftHip: pt(544, 532),
-      rightHip: pt(642, 516),
-      pelvis: pt(594, 524),
-      leftKnee: pt(564, 752),
-      rightKnee: pt(702, 604),
-      leftFoot: pt(554, 960),
-      rightFoot: pt(746, 836),
+      head: pt(548, 232),
+      neck: pt(586, 320),
+      leftShoulder: pt(498, 374),
+      rightShoulder: pt(648, 350),
+      leftElbow: pt(470, 498),
+      rightElbow: pt(706, 456),
+      leftHand: pt(526, 620),
+      rightHand: pt(662, 592),
+      leftHip: pt(550, 544),
+      rightHip: pt(646, 518),
+      pelvis: pt(600, 532),
+      leftKnee: pt(576, 760),
+      rightKnee: pt(736, 578),
+      leftFoot: pt(566, 962),
+      rightFoot: pt(792, 804),
     },
   };
 }
@@ -346,7 +358,11 @@ function squatPose(variant, withWeight) {
   const equipment = withWeight
     ? {
         type: "dumbbells",
-        hands: [{ cx: 600, cy: 402, angle: 90 }],
+        hands: [{
+          cx: variant === "proper" ? 600 : 632,
+          cy: variant === "proper" ? 402 : 446,
+          angle: variant === "proper" ? 90 : 74,
+        }],
       }
     : { type: "none" };
 
@@ -389,30 +405,30 @@ function squatPose(variant, withWeight) {
     footer: "先把膝盖轨迹和躯干稳定做对，再谈深度和重量。",
     equipment,
     highlights: [
-      { cx: 600, cy: 736, rx: 82, ry: 146, opacity: 0.78 },
-      { cx: 600, cy: 470, rx: 118, ry: 126, opacity: 0.52 },
+      { cx: 598, cy: 740, rx: 88, ry: 154, opacity: 0.82 },
+      { cx: 576, cy: 492, rx: 132, ry: 132, opacity: 0.56 },
     ],
     guideLines: [
-      { type: "line", x1: 600, y1: 364, x2: 600, y2: 958, opacity: 0.7 },
-      { type: "curve", d: "M 546 752 C 572 714, 586 696, 600 690", opacity: 0.78 },
-      { type: "curve", d: "M 654 752 C 628 714, 614 696, 600 690", opacity: 0.78 },
+      { type: "line", x1: 562, y1: 348, x2: 612, y2: 958, opacity: 0.76 },
+      { type: "curve", d: "M 566 762 C 592 722, 600 706, 606 696", opacity: 0.82 },
+      { type: "curve", d: "M 634 758 C 616 722, 610 706, 606 696", opacity: 0.82 },
     ],
     points: {
-      head: pt(574, 228),
-      neck: pt(592, 302),
-      leftShoulder: pt(510, 356),
-      rightShoulder: pt(642, 344),
-      leftElbow: withWeight ? pt(550, 442) : pt(476, 472),
-      rightElbow: withWeight ? pt(654, 436) : pt(688, 466),
-      leftHand: withWeight ? pt(560, 492) : pt(506, 586),
-      rightHand: withWeight ? pt(670, 490) : pt(654, 588),
-      leftHip: pt(548, 540),
-      rightHip: pt(642, 532),
-      pelvis: pt(596, 536),
-      leftKnee: pt(574, 748),
-      rightKnee: pt(626, 746),
-      leftFoot: pt(482, 962),
-      rightFoot: pt(712, 956),
+      head: pt(556, 248),
+      neck: pt(582, 330),
+      leftShoulder: pt(496, 392),
+      rightShoulder: pt(628, 372),
+      leftElbow: withWeight ? pt(520, 476) : pt(468, 504),
+      rightElbow: withWeight ? pt(670, 458) : pt(690, 486),
+      leftHand: withWeight ? pt(516, 540) : pt(512, 622),
+      rightHand: withWeight ? pt(710, 522) : pt(662, 624),
+      leftHip: pt(564, 560),
+      rightHip: pt(632, 548),
+      pelvis: pt(598, 554),
+      leftKnee: pt(590, 754),
+      rightKnee: pt(618, 750),
+      leftFoot: pt(486, 962),
+      rightFoot: pt(712, 952),
     },
   };
 }
@@ -524,28 +540,28 @@ function inclinePushUpPose(variant) {
     footer: "做不到时先把斜面调高，别让姿势散掉。",
     equipment,
     highlights: [
-      { cx: 646, cy: 642, rx: 126, ry: 84, opacity: 0.82 },
-      { cx: 774, cy: 476, rx: 86, ry: 68, opacity: 0.46 },
+      { cx: 662, cy: 666, rx: 134, ry: 94, opacity: 0.84 },
+      { cx: 796, cy: 510, rx: 94, ry: 78, opacity: 0.5 },
     ],
     guideLines: [
-      { type: "curve", d: "M 376 750 C 558 598, 710 618, 938 520", opacity: 0.76 },
+      { type: "curve", d: "M 380 766 C 560 628, 694 704, 938 526", opacity: 0.8 },
     ],
     points: {
-      head: pt(902, 454),
-      neck: pt(846, 474),
-      leftShoulder: pt(764, 484),
-      rightShoulder: pt(790, 546),
-      leftElbow: pt(824, 558),
-      rightElbow: pt(864, 612),
-      leftHand: pt(930, 502),
-      rightHand: pt(954, 562),
-      leftHip: pt(646, 620),
-      rightHip: pt(670, 690),
-      pelvis: pt(658, 656),
-      leftKnee: pt(504, 654),
-      rightKnee: pt(528, 716),
-      leftFoot: pt(370, 700),
-      rightFoot: pt(396, 760),
+      head: pt(900, 468),
+      neck: pt(842, 488),
+      leftShoulder: pt(754, 504),
+      rightShoulder: pt(784, 572),
+      leftElbow: pt(850, 586),
+      rightElbow: pt(908, 646),
+      leftHand: pt(936, 506),
+      rightHand: pt(974, 574),
+      leftHip: pt(660, 652),
+      rightHip: pt(688, 726),
+      pelvis: pt(674, 690),
+      leftKnee: pt(506, 664),
+      rightKnee: pt(534, 732),
+      leftFoot: pt(368, 706),
+      rightFoot: pt(402, 778),
     },
   };
 }
@@ -597,28 +613,28 @@ function rowPose(variant, mode) {
     footer: "先减轻重量或阻力，把肩胛控制找回来。",
     equipment,
     highlights: [
-      { cx: 574, cy: 486, rx: 132, ry: 112, opacity: 0.82 },
-      { cx: 722, cy: 632, rx: 82, ry: 88, opacity: 0.5 },
+      { cx: 590, cy: 500, rx: 148, ry: 118, opacity: 0.84 },
+      { cx: 742, cy: 654, rx: 92, ry: 96, opacity: 0.52 },
     ],
     guideLines: [
-      { type: "curve", d: "M 462 410 C 620 354, 746 476, 896 574", opacity: 0.78 },
+      { type: "curve", d: "M 468 428 C 646 362, 776 504, 930 612", opacity: 0.82 },
     ],
     points: {
-      head: pt(452, 348),
-      neck: pt(506, 394),
-      leftShoulder: pt(560, 462),
-      rightShoulder: pt(586, 526),
-      leftElbow: pt(676, 526),
-      rightElbow: pt(738, 608),
-      leftHand: pt(752, 590),
-      rightHand: pt(798, 694),
-      leftHip: pt(658, 580),
-      rightHip: pt(686, 648),
-      pelvis: pt(672, 614),
-      leftKnee: pt(772, 736),
-      rightKnee: pt(820, 810),
-      leftFoot: pt(896, 928),
-      rightFoot: pt(948, 986),
+      head: pt(472, 362),
+      neck: pt(532, 416),
+      leftShoulder: pt(594, 494),
+      rightShoulder: pt(624, 566),
+      leftElbow: pt(716, 560),
+      rightElbow: pt(786, 656),
+      leftHand: pt(782, 634),
+      rightHand: pt(842, 748),
+      leftHip: pt(674, 600),
+      rightHip: pt(706, 676),
+      pelvis: pt(690, 638),
+      leftKnee: pt(782, 748),
+      rightKnee: pt(836, 832),
+      leftFoot: pt(906, 934),
+      rightFoot: pt(964, 992),
     },
   };
 }
@@ -660,27 +676,27 @@ function plankPose(variant) {
     footer: "不稳时改成跪姿或缩短保持时间。",
     equipment: { type: "platform", d: "M 248 962 L 952 962" },
     highlights: [
-      { cx: 614, cy: 706, rx: 164, ry: 82, opacity: 0.82 },
+      { cx: 626, cy: 726, rx: 176, ry: 92, opacity: 0.84 },
     ],
     guideLines: [
-      { type: "curve", d: "M 322 706 C 524 620, 676 768, 920 634", opacity: 0.76 },
+      { type: "curve", d: "M 324 716 C 538 624, 692 806, 922 646", opacity: 0.8 },
     ],
     points: {
-      head: pt(916, 606),
-      neck: pt(856, 614),
-      leftShoulder: pt(760, 620),
-      rightShoulder: pt(756, 680),
-      leftElbow: pt(700, 654),
-      rightElbow: pt(702, 714),
-      leftHand: pt(666, 720),
-      rightHand: pt(670, 778),
-      leftHip: pt(614, 702),
-      rightHip: pt(614, 762),
-      pelvis: pt(614, 732),
-      leftKnee: pt(468, 684),
-      rightKnee: pt(470, 746),
-      leftFoot: pt(324, 662),
-      rightFoot: pt(328, 724),
+      head: pt(918, 612),
+      neck: pt(856, 620),
+      leftShoulder: pt(758, 626),
+      rightShoulder: pt(754, 688),
+      leftElbow: pt(698, 662),
+      rightElbow: pt(700, 724),
+      leftHand: pt(662, 730),
+      rightHand: pt(666, 792),
+      leftHip: pt(632, 736),
+      rightHip: pt(632, 804),
+      pelvis: pt(632, 770),
+      leftKnee: pt(474, 694),
+      rightKnee: pt(476, 760),
+      leftFoot: pt(324, 664),
+      rightFoot: pt(330, 730),
     },
   };
 }
@@ -795,28 +811,28 @@ function latPulldownPose(variant) {
       bar: { x1: 462, y1: 326, x2: 722, y2: 326 },
     },
     highlights: [
-      { cx: 600, cy: 436, rx: 150, ry: 122, opacity: 0.8 },
-      { cx: 600, cy: 302, rx: 118, ry: 82, opacity: 0.5 },
+      { cx: 608, cy: 454, rx: 158, ry: 128, opacity: 0.82 },
+      { cx: 614, cy: 318, rx: 124, ry: 88, opacity: 0.56 },
     ],
     guideLines: [
-      { type: "curve", d: "M 548 250 C 548 360, 650 430, 708 512", opacity: 0.76 },
+      { type: "curve", d: "M 544 246 C 552 384, 676 462, 752 560", opacity: 0.8 },
     ],
     points: {
-      head: pt(574, 228),
-      neck: pt(590, 304),
-      leftShoulder: pt(522, 362),
-      rightShoulder: pt(642, 350),
-      leftElbow: pt(498, 438),
-      rightElbow: pt(678, 438),
-      leftHand: pt(484, 326),
-      rightHand: pt(700, 326),
-      leftHip: pt(560, 548),
-      rightHip: pt(642, 536),
-      pelvis: pt(600, 542),
-      leftKnee: pt(570, 748),
-      rightKnee: pt(636, 744),
-      leftFoot: pt(522, 966),
-      rightFoot: pt(678, 962),
+      head: pt(564, 236),
+      neck: pt(586, 320),
+      leftShoulder: pt(518, 382),
+      rightShoulder: pt(646, 362),
+      leftElbow: pt(492, 454),
+      rightElbow: pt(684, 454),
+      leftHand: pt(474, 326),
+      rightHand: pt(706, 326),
+      leftHip: pt(568, 566),
+      rightHip: pt(648, 544),
+      pelvis: pt(608, 556),
+      leftKnee: pt(578, 750),
+      rightKnee: pt(640, 746),
+      leftFoot: pt(528, 966),
+      rightFoot: pt(680, 962),
     },
   };
 }
@@ -867,28 +883,28 @@ function chestPressPose(variant) {
         handleRight: { x1: 730, y1: 574, x2: 818, y2: 612 },
       },
     highlights: [
-      { cx: 642, cy: 404, rx: 156, ry: 112, opacity: 0.82 },
-      { cx: 748, cy: 498, rx: 96, ry: 80, opacity: 0.52 },
+      { cx: 650, cy: 412, rx: 164, ry: 118, opacity: 0.84 },
+      { cx: 758, cy: 516, rx: 102, ry: 86, opacity: 0.56 },
     ],
     guideLines: [
-      { type: "curve", d: "M 628 332 C 686 334, 722 360, 774 430", opacity: 0.8 },
+      { type: "curve", d: "M 622 336 C 694 338, 744 378, 804 470", opacity: 0.84 },
     ],
     points: {
-      head: pt(574, 244),
-      neck: pt(592, 320),
-      leftShoulder: pt(566, 388),
-      rightShoulder: pt(632, 424),
-      leftElbow: pt(682, 428),
-      rightElbow: pt(694, 540),
-      leftHand: pt(752, 416),
-      rightHand: pt(754, 574),
-      leftHip: pt(556, 566),
-      rightHip: pt(624, 600),
-      pelvis: pt(590, 582),
-      leftKnee: pt(522, 758),
-      rightKnee: pt(642, 764),
+      head: pt(582, 250),
+      neck: pt(604, 330),
+      leftShoulder: pt(586, 412),
+      rightShoulder: pt(656, 450),
+      leftElbow: pt(704, 450),
+      rightElbow: pt(716, 568),
+      leftHand: pt(744, 402),
+      rightHand: pt(748, 594),
+      leftHip: pt(562, 572),
+      rightHip: pt(632, 608),
+      pelvis: pt(598, 590),
+      leftKnee: pt(524, 760),
+      rightKnee: pt(644, 768),
       leftFoot: pt(474, 970),
-      rightFoot: pt(674, 974),
+      rightFoot: pt(676, 976),
     },
   };
 }
@@ -939,28 +955,28 @@ function seatedCableRowPose(variant) {
       handle: { x1: 736, y1: 600, x2: 780, y2: 600 },
     },
     highlights: [
-      { cx: 608, cy: 470, rx: 148, ry: 116, opacity: 0.82 },
-      { cx: 744, cy: 600, rx: 76, ry: 72, opacity: 0.48 },
+      { cx: 614, cy: 492, rx: 156, ry: 124, opacity: 0.84 },
+      { cx: 752, cy: 614, rx: 82, ry: 76, opacity: 0.52 },
     ],
     guideLines: [
-      { type: "curve", d: "M 514 306 C 604 362, 648 452, 768 608", opacity: 0.78 },
+      { type: "curve", d: "M 508 320 C 618 390, 674 494, 792 650", opacity: 0.82 },
     ],
     points: {
-      head: pt(502, 290),
-      neck: pt(530, 364),
-      leftShoulder: pt(566, 438),
-      rightShoulder: pt(628, 478),
-      leftElbow: pt(678, 496),
-      rightElbow: pt(728, 566),
-      leftHand: pt(736, 592),
-      rightHand: pt(778, 612),
-      leftHip: pt(592, 598),
-      rightHip: pt(656, 634),
-      pelvis: pt(624, 616),
-      leftKnee: pt(708, 760),
-      rightKnee: pt(760, 814),
-      leftFoot: pt(812, 930),
-      rightFoot: pt(876, 982),
+      head: pt(492, 304),
+      neck: pt(526, 386),
+      leftShoulder: pt(572, 468),
+      rightShoulder: pt(638, 512),
+      leftElbow: pt(694, 526),
+      rightElbow: pt(748, 606),
+      leftHand: pt(746, 618),
+      rightHand: pt(792, 640),
+      leftHip: pt(604, 624),
+      rightHip: pt(672, 662),
+      pelvis: pt(638, 644),
+      leftKnee: pt(718, 770),
+      rightKnee: pt(774, 828),
+      leftFoot: pt(816, 932),
+      rightFoot: pt(882, 986),
     },
   };
 }
@@ -1070,28 +1086,29 @@ function stretchPose(variant) {
     footer: "拉伸不是比赛，刺痛一出现就应该退回来。",
     equipment: { type: "none" },
     highlights: [
-      { cx: 610, cy: 420, rx: 138, ry: 178, opacity: 0.74 },
-      { cx: 644, cy: 274, rx: 120, ry: 84, opacity: 0.5 },
+      { cx: 624, cy: 454, rx: 146, ry: 184, opacity: 0.78 },
+      { cx: 646, cy: 312, rx: 126, ry: 92, opacity: 0.56 },
     ],
     guideLines: [
-      { type: "curve", d: "M 530 286 C 608 324, 654 390, 706 594", opacity: 0.82 },
+      { type: "curve", d: "M 560 334 C 620 390, 664 458, 700 628", opacity: 0.84 },
+      { type: "curve", d: "M 650 352 C 694 324, 724 300, 742 248", opacity: 0.72 },
     ],
     points: {
-      head: pt(586, 216),
-      neck: pt(600, 294),
-      leftShoulder: pt(534, 342),
-      rightShoulder: pt(650, 334),
-      leftElbow: pt(510, 216),
-      rightElbow: pt(702, 206),
-      leftHand: pt(478, 116),
-      rightHand: pt(768, 122),
-      leftHip: pt(570, 546),
-      rightHip: pt(652, 538),
-      pelvis: pt(610, 542),
-      leftKnee: pt(576, 754),
-      rightKnee: pt(648, 750),
-      leftFoot: pt(558, 960),
-      rightFoot: pt(672, 958),
+      head: pt(598, 246),
+      neck: pt(612, 334),
+      leftShoulder: pt(556, 378),
+      rightShoulder: pt(676, 370),
+      leftElbow: pt(558, 286),
+      rightElbow: pt(720, 276),
+      leftHand: pt(542, 208),
+      rightHand: pt(744, 224),
+      leftHip: pt(590, 570),
+      rightHip: pt(654, 562),
+      pelvis: pt(622, 568),
+      leftKnee: pt(592, 776),
+      rightKnee: pt(652, 766),
+      leftFoot: pt(572, 960),
+      rightFoot: pt(682, 958),
     },
   };
 }

@@ -120,7 +120,7 @@ describe("buildFaqEntries", () => {
 
   it("explains recomp logic and gym-versus-home differences", () => {
     const entries = buildFaqEntries({
-      goalText: "体型重组，想更紧实一些",
+      goalText: "体型重组，想更紧实一点",
       profile: {
         primaryGoal: "recomposition",
         environmentBias: "gym",
@@ -202,9 +202,98 @@ describe("buildFaqEntries", () => {
     expect(entryById(homeEntries, "environment-plan-difference")?.answer).toContain("节奏");
     expect(entryById(homeEntries, "environment-plan-difference")?.answer).toContain("循环安排");
     expect(entryById(gymEntries, "environment-plan-difference")?.answer).toContain("自由重量");
-    expect(entryById(gymEntries, "environment-plan-difference")?.answer).toContain("稳定加重");
+    expect(entryById(gymEntries, "environment-plan-difference")?.answer).toContain("稳定加重量");
     expect(entryById(mixedEntries, "environment-plan-difference")?.answer).toContain("健身房");
     expect(entryById(mixedEntries, "environment-plan-difference")?.answer).toContain("家里");
     expect(entryById(mixedEntries, "environment-plan-difference")?.answer).toContain("不是简单把同一套动作复制两遍");
+  });
+
+  it("adds beginner FAQs for gym users around equipment, activation, results, and indulgence meals", () => {
+    const entries = buildFaqEntries({
+      goalText: "增肌",
+      profile: {
+        primaryGoal: "lean_gain_strength",
+        environmentBias: "gym",
+        trainingPriority: "strength_hypertrophy",
+        cardioPriority: "low",
+        calorieStrategy: "small_surplus",
+      } satisfies PlanProfile,
+      program: {
+        splitStyle: "upper_lower",
+        weeklyStructure: ["upper", "lower", "rest", "upper", "lower"],
+        cardioMinutesPerWeek: 45,
+      } satisfies ProgramTemplate,
+      nutrition: baseNutrition,
+    });
+
+    expect(questionsOf(entries)).toEqual(
+      expect.arrayContaining([
+        "健身房器械太多，怕自己不会用怎么办？",
+        "练动作找不到发力感，是不是没练到？",
+        "按计划练多久能看到变化？",
+        "什么时候可以安排放松餐？",
+      ]),
+    );
+
+    expect(entryById(entries, "equipment-confidence")?.answer).toContain("2-4");
+    expect(entryById(entries, "equipment-confidence")?.answer).toContain("器械");
+    expect(entryById(entries, "mind-muscle-connection")?.answer).toContain("降重");
+    expect(entryById(entries, "mind-muscle-connection")?.answer).toContain("主要发力肌群");
+    expect(entryById(entries, "results-timeline")?.answer).toContain("4-6");
+    expect(entryById(entries, "results-timeline")?.answer).toContain("加重量");
+    expect(entryById(entries, "indulgence-meal-timing")?.answer).toContain("放松餐");
+    expect(entryById(entries, "indulgence-meal-timing")?.answer).toContain("训练");
+  });
+
+  it("tailors beginner FAQs differently for home and mixed recomposition users", () => {
+    const homeEntries = buildFaqEntries({
+      goalText: "家庭减脂",
+      profile: {
+        primaryGoal: "fat_loss_preserve_muscle",
+        environmentBias: "home",
+        trainingPriority: "adherence",
+        cardioPriority: "high",
+        calorieStrategy: "deficit",
+      } satisfies PlanProfile,
+      program: {
+        splitStyle: "full_body",
+        weeklyStructure: ["full_body", "walk", "full_body", "mobility"],
+        cardioMinutesPerWeek: 180,
+      } satisfies ProgramTemplate,
+      nutrition: {
+        ...baseNutrition,
+        proteinGrams: 105,
+      },
+    });
+    const mixedEntries = buildFaqEntries({
+      goalText: "重组",
+      profile: {
+        primaryGoal: "recomposition",
+        environmentBias: "mixed",
+        trainingPriority: "hypertrophy",
+        cardioPriority: "moderate",
+        calorieStrategy: "maintenance_or_small_deficit",
+      } satisfies PlanProfile,
+      program: {
+        splitStyle: "modified_split",
+        weeklyStructure: ["gym_upper", "home_lower", "cardio_home", "gym_upper"],
+        cardioMinutesPerWeek: 90,
+      } satisfies ProgramTemplate,
+      nutrition: baseNutrition,
+    });
+
+    expect(entryById(homeEntries, "equipment-confidence")?.answer).toContain("家庭");
+    expect(entryById(homeEntries, "equipment-confidence")?.answer).toContain("弹力带");
+    expect(entryById(homeEntries, "results-timeline")?.answer).toContain("体重");
+    expect(entryById(homeEntries, "results-timeline")?.answer).toContain("围度");
+    expect(entryById(homeEntries, "indulgence-meal-timing")?.answer).toContain("维持缺口");
+    expect(entryById(homeEntries, "indulgence-meal-timing")?.answer).toContain("一周");
+
+    expect(entryById(mixedEntries, "equipment-confidence")?.answer).toContain("健身房");
+    expect(entryById(mixedEntries, "equipment-confidence")?.answer).toContain("家里");
+    expect(entryById(mixedEntries, "results-timeline")?.answer).toContain("线条");
+    expect(entryById(mixedEntries, "results-timeline")?.answer).toContain("8-12");
+    expect(entryById(mixedEntries, "indulgence-meal-timing")?.answer).toContain("体重");
+    expect(entryById(mixedEntries, "indulgence-meal-timing")?.answer).toContain("社交");
   });
 });

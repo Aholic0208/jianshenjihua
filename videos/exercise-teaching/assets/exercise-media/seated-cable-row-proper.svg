@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="坐姿划船器 正确示范">
+  <defs>
+    <linearGradient id="seated-cable-row-proper-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10141b" />
+      <stop offset="100%" stop-color="#1b2330" />
+    </linearGradient>
+    <radialGradient id="seated-cable-row-proper-glow-gradient" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="rgba(34, 197, 94, 0.18)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    <filter id="seated-cable-row-proper-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="rgba(0,0,0,0.28)" />
+    </filter>
+  </defs>
+  <style>
+    .title { font: 700 56px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #f8fafc; }
+    .subtitle { font: 500 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #c8d4e0; }
+    .pill { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.12); stroke-width: 2; }
+    .pill-text { font: 700 28px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+    .ground { fill: rgba(255,255,255,0.06); }
+    .machine { fill: rgba(88, 102, 121, 0.92); stroke: rgba(196, 211, 224, 0.2); stroke-width: 4; }
+    .machine-detail { fill: rgba(153, 170, 189, 0.85); }
+    .body-core { fill: rgba(232, 239, 246, 0.96); stroke: rgba(209, 222, 235, 0.95); stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+    .body-line { stroke: rgba(232, 239, 246, 0.96); stroke-width: 44; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .joint { fill: rgba(248, 250, 252, 0.98); }
+    .joint-outline { fill: none; stroke: rgba(193, 210, 226, 0.7); stroke-width: 4; }
+    .highlight { fill: rgba(34, 197, 94, 0.18); stroke: #22c55e; stroke-width: 4; }
+    .good-line { stroke: #22c55e; }
+    .bad-line { stroke: #ef4444; }
+    .guide-line { fill: none; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .guide-dash { fill: none; stroke: rgba(248, 250, 252, 0.7); stroke-width: 6; stroke-dasharray: 16 14; }
+    .caption { font: 600 26px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #e7eef6; }
+    .accent-copy { font: 600 24px 'Segoe UI', 'Microsoft YaHei', sans-serif; fill: #22c55e; }
+  </style>
+  <rect width="1200" height="1200" fill="url(#seated-cable-row-proper-bg-gradient)" />
+  <rect x="36" y="36" width="1128" height="1128" rx="40" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  <ellipse cx="600" cy="650" rx="320" ry="340" fill="url(#seated-cable-row-proper-glow-gradient)" />
+  <text class="title" x="72" y="118">坐姿划船器</text>
+  <text class="subtitle" x="72" y="162">背阔肌 · 菱形肌 · 后束三角肌</text>
+  <g transform="translate(72 204)">
+    <rect class="pill" width="188" height="60" rx="30" />
+    <text class="pill-text" x="34" y="39">正确示范</text>
+  </g>
+  <ellipse class="ground" cx="600" cy="1034" rx="230" ry="34" />
+  <g class="stage-figure" filter="url(#seated-cable-row-proper-soft-shadow)">
+    <g class="figure-equipment">
+      
+      <rect class="machine" x="350" y="810" width="360" height="42" rx="21" />
+      <rect class="machine" x="690" y="766" width="132" height="62" rx="22" />
+      <line class="machine" x1="760" y1="556" x2="890" y2="532" style="stroke-width: 10; stroke-linecap: round;" />
+      <line class="machine" x1="726" y1="560" x2="768" y2="560" style="stroke-width: 18; stroke-linecap: round;" />
+    
+    </g>
+    <g class="figure-highlights">
+      <ellipse class="highlight" cx="604" cy="456" rx="140" ry="112" opacity="0.72" /><ellipse class="highlight" cx="720" cy="558" rx="70" ry="66" opacity="0.46" />
+    </g>
+    <g class="figure-guides">
+      <line class="guide-line good-line" x1="534" y1="390" x2="724" y2="540" opacity="0.72" />
+    </g>
+    <g class="figure-body">
+      
+    <path class="body-core" d="M 564 412 L 622 448 L 642 612 L 580 578 Z" />
+    <line class="body-line" x1="544" y1="344" x2="610" y2="594" />
+    <line class="body-line" x1="564" y1="412" x2="662" y2="468" /><line class="body-line" x1="662" y1="468" x2="724" y2="552" /><line class="body-line" x1="622" y1="448" x2="706" y2="528" /><line class="body-line" x1="706" y1="528" x2="760" y2="570" /><line class="body-line" x1="580" y1="578" x2="694" y2="754" /><line class="body-line" x1="694" y1="754" x2="806" y2="930" /><line class="body-line" x1="642" y1="612" x2="746" y2="806" /><line class="body-line" x1="746" y1="806" x2="872" y2="978" />
+    <circle class="body-core" cx="522" cy="272" r="64" />
+    
+      <circle class="joint" cx="564" cy="412" r="19" />
+      <circle class="joint-outline" cx="564" cy="412" r="19" />
+      <circle class="joint" cx="622" cy="448" r="19" />
+      <circle class="joint-outline" cx="622" cy="448" r="19" />
+      <circle class="joint" cx="662" cy="468" r="19" />
+      <circle class="joint-outline" cx="662" cy="468" r="19" />
+      <circle class="joint" cx="706" cy="528" r="19" />
+      <circle class="joint-outline" cx="706" cy="528" r="19" />
+      <circle class="joint" cx="724" cy="552" r="19" />
+      <circle class="joint-outline" cx="724" cy="552" r="19" />
+      <circle class="joint" cx="760" cy="570" r="19" />
+      <circle class="joint-outline" cx="760" cy="570" r="19" />
+      <circle class="joint" cx="580" cy="578" r="19" />
+      <circle class="joint-outline" cx="580" cy="578" r="19" />
+      <circle class="joint" cx="642" cy="612" r="19" />
+      <circle class="joint-outline" cx="642" cy="612" r="19" />
+      <circle class="joint" cx="694" cy="754" r="19" />
+      <circle class="joint-outline" cx="694" cy="754" r="19" />
+      <circle class="joint" cx="746" cy="806" r="19" />
+      <circle class="joint-outline" cx="746" cy="806" r="19" />
+      <circle class="joint" cx="806" cy="930" r="19" />
+      <circle class="joint-outline" cx="806" cy="930" r="19" />
+      <circle class="joint" cx="872" cy="978" r="19" />
+      <circle class="joint-outline" cx="872" cy="978" r="19" />
+  
+    </g>
+  </g>
+  <text class="caption" x="72" y="1092">胸口打开，先收肩胛，再把把手拉向下肋附近。</text>
+  <text class="accent-copy" x="72" y="1136">回放时保持张力，不要前后乱晃借力。</text>
+</svg>
